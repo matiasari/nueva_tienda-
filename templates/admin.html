@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Bazar Guille</title>
+  <link rel="stylesheet" href="/static/estilos.css">
+</head>
+
+<body class="admin-body">
+
+<header class="admin-header">
+  <h1>🛠 Panel Administrador</h1>
+  <a href="/logout" class="btn-logout">Cerrar sesión</a>
+</header>
+
+<section class="admin-form">
+  <h2>➕ Agregar producto</h2>
+
+  <form action="/agregar" method="post" enctype="multipart/form-data">
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="codigo" placeholder="Código" required>
+    <input type="number" name="precio" placeholder="Precio" required>
+    <input type="number" name="stock" placeholder="Stock" required>
+    <select name="categoria" required>
+  <option value="">Seleccionar categoría</option>
+    {% for c in categorias %}
+    <option value="{{ c }}">{{ c }}</option>
+  {% endfor %}
+</select>
+
+    <input type="file" name="imagen">
+    <button type="submit">Agregar</button>
+  </form>
+</section>
+
+<section class="admin-productos">
+  <h2>📦 Productos</h2>
+
+  {% for p in productos %}
+  <div class="admin-card">
+
+    {% if p.imagen %}
+      <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+    {% endif %}
+
+    <div class="info">
+      <strong>{{ p.nombre }}</strong>
+      <p>Código: {{ p.codigo }}</p>
+      <p>$ {{ p.precio }}</p>
+      <p>Stock: {{ p.stock }}</p>
+    </div>
+
+    <div class="acciones">
+      <a href="/stock_mas/{{ p.id }}">➕</a>
+      <a href="/stock_menos/{{ p.id }}">➖</a>
+      <a href="/eliminar/{{ p.id }}" class="eliminar">🗑</a>
+    </div>
+
+  </div>
+  {% endfor %}
+</section>
+
+</body>
+</html>

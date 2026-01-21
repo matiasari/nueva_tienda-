@@ -1,0 +1,53 @@
+[
+    {
+        "id": 2,
+        "nombre": "Bandeja de cama madera",
+        "precio": 15000,
+        "stock": 3,
+        "imagen": "WhatsApp_Image_2025-11-12_at_16.51.23.jpeg",
+        "categoria": "Decoración",
+        "codigo": "42731440"
+    },
+    {
+        "id": 3,
+        "nombre": "Bandeja de cama negra",
+        "precio": 15000,
+        "stock": 2,
+        "categoria": "Decoración",
+        "imagen": "mesa_negra.jpeg",
+        "codigo": "42731447"
+    },
+    {
+        "id": 4,
+        "nombre": "bandeja de cama madera clarita",
+        "precio": 15000,
+        "stock": 3,
+        "categoria": "Decoración",
+        "imagen": "bandeja_de_cama.png",
+        "codigo": "123456"
+    },
+    {
+        "id": 5,
+        "nombre": "450ML TAZA CON BATIDOR A PILA",
+        "precio": 15000,
+        "stock": 1,
+        "categoria": "Cocina",
+        "imagen": "4614707.png"
+    },
+    {
+        "id": 6,
+        "nombre": "300ML DISPENSER JABON VIDRIO FUME",
+        "precio": 4000,
+        "stock": 5,
+        "categoria": "Baño",
+        "imagen": "4290588.png"
+    },
+    {
+        "id": 7,
+        "nombre": "400 ml TAZA ROSA VIEJO",
+        "precio": 5000,
+        "stock": 1,
+        "categoria": "Decoración",
+        "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg"
+    }
+]

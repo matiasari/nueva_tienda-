@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Bazar_Guille</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='logo.ico') }}" class="logo">
+    <span class="nombre">BAZAR_GUILLE</span>
+  </div>
+
+  <div class="header-right">
+   <a href="/carrito" class="carrito-btn">
+  🛒 Carrito
+  {% if carrito_total > 0 %}
+    <span class="contador">{{ carrito_total }}</span>
+  {% endif %}
+</a>
+  </div>
+</header>
+
+<div class="categorias">
+  <a href="/">Todos</a>
+  <a href="/?categoria=Cocina">Cocina</a>
+  <a href="/?categoria=Baño">Baño</a>
+  <a href="/?categoria=Decoración">Decoración</a>
+  <a href="/?categoria=Limpieza">Limpieza</a>
+</div>
+
+<form method="get" action="/" class="buscador">
+  <input type="text" name="q" placeholder="Buscar producto...">
+  <button type="submit">Buscar</button>
+</form>
+
+<div class="productos">
+
+{% for p in productos %}
+  <div class="card">
+
+    {% if p.imagen %}
+      <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+    {% endif %}
+
+    <h3>{{ p.nombre }}</h3>
+    <p>$ {{ p.precio }}</p>
+
+    {% if p.stock > 0 %}
+      <p class="stock">Stock: {{ p.stock }}</p>
+      <a href="/agregar_carrito/{{ p.id }}" class="btn-carrito">
+        🛒 Agregar al carrito
+      </a>
+    {% else %}
+      <p class="sin-stock">Sin stock</p>
+    {% endif %}
+
+  </div>
+{% endfor %}
+
+</div>
+
+</body>
+</html>

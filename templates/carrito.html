@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="UTF-8">
+    <title>Carrito</title>
+    <link rel="stylesheet" href="/static/estilos.css">
+</head>
+<body>
+
+<h1>🛒 Tu carrito</h1>
+
+{% if carrito %}
+  <div class="carrito-lista">
+
+    {% for item in carrito %}
+      <div class="item-carrito">
+
+        {% if item.imagen %}
+          <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}">
+        {% endif %}
+
+        <div class="info">
+          <h3>{{ item.nombre }}</h3>
+          <p>$ {{ item.precio }} x {{ item.cantidad }}</p>
+          <p><strong>Subtotal:</strong> $ {{ item.precio * item.cantidad }}</p>
+          <p><strong>{{ item.nombre }}</strong></p>
+          <p>Código: {{ item.codigo }}</p>
+
+          <a href="/carrito/eliminar/{{ item.id }}" class="btn-quitar">❌ Quitar</a>
+        </div>
+
+      </div>
+      
+    {% endfor %}
+
+  </div>
+
+  <h2>Total: $ {{ total }}</h2>
+
+  <div class="acciones-carrito">
+  <a href="/" class="btn-seguir">
+    ← Seguir comprando
+  </a>
+
+  <a href="/carrito/vaciar" class="btn-vaciar">
+    Vaciar carrito
+  </a>
+  
+</div>
+
+
+{% else %}
+    <a href="/" class="btn-seguir">
+    ← Seguir comprando
+{% endif %}
+
+<a 
+href="https://wa.me/5491149899616?text=
+Hola,%20quiero%20comprar:%0A
+{% for item in carrito %}
+🛒%20{{ item.nombre }}%20({{ item.codigo }})%0A
+Cantidad:%20{{ item.cantidad }}%0A
+Precio:%20${{ item.precio }}%0A%0A
+{% endfor %}
+Total:%20${{ total }}"
+target="_blank"
+class="btn-whatsapp"
+>
+Comprar por WhatsApp
+</a>
+
+</body>
+</html>
