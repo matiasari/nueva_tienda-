@@ -37,26 +37,34 @@
   <h2>📦 Productos</h2>
 
   {% for p in productos %}
-  <div class="admin-card">
+  <form action="/editar/{{ p.id }}" method="post" enctype="multipart/form-data" class="admin-card">
 
-    {% if p.imagen %}
-      <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-    {% endif %}
+  {% if p.imagen %}
+    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+  {% endif %}
 
-    <div class="info">
-      <strong>{{ p.nombre }}</strong>
-      <p>Código: {{ p.codigo }}</p>
-      <p>$ {{ p.precio }}</p>
-      <p>Stock: {{ p.stock }}</p>
-    </div>
+  <input type="text" name="nombre" value="{{ p.nombre }}" required>
+  <input type="text" name="codigo" value="{{ p.codigo }}" required>
+  <input type="number" name="precio" value="{{ p.precio }}" required>
+  <input type="number" name="stock" value="{{ p.stock }}" required>
 
-    <div class="acciones">
-      <a href="/stock_mas/{{ p.id }}">➕</a>
-      <a href="/stock_menos/{{ p.id }}">➖</a>
-      <a href="/eliminar/{{ p.id }}" class="eliminar">🗑</a>
-    </div>
+  <select name="categoria" required>
+    {% for c in categorias %}
+      <option value="{{ c }}" {% if c == p.categoria %}selected{% endif %}>
+        {{ c }}
+      </option>
+    {% endfor %}
+  </select>
 
+  <input type="file" name="imagen">
+
+  <div class="acciones">
+    <button type="submit">💾 Guardar</button>
+    <a href="/eliminar/{{ p.id }}" class="eliminar">🗑</a>
   </div>
+
+</form>
+ 
   {% endfor %}
 </section>
 

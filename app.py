@@ -1,16 +1,25 @@
 from flask import Flask, render_template, request, redirect, session
+from datetime import timedelta
 from werkzeug.utils import secure_filename
+from functools import wraps
 import json
 import os
+
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
-
-app.secret_key = "42731440"
-ADMIN_USER = "admin"
-ADMIN_PASS = "1234"
+def login_requerido(f):
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        if not session.get("admin"):
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorador
+app.secret_key = "1124023140aA@"
+ADMIN_USER = "mariasotelo"
+ADMIN_PASS = "241289maria@"
 
 ARCHIVO = os.path.join(BASE_DIR, "productos.json")
 UPLOADS = os.path.join(BASE_DIR, "static", "uploads")
@@ -64,9 +73,8 @@ def tienda():
 
 
 @app.route("/admin")
+@login_requerido
 def admin():
-    if not session.get("admin"):
-        return redirect("/login")
 
     productos = cargar_productos()
     categorias = ["Cocina", "Baño", "Decoración", "Limpieza"]
@@ -78,6 +86,7 @@ def admin():
     )
 
 @app.route("/agregar", methods=["POST"])
+@login_requerido
 def agregar():
     productos = cargar_productos()
 
@@ -102,6 +111,7 @@ def agregar():
     return redirect("/admin")
 
 @app.route("/editar/<int:id>", methods=["POST"])
+@login_requerido
 def editar(id):
     productos = cargar_productos()
 
@@ -123,6 +133,7 @@ def editar(id):
     return redirect("/admin")
 
 @app.route("/eliminar/<int:id>")
+@login_requerido
 def eliminar(id):
     productos = cargar_productos()
     productos = [p for p in productos if p["id"] != id]
@@ -130,6 +141,7 @@ def eliminar(id):
     return redirect("/admin")
 
 @app.route("/stock_mas/<int:id>")
+@login_requerido
 def stock_mas(id):
     productos = cargar_productos()
 
@@ -142,6 +154,7 @@ def stock_mas(id):
 
 
 @app.route("/stock_menos/<int:id>")
+@login_requerido
 def stock_menos(id):
     productos = cargar_productos()
 
@@ -152,15 +165,29 @@ def stock_menos(id):
     guardar_productos(productos)
     return redirect("/admin")
 #### ENTRAR AL USUARIO Y SALIR ############
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    app.permanent_session_lifetime = timedelta(minutes=30)
+    if request.method == "GET":
+        session.clear()
     if request.method == "POST":
-            session["admin"] = True
-            return redirect("/admin")
-    else:
-            return render_template("login.html", error="Datos incorrectos")
+        user = request.form.get("usuario")
+        password = request.form.get("password")
 
+        if user == ADMIN_USER and password == ADMIN_PASS:
+            session.clear()
+            session["admin"] = True
+            session.permanent = True
+            return redirect("/admin")
         
+
+        return render_template("login.html", error="Usuario o contraseña incorrectos")
+
+    return render_template("login.html")
+
+
 
 @app.route("/logout")
 def logout():

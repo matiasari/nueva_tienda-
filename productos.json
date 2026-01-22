@@ -32,7 +32,8 @@
         "precio": 15000,
         "stock": 1,
         "categoria": "Cocina",
-        "imagen": "4614707.png"
+        "imagen": "4614707.png",
+        "codigo": "4614707"
     },
     {
         "id": 6,
@@ -40,7 +41,8 @@
         "precio": 4000,
         "stock": 5,
         "categoria": "Baño",
-        "imagen": "4290588.png"
+        "imagen": "4290588.png",
+        "codigo": "4290588"
     },
     {
         "id": 7,
@@ -48,6 +50,7 @@
         "precio": 5000,
         "stock": 1,
         "categoria": "Decoración",
-        "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg"
+        "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg",
+        "codigo": "4024273"
     }
 ]
