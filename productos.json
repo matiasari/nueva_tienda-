@@ -106,5 +106,32 @@
         "categoria": "Cocina",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.30.29.jpeg",
         "codigo": "4024123"
+    },
+    {
+        "id": 14,
+        "nombre": " 30X50CM BANDEJA DE CAMA MADERA",
+        "precio": 12000,
+        "stock": 3,
+        "codigo": 4948914,
+        "categoria": "Decoración",
+        "imagen": "bandeja_de_cama_madera.png"
+    },
+    {
+        "id": 15,
+        "nombre": "30X50CM BANDEJA DE CAMA NEGRA",
+        "precio": 12000,
+        "stock": 3,
+        "codigo": 4948914,
+        "categoria": "Decoración",
+        "imagen": "imagen_2026-01-22_150818082.png"
+    },
+    {
+        "id": 16,
+        "nombre": " 30X50CM BANDEJA DE CAMA CLARITA",
+        "precio": 12000,
+        "stock": 2,
+        "codigo": 4948914,
+        "categoria": "Decoración",
+        "imagen": "imagen_2026-01-22_150905177.png"
     }
 ]
