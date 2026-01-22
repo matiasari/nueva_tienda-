@@ -52,5 +52,59 @@
         "categoria": "Decoración",
         "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg",
         "codigo": "4024273"
+    },
+    {
+        "id": 8,
+        "nombre": "260ML SETX6 COMPOTERA VIDRIO RAYADO",
+        "precio": 15000,
+        "stock": 4,
+        "categoria": "Cocina",
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.31.04.jpeg",
+        "codigo": "4960615"
+    },
+    {
+        "id": 9,
+        "nombre": "6SET DE BAÑO PVC C/TAPA BAMBOO GRIS",
+        "precio": 45000,
+        "stock": 4,
+        "categoria": "Baño",
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.25.06.jpeg",
+        "codigo": "4958751"
+    },
+    {
+        "id": 10,
+        "nombre": "SET DE BAÑO PVC 6PCS NEGRO",
+        "precio": 30000,
+        "stock": 4,
+        "categoria": "Baño",
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.25.21.jpeg",
+        "codigo": "4919704"
+    },
+    {
+        "id": 11,
+        "nombre": " 9 LT CESTO DE BASURA",
+        "precio": 20000,
+        "stock": 3,
+        "categoria": "Baño",
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.27.14.jpeg",
+        "codigo": "4960997"
+    },
+    {
+        "id": 12,
+        "nombre": "52CM PORTARROLLO PAPEL HIGIENICO",
+        "precio": 18000,
+        "stock": 3,
+        "categoria": "Baño",
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.30.08.jpeg",
+        "codigo": "4331232"
+    },
+    {
+        "id": 13,
+        "nombre": "MORTERO MARMOL SURT",
+        "precio": 15000,
+        "stock": 2,
+        "categoria": "Cocina",
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.30.29.jpeg",
+        "codigo": "4024123"
     }
 ]

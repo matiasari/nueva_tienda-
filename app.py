@@ -102,6 +102,7 @@ def agregar():
     "nombre": request.form["nombre"],
     "precio": int(request.form["precio"]),
     "stock": int(request.form["stock"]),
+    "codigo": int(request.form["codigo"]),
     "categoria": request.form["categoria"],
     "imagen": nombre_imagen
 }
@@ -121,7 +122,7 @@ def editar(id):
             p["precio"] = int(request.form["precio"])
             p["stock"] = int(request.form["stock"])
             p["categoria"] = request.form["categoria"]
-            p["codigo"] = request.form["codigo"]
+            p["codigo"] =int (request.form["codigo"])
 
             imagen = request.files.get("imagen")
             if imagen and imagen.filename != "":
