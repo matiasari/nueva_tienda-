@@ -457,3 +457,156 @@ body.admin-body {
     gap: 15px;
     flex-wrap: wrap;
 }
+/* --- CONFIGURACIÓN GENERAL --- */
+body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    padding: 20px;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+/* --- CONTENEDOR DE PRODUCTOS --- */
+.carrito-lista {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.item-carrito {
+    background: white;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    gap: 20px;
+}
+
+.item-carrito img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.info {
+    flex: 1;
+}
+
+.info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    color: #1e293b;
+}
+
+.info p {
+    margin: 3px 0;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.btn-quitar {
+    display: inline-block;
+    margin-top: 8px;
+    color: #ef4444;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* --- TOTAL --- */
+h2 {
+    text-align: right;
+    max-width: 800px;
+    margin: 20px auto;
+    font-size: 1.6rem;
+    color: #1e293b;
+}
+
+/* --- BOTONES DE ACCIÓN --- */
+.acciones-carrito {
+    max-width: 800px;
+    margin: 30px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botón Volver / Seguir comprando */
+.btn-seguir {
+    background-color: #64748b;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-seguir:hover {
+    background-color: #334155;
+}
+
+/* Botón Vaciar carrito */
+.btn-vaciar {
+    background-color: #fee2e2;
+    color: #ef4444;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-vaciar:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Botón WhatsApp */
+.btn-whatsapp {
+    display: block;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #25d366;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+    transition: transform 0.2s, background 0.3s;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128c7e;
+    transform: translateY(-2px);
+}
+
+/* Ajuste para móviles */
+@media (max-width: 600px) {
+    .item-carrito {
+        flex-direction: column;
+        text-align: center;
+    }
+    .acciones-carrito {
+        flex-direction: column;
+    }
+    .btn-seguir, .btn-vaciar, .btn-whatsapp {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
