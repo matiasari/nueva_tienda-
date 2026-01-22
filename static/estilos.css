@@ -610,3 +610,42 @@ h2 {
         box-sizing: border-box;
     }
 }
+.modal-foto {
+    display: none; 
+    position: fixed;
+    z-index: 1000; /* Para que esté por encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Negro con transparencia */
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* La imagen agrandada */
+.modal-contenido {
+    max-width: 90%;
+    max-height: 80%;
+    border: 4px solid white;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    animation: zoomIn 0.3s ease; /* Efecto de apertura */
+}
+
+/* Animación para que la foto aparezca creciendo */
+@keyframes zoomIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* La X para cerrar */
+.cerrar-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+}

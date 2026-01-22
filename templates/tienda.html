@@ -48,7 +48,9 @@
 {% for p in productos %}
     <div class="card">
         {% if p.imagen %}
-            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+           <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+     onclick="ampliarImagen(this.src)" 
+     style="cursor: pointer;">
         {% endif %}
         <h3>{{ p.nombre }}</h3>
         <p>$ {{ p.precio }}</p>
@@ -79,6 +81,19 @@
         Todos los derechos reservados © Bazar_Guille
     </p>
 </footer>
+<div id="modalImagen" class="modal-foto" onclick="this.style.display='none'">
+    <span class="cerrar-modal">&times;</span>
+    <img id="imgExpandida" class="modal-contenido">
+</div>
 
+<script>
+function ampliarImagen(src) {
+    const modal = document.getElementById("modalImagen");
+    const imagenGrande = document.getElementById("imgExpandida");
+    
+    modal.style.display = "flex"; // Muestra el fondo oscuro
+    imagenGrande.src = src;       // Pone la foto que tocaste en el centro
+}
+</script>
 </body>
 </html>
