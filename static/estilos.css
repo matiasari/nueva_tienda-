@@ -392,3 +392,68 @@ body.admin-body {
         align-items: stretch;
     }
 }
+
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #25d366; /* El verde oficial de WhatsApp */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    gap: 10px;
+    transition: background 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128c7e;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+/* Botón Vaciar Carrito (Peligro/Borrar) */
+.btn-vaciar {
+    background-color: #ffffff;
+    color: #ef4444; /* Rojo */
+    border: 1px solid #ef4444;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-vaciar:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Botón Volver a Comprar / Seguir Comprando */
+.btn-volver {
+    background-color: #64748b; /* Gris azulado elegante */
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    display: inline-block;
+}
+
+.btn-volver:hover {
+    background-color: #334155;
+}
+
+/* Contenedor para alinear los botones del carrito */
+.carrito-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
