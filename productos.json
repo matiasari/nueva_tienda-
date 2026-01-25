@@ -116,7 +116,8 @@
         "stock": 2,
         "categoria": "Cocina",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.30.29.jpeg",
-        "codigo": "4024123"
+        "codigo": 4024123,
+        "peso": 0.5
     },
     {
         "id": 14,
