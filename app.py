@@ -241,7 +241,7 @@ def agregar_carrito(id):
 def carrito():
     carrito = session.get("carrito", [])
     total = sum(i["precio"] * i["cantidad"] for i in carrito)
-    peso_total = sum(i["peso"] * i["cantidad"] for i in carrito)
+    peso_total = sum(float(i.get("peso", 0)) * i.get("cantidad", 1) for i in carrito)
 
     envio = session.get("envio", 0)
 
