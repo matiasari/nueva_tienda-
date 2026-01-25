@@ -1,92 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Carrito</title>
-    <link rel="stylesheet" href="/static/estilos.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ range(1, 999) | random }}">
 </head>
 <body>
+<div class="carrito-header">
+    <h1>🛒 Mi Carrito</h1>
+    <div class="header-line"></div>
+</div>
 
-<h1>🛒 Tu carrito</h1>
+    {% if carrito %}
+    <div class="carrito-lista">
+        {% for item in carrito %}
+        <div class="item-carrito">
+            {% if item.imagen %}
+                <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}">
+            {% endif %}
+            <div class="info">
+                <h3>{{ item.nombre }}</h3>
+                <p>Precio: ${{ item.precio }}</p>
+                <div class="cantidad-control">
+                    <a href="/disminuir/{{ item.id }}" class="btn-qty">-</a>
+                    <span class="qty-numero">{{ item.cantidad }}</span>
+                    <a href="/aumentar/{{ item.id }}" class="btn-qty">+</a>
+                </div>
+                <a href="/carrito/eliminar/{{ item.id }}" class="btn-quitar">Eliminar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
-{% if carrito %}
-  <div class="carrito-lista">
-
-    {% for item in carrito %}
-      <div class="item-carrito">
-
-        {% if item.imagen %}
-          <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}">
+    <div class="envio-contenedor">
+        <h3>Calcular costo de envío</h3>
+        <form action="/calcular_envio" method="post" class="envio-form">
+            <input type="text" name="cp" placeholder="Tu Código Postal" required>
+            <button type="submit">Calcular</button>
+        </form>
+        {% if session.envio %}
+        <div class="resultado-envio">
+            <p>⚖️ Peso total: <strong>{{ "%.2f"|format(peso_total) }} kg</strong></p>
+            <p>📦 Envío estimado: <strong>$ {{ session.envio }}</strong></p>
+        </div>
         {% endif %}
-
-        <div class="info">
-    <h3>{{ item.nombre }}</h3>
-    <p>Precio: ${{ item.precio }}</p>
-    
-    <div class="cantidad-control">
-        <a href="/disminuir/{{ item.id }}" class="btn-qty">-</a>
-        <span class="qty-numero">{{ item.cantidad }}</span>
-        <a href="/aumentar/{{ item.id }}" class="btn-qty">+</a>
     </div>
 
-    <a href="/quitar/{{ item.id }}" class="btn-quitar">Eliminar</a>
-</div>
-      
-    {% endfor %}
-
- <div class="envio-contenedor">
-    <h3><i class="fa-solid fa-truck-fast"></i> Calcular costo de envío</h3>
-    
-    <form action="/calcular_envio" method="post" class="envio-form">
-        <input type="text" name="cp" placeholder="Tu Código Postal" required>
-        <button type="submit">Calcular</button>
-    </form>
-
-    {% if session.envio %}
-    <div class="resultado-envio">
-        <p>⚖️ Peso total: <strong>{{ "%.2f"|format(peso_total) }} kg</strong></p>
-        <p>📦 Envío estimado: <strong>$ {{ session.envio }}</strong></p>
-        <p style="margin-top:10px; border-top: 1px solid #ddd; padding-top: 5px;">
-            <span style="font-size: 1.2rem; font-weight: 800;">Total final: $ {{ total + session.envio }}</span>
-        </p>
+    <div class="totales-contenedor">
+        <h3>Subtotal productos: $ {{ total }}</h3>
+        {% if session.envio %}
+            <h2 style="color: #27ae60;">Total Final: $ {{ total + session.envio }}</h2>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
-  <div class="acciones-carrito">
-  <a href="/" class="btn-seguir">
-    ← Seguir comprando
-  </a>
 
-  <a href="/carrito/vaciar" class="btn-vaciar">
-    Vaciar carrito
-  </a>
-  
-</div>
+    <div class="acciones-carrito">
+        <a href="/" class="btn-seguir">← Seguir comprando</a>
+        <a href="/carrito/vaciar" class="btn-vaciar">Vaciar carrito</a>
+    </div>
 
+    <div class="finalizar-compra-contenedor">
+        <a href="{{ link_whatsapp }}" target="_blank" class="btn-whatsapp">
+            Confirmar pedido por WhatsApp
+        </a>
+    </div>
 
-{% else %}
+    {% else %}
     <div style="text-align: center; margin-top: 50px;">
         <p>Tu carrito está vacío ☹️</p>
         <a href="/" class="btn-seguir">← Volver a la tienda</a>
     </div>
-{% endif %}
-<div class="totales-contenedor">
-    <h3>Subtotal productos: $ {{ total }}</h3>
-    
-    {% if session.envio %}
-        <p>⚖️ Peso total del pedido: {{ "%.2f"|format(peso_total) }} kg</p>
-        <p>📦 Costo de envío: $ {{ session.envio }}</p>
-        <hr>
-        <h2 style="color: #27ae60;">Total Final: $ {{ total + session.envio }}</h2>
     {% endif %}
-</div>
 
-<div class="finalizar-compra-contenedor">
-    <a href="{{ link_whatsapp }}" target="_blank" class="btn-whatsapp">
-        <i class="fa-brands fa-whatsapp"></i> Confirmar pedido por WhatsApp
-    </a>
-</div>
 </body>
 </html>
