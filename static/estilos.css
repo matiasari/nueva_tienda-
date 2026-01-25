@@ -477,3 +477,44 @@ a { text-decoration: none; }
 .carrito-header {
     animation: fadeInTitle 0.6s ease-out;
 }
+
+
+opciones-entrega {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.entrega-toggle {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.entrega-toggle .opcion {
+    flex: 1;
+    cursor: pointer;
+}
+
+.entrega-toggle input {
+    display: none; /* Escondemos el radio button original */
+}
+
+.entrega-toggle span {
+    display: block;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.entrega-toggle input:checked + span {
+    border-color: var(--success);
+    background: #eafff2;
+    color: #128c7e;
+}

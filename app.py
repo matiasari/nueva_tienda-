@@ -227,23 +227,38 @@ def agregar_carrito(id):
 @app.route('/carrito')
 def carrito():
     carrito = session.get("carrito", [])
+    # Calculamos totales
     total = sum(float(i.get("precio", 0)) * int(i.get("cantidad", 1)) for i in carrito)
     peso_total = sum(float(i.get("peso", 0)) * int(i.get("cantidad", 1)) for i in carrito)
+    
     envio = session.get("envio", 0)
+    zona = session.get("zona_envio", "")
 
+    # --- GENERACIÓN DE MENSAJE DE WHATSAPP ---
     mensaje = "*Pedido Bazar Guille*\n\n"
     for i in carrito:
         mensaje += f"• {i['nombre']} x{i['cantidad']} - ${i['precio'] * i['cantidad']}\n"
     
     if envio > 0:
-        mensaje += f"\nSubtotal: ${total}\nEnvío: ${envio}\n*TOTAL: ${total + envio}*"
+        mensaje += f"\n--------------------------"
+        mensaje += f"\nSubtotal: ${total}"
+        mensaje += f"\nEnvío ({zona}): ${envio}"
+        mensaje += f"\n*TOTAL FINAL: ${total + envio}*"
     else:
-        mensaje += f"\n*TOTAL: ${total}*\n(Envío a convenir)"
+        mensaje += f"\n--------------------------"
+        mensaje += f"\n*TOTAL: ${total}*"
+        mensaje += f"\n*Entrega:* A convenir / Retiro en local"
 
+    # Codificamos el link
     link_whatsapp = f"https://wa.me/5491149899616?text={urllib.parse.quote(mensaje)}"
 
-    return render_template('carrito.html', carrito=carrito, total=total, peso_total=peso_total, link_whatsapp=link_whatsapp)
-
+    return render_template('carrito.html', 
+                           carrito=carrito, 
+                           total=total, 
+                           peso_total=peso_total, 
+                           link_whatsapp=link_whatsapp)
+    
+    
 @app.route('/aumentar/<int:producto_id>')
 def aumentar(producto_id):
     carrito = session.get("carrito", [])
@@ -304,6 +319,12 @@ def calcular_envio():
     session["envio"] = envio
     session["zona_envio"] = zona
     return redirect(url_for("carrito"))
+
+@app.route("/limpiar_envio")
+def limpiar_envio():
+    session.pop("envio", None)
+    session.pop("zona_envio", None)
+    return redirect(url_for('carrito'))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

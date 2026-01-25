@@ -33,19 +33,35 @@
         {% endfor %}
     </div>
 
-    <div class="envio-contenedor">
-        <h3>Calcular costo de envío</h3>
+div class="opciones-entrega">
+    <h3>🚚 Método de Entrega</h3>
+    
+    <div class="entrega-toggle">
+        <label class="opcion">
+            <input type="radio" name="metodo" value="acordar" checked onclick="toggleEnvio(false)">
+            <span>🤝 Acordar con vendedor</span>
+        </label>
+        <label class="opcion">
+            <input type="radio" name="metodo" value="envio" onclick="toggleEnvio(true)">
+            <span>📦 Calcular Envío</span>
+        </label>
+    </div>
+
+    <div id="calculador-envio" style="display: none; margin-top: 20px;">
         <form action="/calcular_envio" method="post" class="envio-form">
             <input type="text" name="cp" placeholder="Tu Código Postal" required>
             <button type="submit">Calcular</button>
         </form>
-        {% if session.envio %}
-        <div class="resultado-envio">
-            <p>⚖️ Peso total: <strong>{{ "%.2f"|format(peso_total) }} kg</strong></p>
-            <p>📦 Envío estimado: <strong>$ {{ session.envio }}</strong></p>
-        </div>
-        {% endif %}
     </div>
+
+    {% if session.envio and session.envio > 0 %}
+    <div class="resultado-envio">
+        <p>📍 Zona: <strong>{{ session.zona_envio }}</strong></p>
+        <p>📦 Costo: <strong>$ {{ session.envio }}</strong></p>
+        <script>document.getElementById('calculador-envio').style.display = 'block';</script>
+    </div>
+    {% endif %}
+</div>
 
     <div class="totales-contenedor">
         <h3>Subtotal productos: $ {{ total }}</h3>
@@ -72,5 +88,16 @@
     </div>
     {% endif %}
 
+<script>
+function toggleEnvio(mostrar) {
+    const div = document.getElementById('calculador-envio');
+    div.style.display = mostrar ? 'block' : 'none';
+    if (!mostrar) {
+        // Si elige acordar, podrías limpiar el envío en la sesión si quisieras
+        window.location.href = "/limpiar_envio"; 
+    }
+}
+</script>
+    
 </body>
 </html>
