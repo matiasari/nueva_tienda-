@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin - Bazar Guille</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/static/estilos.css">
 </head>
 
@@ -14,59 +15,81 @@
 </header>
 
 <section class="admin-form">
-  <h2>➕ Agregar producto</h2>
-
+  <h2>➕ Agregar nuevo producto</h2>
   <form action="/agregar" method="post" enctype="multipart/form-data">
     <input type="text" name="nombre" placeholder="Nombre" required>
     <input type="text" name="codigo" placeholder="Código" required>
     <input type="number" name="precio" placeholder="Precio" required>
     <input type="number" name="stock" placeholder="Stock" required>
+    <input type="number" name="peso" step="0.01" placeholder="Peso en kg" required>
     <select name="categoria" required>
-  <option value="">Seleccionar categoría</option>
-    {% for c in categorias %}
-    <option value="{{ c }}">{{ c }}</option>
-  {% endfor %}
-</select>
-
+      <option value="">Categoría</option>
+      {% for c in categorias %}
+        <option value="{{ c }}">{{ c }}</option>
+      {% endfor %}
+    </select>
     <input type="file" name="imagen">
     <button type="submit">Agregar</button>
   </form>
 </section>
 
 <section class="admin-productos">
-  <h2>📦 Productos</h2>
+  <h2>📦 Gestión de Productos</h2>
 
-  {% for p in productos %}
-  <form action="/editar/{{ p.id }}" method="post" enctype="multipart/form-data" class="admin-card">
-
-  {% if p.imagen %}
-    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-  {% endif %}
-
-  <input type="text" name="nombre" value="{{ p.nombre }}" required>
-  <input type="text" name="codigo" value="{{ p.codigo }}" required>
-  <input type="number" name="precio" value="{{ p.precio }}" required>
-  <input type="number" name="stock" value="{{ p.stock }}" required>
-
-  <select name="categoria" required>
-    {% for c in categorias %}
-      <option value="{{ c }}" {% if c == p.categoria %}selected{% endif %}>
-        {{ c }}
-      </option>
-    {% endfor %}
-  </select>
-
-  <input type="file" name="imagen">
-
-  <div class="acciones">
-    <button type="submit">💾 Guardar</button>
-    <a href="/eliminar/{{ p.id }}" class="eliminar">🗑</a>
+  <div class="admin-buscador-codigo">
+    <i class="fa-solid fa-barcode"></i>
+    <input type="text" id="filtroCodigo" onkeyup="buscarPorCodigo()" placeholder="Escanea o escribe un código para editar...">
   </div>
 
-</form>
- 
-  {% endfor %}
+  <div class="admin-productos-grid" id="contenedorProductos">
+    {% for p in productos %}
+    <form action="/editar/{{ p.id }}" method="post" enctype="multipart/form-data" class="admin-card" data-codigo="{{ p.codigo }}">
+      
+      {% if p.imagen %}
+        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
+      {% endif %}
+
+      <input type="text" name="nombre" value="{{ p.nombre }}" placeholder="Nombre" required>
+      <input type="text" name="codigo" value="{{ p.codigo }}" placeholder="Código" required>
+      <input type="number" name="precio" value="{{ p.precio }}" placeholder="Precio" required>
+      <input type="number" name="stock" value="{{ p.stock }}" placeholder="Stock" required>
+      <input type="number" name="peso" step="0.01" value="{{ p.peso }}" placeholder="Peso en kg" required>
+      
+      <select name="categoria" required>
+        {% for c in categorias %}
+          <option value="{{ c }}" {% if c == p.categoria %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="file" name="imagen">
+
+      <div class="acciones">
+        <button type="submit">💾 Guardar</button>
+        <a href="/eliminar/{{ p.id }}" class="eliminar" onclick="return confirm('¿Seguro quieres eliminar este producto?')">🗑</a>
+      </div>
+    </form>
+    {% endfor %}
+  </div>
 </section>
+
+<script>
+function buscarPorCodigo() {
+    let input = document.getElementById('filtroCodigo').value.toLowerCase();
+    let productos = document.getElementsByClassName('admin-card');
+
+    for (let i = 0; i < productos.length; i++) {
+        // Obtenemos el código del atributo data-codigo que pusimos arriba
+        let codigo = productos[i].getAttribute('data-codigo') || "";
+        codigo = codigo.toLowerCase();
+        
+        if (codigo.includes(input)) {
+            productos[i].style.display = "";
+        } else {
+            productos[i].style.display = "none";
+        }
+    }
+}
+</script>
 
 </body>
 </html>

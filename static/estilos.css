@@ -1,478 +1,206 @@
+/* --- 1. VARIABLES Y CONFIGURACIÓN GENERAL --- */
+:root {
+    --primary: #111111;
+    --success: #25D366;
+    --danger: #ef4444;
+    --bg-light: #ffffff;
+    --bg-gray: #f9f9f9;
+    --text-dark: #1a1a1a;
+    --text-muted: #64748b;
+    --border: #f0f0f0;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
 }
 
-a {
-  text-decoration: none;
-}
+a { text-decoration: none; }
 
+/* --- 2. HEADER (Logo centrado y Carrito) --- */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  background: #111;
-  color: white;
+    display: grid; 
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 20px 5%;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
 
 .logo {
-  width: 40px;
+    width: 100px;
+    height: auto;
 }
 
 .nombre {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.carrito-btn {
-  position: relative;
-  background: #25D366;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-}
-
-.contador {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  background: #e63946;
-  color: white;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 50%;
-}
-.categorias {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  padding: 10px;
-  background: #f7f7f7;
-  flex-wrap: wrap;
-}
-
-.categorias a {
-  padding: 6px 12px;
-  background: white;
-  border-radius: 15px;
-  color: #333;
-  border: 1px solid #ddd;
-  font-size: 14px;
-}
-
-.categorias a:hover {
-  background: #25D366;
-  color: white;
-  border-color: #25D366;
-}
-.productos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-  padding: 15px;
-}
-
-.card {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
-  transition: transform 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.stock {
-  color: #2ecc71;
-  font-weight: bold;
-}
-
-.sin-stock {
-  color: #e74c3c;
-  font-weight: bold;
-}
-.productos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-  padding: 15px;
-}
-
-.card {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
-  transition: transform 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.stock {
-  color: #2ecc71;
-  font-weight: bold;
-}
-
-.sin-stock {
-  color: #e74c3c;
-  font-weight: bold;
-}
-.footer {
-  background: #111;
-  color: #aaa;
-  text-align: center;
-  padding: 15px;
-  font-size: 14px;
-  margin-top: 40px;
-}
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .productos {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .productos {
-    grid-template-columns: 1fr;
-  }
-}
-.footer {
-    margin-top: 40px;
-    padding: 25px 10px;
-    text-align: center;
-    background: #f5f5f5;
-}
-
-.instagram-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #E1306C;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 16px;
-    margin-bottom: 15px;
-}
-
-.instagram-btn i {
-    font-size: 20px;
-}
-
-.footer p {
-    font-size: 14px;
-    color: #555;
-}
-
-
-
-:root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --bg-body: #f1f5f9;
-    --bg-card: #ffffff;
-    --text-dark: #1e293b;
-    --text-muted: #64748b;
-    --success: #22c55e;
-    --danger: #ef4444;
-    --border: #e2e8f0;
-    --radius: 10px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-body.admin-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-body);
-    color: var(--text-dark);
-    margin: 0;
-    padding: 20px;
-}
-
-/* --- HEADER --- */
-.admin-header {
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg-card);
-    padding: 15px 25px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.admin-header h1 {
-    font-size: 1.5rem;
-    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
     color: var(--primary);
 }
 
-.btn-logout {
-    text-decoration: none;
-    color: var(--danger);
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 8px 16px;
-    border: 1px solid var(--danger);
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.btn-logout:hover {
-    background: var(--danger);
-    color: white;
-}
-
-/* --- FORMULARIO DE AGREGAR --- */
-.admin-form {
-    max-width: 1200px;
-    margin: 0 auto 40px;
-    background: var(--bg-card);
-    padding: 25px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.admin-form h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
-    border-bottom: 2px solid var(--bg-body);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.admin-form form {
+.header-right {
+    grid-column: 3;
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Botón de Carrito Mejorado */
+.carrito-btn {
+    position: relative;
+    background: var(--primary); /* Negro minimalista */
+    color: white;
+    padding: 10px 16px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.carrito-btn:hover {
+    background: #333;
+    transform: scale(1.05);
+}
+
+.contador {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--success);
+    color: white;
+    font-size: 11px;
+    width: 20px;
+    height: 20px;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid white;
 }
 
-.admin-form input, 
-.admin-form select {
-    flex: 1;
-    min-width: 150px;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+/* --- 3. BUSCADOR Y CATEGORÍAS --- */
+.buscador {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 5%;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.admin-form button {
+.buscador input {
+    width: 300px;
+    padding: 12px 20px;
+    border: 2px solid var(--primary);
+    border-radius: 25px 0 0 25px;
+    outline: none;
+}
+
+.buscador button {
+    padding: 12px 25px;
     background: var(--primary);
     color: white;
     border: none;
-    padding: 10px 25px;
-    border-radius: 6px;
-    font-weight: 600;
+    border-radius: 0 25px 25px 0;
     cursor: pointer;
-}
-
-/* --- GRID DE PRODUCTOS --- */
-.admin-productos {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-}
-
-.admin-productos h2 {
-    grid-column: 1 / -1;
-    margin-bottom: 10px;
-}
-
-/* --- TARJETA DE PRODUCTO --- */
-.admin-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: transform 0.2s;
-}
-
-.admin-card:hover {
-    transform: translateY(-5px);
-}
-
-.admin-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: contain;
-    background: #f8fafc;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-.admin-card input, 
-.admin-card select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-size: 0.9rem;
-}
-
-/* --- BOTONES DE ACCIÓN --- */
-.acciones {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.acciones button {
-    flex: 3;
-    background: var(--success);
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.acciones .eliminar {
-    flex: 1;
-    background: #fee2e2;
-    color: var(--danger);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    font-size: 1.2rem;
-    transition: background 0.2s;
-}
-
-.acciones .eliminar:hover {
-    background: var(--danger);
-    color: white;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-    .admin-form form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-}
-
-.btn-whatsapp {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #25d366; /* El verde oficial de WhatsApp */
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    text-decoration: none;
     font-weight: bold;
-    gap: 10px;
-    transition: background 0.3s ease;
-    border: none;
-    cursor: pointer;
 }
 
-.btn-whatsapp:hover {
-    background-color: #128c7e;
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-}
-
-/* Botón Vaciar Carrito (Peligro/Borrar) */
-.btn-vaciar {
-    background-color: #ffffff;
-    color: #ef4444; /* Rojo */
-    border: 1px solid #ef4444;
-    padding: 10px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.btn-vaciar:hover {
-    background-color: #ef4444;
-    color: white;
-}
-
-/* Botón Volver a Comprar / Seguir Comprando */
-.btn-volver {
-    background-color: #64748b; /* Gris azulado elegante */
-    color: white;
-    padding: 10px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.3s ease;
-    display: inline-block;
-}
-
-.btn-volver:hover {
-    background-color: #334155;
-}
-
-/* Contenedor para alinear los botones del carrito */
-.carrito-acciones {
+.categorias {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 25px;
-    gap: 15px;
+    gap: 10px;
+    justify-content: center;
+    padding: 15px;
     flex-wrap: wrap;
 }
-/* --- CONFIGURACIÓN GENERAL --- */
-body {
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    padding: 20px;
-    margin: 0;
+
+.categorias a {
+    padding: 8px 18px;
+    background: var(--bg-gray);
+    border-radius: 20px;
+    color: var(--text-dark);
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: 0.3s;
 }
 
-h1 {
+.categorias a:hover {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+/* --- 4. GRID DE PRODUCTOS (Tienda) --- */
+.productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 20px 5%;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
     text-align: center;
-    color: #2c3e50;
-    margin-bottom: 30px;
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* --- CONTENEDOR DE PRODUCTOS --- */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.btn-carrito {
+    display: block;
+    background: var(--primary); /* Negro minimalista */
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+.btn-carrito:hover {
+    background: #333; /* Un gris muy oscuro al pasar el mouse */
+    transform: translateY(-2px); /* Pequeño salto hacia arriba */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+}
+
+.sin-stock {
+    display: block;
+    padding: 12px;
+    color: var(--danger);
+    font-weight: bold;
+    background: #fff5f5;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+/* --- 5. CARRITO DE COMPRAS --- */
 .carrito-lista {
     max-width: 800px;
     margin: 0 auto;
@@ -489,163 +217,422 @@ h1 {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     gap: 20px;
+    border: 1px solid var(--border);
 }
 
-.item-carrito img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
-    background: #f9f9f9;
-}
+.item-carrito img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
 
-.info {
-    flex: 1;
-}
-
-.info h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
-    color: #1e293b;
-}
-
-.info p {
-    margin: 3px 0;
-    color: #64748b;
-    font-size: 0.95rem;
-}
-
-.btn-quitar {
-    display: inline-block;
-    margin-top: 8px;
-    color: #ef4444;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-/* --- TOTAL --- */
-h2 {
-    text-align: right;
-    max-width: 800px;
-    margin: 20px auto;
-    font-size: 1.6rem;
-    color: #1e293b;
-}
-
-/* --- BOTONES DE ACCIÓN --- */
 .acciones-carrito {
     max-width: 800px;
     margin: 30px auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
-/* Botón Volver / Seguir comprando */
+/* --- 6. PANEL ADMIN --- */
+.admin-body { background-color: #f1f5f9; padding: 20px; }
+.admin-header, .admin-form {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+/* --- 7. MODAL FOTO --- */
+.modal-foto {
+    display: none; position: fixed; z-index: 1000;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); justify-content: center; align-items: center;
+}
+.modal-contenido { max-width: 90%; max-height: 80%; border-radius: 8px; animation: zoomIn 0.3s; }
+@keyframes zoomIn { from {transform: scale(0.8);} to {transform: scale(1);} }
+
+/* --- 8. FOOTER --- */
+.footer {
+    background: var(--bg-gray);
+    padding: 30px 10px;
+    text-align: center;
+    margin-top: 50px;
+    border-top: 1px solid var(--border);
+}
+
+/* --- 9. RESPONSIVE --- */
+@media (max-width: 768px) {
+    .header { display: flex; flex-direction: column; gap: 15px; }
+    .buscador { justify-content: center; width: 90%; }
+    .buscador input { width: 100%; }
+    .productos { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .productos { grid-template-columns: 1fr; }
+    .acciones-carrito { flex-direction: column; }
+}
+
+
+
+/* --- BOTONES DE ACCIÓN EN EL CARRITO --- */
+.acciones-carrito {
+    max-width: 800px;
+    margin: 30px auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 0 10px;
+}
+
+/* Botón Seguir Comprando (Estilo minimalista) */
 .btn-seguir {
-    background-color: #64748b;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.3s;
+    background-color: transparent;
+    color: var(--primary);
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: 2px solid var(--primary);
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .btn-seguir:hover {
-    background-color: #334155;
+    background-color: var(--primary);
+    color: white;
 }
 
-/* Botón Vaciar carrito */
+/* Botón Vaciar Carrito (Sutil para no distraer) */
 .btn-vaciar {
-    background-color: #fee2e2;
-    color: #ef4444;
-    padding: 12px 20px;
-    border-radius: 8px;
-    text-decoration: none;
+    background-color: transparent;
+    color: var(--danger);
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: 1px solid #ffcccc;
     font-weight: 600;
-    transition: all 0.3s;
+    font-size: 14px;
+    transition: all 0.3s ease;
 }
 
 .btn-vaciar:hover {
-    background-color: #ef4444;
-    color: white;
+    background-color: #fff5f5;
+    border-color: var(--danger);
 }
 
-/* Botón WhatsApp */
+/* Botón WhatsApp (Grande y llamativo al final) */
 .btn-whatsapp {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     max-width: 800px;
     margin: 20px auto;
-    background-color: #25d366;
+    background-color: var(--success); /* El verde que definimos en variables */
     color: white;
-    text-align: center;
-    padding: 15px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
-    transition: transform 0.2s, background 0.3s;
+    padding: 18px;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
 }
 
 .btn-whatsapp:hover {
-    background-color: #128c7e;
-    transform: translateY(-2px);
+    background-color: #1ebd5b;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
 }
 
-/* Ajuste para móviles */
-@media (max-width: 600px) {
-    .item-carrito {
-        flex-direction: column;
-        text-align: center;
-    }
-    .acciones-carrito {
-        flex-direction: column;
-    }
-    .btn-seguir, .btn-vaciar, .btn-whatsapp {
-        width: 100%;
-        box-sizing: border-box;
-    }
+/* Icono dentro del botón WhatsApp */
+.btn-whatsapp i {
+    font-size: 24px;
 }
-.modal-foto {
-    display: none; 
-    position: fixed;
-    z-index: 1000; /* Para que esté por encima de todo */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); /* Negro con transparencia */
-    justify-content: center;
+
+
+.envio-contenedor {
+    max-width: 800px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    gap: 15px;
+}
+
+.envio-contenedor h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.envio-form {
+    display: flex;
+    width: 100%;
+    max-width: 400px;
+}
+
+.envio-form input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid var(--primary);
+    border-radius: 10px 0 0 10px;
+    outline: none;
+    font-size: 14px;
+}
+
+.envio-form button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.envio-form button:hover {
+    background: #333;
+}
+
+/* --- CUADRO DE RESULTADO DEL ENVÍO --- */
+.resultado-envio {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+    padding: 15px;
+    background: var(--bg-gray);
+    border-radius: 10px;
+    text-align: center;
+    border-left: 4px solid var(--success);
+}
+
+.resultado-envio p {
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+
+.resultado-envio strong {
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.admin-page-container {
+    background-color: #f1f5f9;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Encabezado del Admin */
+/* --- ESTILOS PANEL ADMINISTRADOR --- */
+
+body.admin-body {
+    background-color: #f1f5f9; /* Fondo gris claro para que resalten las tarjetas */
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.admin-header {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    background: #111;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-logout {
+    color: #ff4d4d;
+    text-decoration: none;
+    font-weight: bold;
+    border: 1px solid #ff4d4d;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.btn-logout:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
+/* Formulario de Agregar */
+.admin-form {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.admin-form h2 { margin-top: 0; font-size: 1.4rem; color: #334155; }
+
+.admin-form form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.admin-form input, .admin-form select {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    outline: none;
+}
+
+.admin-form button {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
 }
 
-/* La imagen agrandada */
-.modal-contenido {
-    max-width: 90%;
-    max-height: 80%;
-    border: 4px solid white;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    animation: zoomIn 0.3s ease; /* Efecto de apertura */
+/* Listado de Productos */
+.admin-productos {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* Animación para que la foto aparezca creciendo */
-@keyframes zoomIn {
-    from { transform: scale(0.5); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+.admin-productos h2 { color: #334155; }
+
+.admin-productos-grid { /* Usaremos grid para las tarjetas */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
-/* La X para cerrar */
-.cerrar-modal {
-    position: absolute;
-    top: 20px;
-    right: 30px;
+.admin-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid #f1f5f9;
+}
+
+.admin-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.admin-card input, .admin-card select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+/* Acciones (Guardar y Eliminar) */
+.acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.acciones button {
+    flex: 4;
+    background: #22c55e;
     color: white;
-    font-size: 40px;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
     font-weight: bold;
+    cursor: pointer;
+}
+
+.acciones .eliminar {
+    flex: 1;
+    background: #fee2e2;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    transition: 0.3s;
+}
+
+.acciones .eliminar:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.admin-buscador-codigo {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 2px solid #111;
+}
+
+.admin-buscador-codigo input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+
+/* BOTÓN DE INSTAGRAM CON COLORES OFICIALES */
+.instagram-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    /* Degradado oficial de Instagram */
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px; /* Más redondeado, estilo moderno */
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(214, 36, 159, 0.3);
+}
+
+.instagram-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(214, 36, 159, 0.5);
+    color: white; /* Asegura que el texto siga blanco */
+}
+
+.instagram-btn i {
+    font-size: 22px;
 }

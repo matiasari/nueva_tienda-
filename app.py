@@ -5,27 +5,28 @@ from functools import wraps
 import json
 import os
 
-
+# =====================
+# CONFIGURACIÓN GENERAL
+# =====================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
-def login_requerido(f):
-    @wraps(f)
-    def decorador(*args, **kwargs):
-        if not session.get("admin"):
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorador
 app.secret_key = "1124023140aA@"
+
 ADMIN_USER = "mariasotelo"
 ADMIN_PASS = "241289maria@"
 
 ARCHIVO = os.path.join(BASE_DIR, "productos.json")
 UPLOADS = os.path.join(BASE_DIR, "static", "uploads")
 
-# crear carpeta uploads si no existe
 os.makedirs(UPLOADS, exist_ok=True)
+
+CATEGORIAS = ["Cocina", "Baño", "Decoración", "Limpieza"]
+
+# =====================
+# FUNCIONES AUXILIARES
+# =====================
 
 def cargar_productos():
     if not os.path.exists(ARCHIVO):
@@ -37,13 +38,54 @@ def guardar_productos(productos):
     with open(ARCHIVO, "w", encoding="utf-8") as f:
         json.dump(productos, f, indent=4, ensure_ascii=False)
 
+def zona_por_cp(cp):
+    cp = int(cp)
+    if 1000 <= cp <= 1499:
+        return "CABA"
+    elif 1500 <= cp <= 1999:
+        return "AMBA"
+    elif 2000 <= cp <= 2999:
+        return "CENTRO"
+    else:
+        return "INTERIOR"
+
+def costo_envio_por_peso(peso):
+    if peso <= 1:
+        return 15500
+    elif peso <= 5:
+        return 18300
+    elif peso <= 10:
+        return 24500
+    elif peso <= 15:
+        return 30300
+    elif peso <= 20:
+        return 35700
+    elif peso <= 25:
+        return 42900
+    else:
+        return 42900 + int((peso - 25) * 2000)
+
+# =====================
+# DECORADORES
+# =====================
+
+def login_requerido(f):
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        if not session.get("admin"):
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorador
+
 @app.context_processor
 def carrito_contador():
     carrito = session.get("carrito", [])
     total_items = sum(item["cantidad"] for item in carrito)
     return dict(carrito_total=total_items)
-CATEGORIAS = ["Cocina", "Baño", "Decoración", "Limpieza"]
 
+# =====================
+# RUTAS PÚBLICAS
+# =====================
 
 @app.route("/")
 def tienda():
@@ -53,16 +95,10 @@ def tienda():
 
     if q:
         q = q.lower()
-        productos = [
-            p for p in productos
-            if q in p["nombre"].lower()
-        ]
+        productos = [p for p in productos if q in p["nombre"].lower()]
 
     if categoria:
-        productos = [
-            p for p in productos
-            if p.get("categoria") == categoria
-        ]
+        productos = [p for p in productos if p.get("categoria") == categoria]
 
     return render_template(
         "tienda.html",
@@ -71,19 +107,45 @@ def tienda():
         categoria_seleccionada=categoria
     )
 
+# =====================
+# LOGIN / LOGOUT
+# =====================
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    app.permanent_session_lifetime = timedelta(minutes=30)
+
+    if request.method == "GET":
+        session.clear()
+
+    if request.method == "POST":
+        user = request.form.get("usuario")
+        password = request.form.get("password")
+
+        if user == ADMIN_USER and password == ADMIN_PASS:
+            session.clear()
+            session["admin"] = True
+            session.permanent = True
+            return redirect("/admin")
+
+        return render_template("login.html", error="Usuario o contraseña incorrectos")
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("admin", None)
+    return redirect("/login")
+
+# =====================
+# PANEL ADMIN
+# =====================
 
 @app.route("/admin")
 @login_requerido
 def admin():
-
     productos = cargar_productos()
-    categorias = ["Cocina", "Baño", "Decoración", "Limpieza"]
-
-    return render_template(
-        "admin.html",
-        productos=productos,
-        categorias=categorias
-    )
+    return render_template("admin.html", productos=productos, categorias=CATEGORIAS)
 
 @app.route("/agregar", methods=["POST"])
 @login_requerido
@@ -93,19 +155,20 @@ def agregar():
     imagen = request.files.get("imagen")
     nombre_imagen = ""
 
-    if imagen and imagen.filename != "":
+    if imagen and imagen.filename:
         nombre_imagen = secure_filename(imagen.filename)
         imagen.save(os.path.join(UPLOADS, nombre_imagen))
 
     nuevo = {
-    "id": productos[-1]["id"] + 1 if productos else 1,
-    "nombre": request.form["nombre"],
-    "precio": int(request.form["precio"]),
-    "stock": int(request.form["stock"]),
-    "codigo": int(request.form["codigo"]),
-    "categoria": request.form["categoria"],
-    "imagen": nombre_imagen
-}
+        "id": productos[-1]["id"] + 1 if productos else 1,
+        "nombre": request.form["nombre"],
+        "precio": int(request.form["precio"]),
+        "stock": int(request.form["stock"]),
+        "codigo": int(request.form["codigo"]),
+        "categoria": request.form["categoria"],
+        "peso": float(request.form["peso"]),
+        "imagen": nombre_imagen
+    }
 
     productos.append(nuevo)
     guardar_productos(productos)
@@ -118,14 +181,17 @@ def editar(id):
 
     for p in productos:
         if p["id"] == id:
-            p["nombre"] = request.form["nombre"]
-            p["precio"] = int(request.form["precio"])
-            p["stock"] = int(request.form["stock"])
-            p["categoria"] = request.form["categoria"]
-            p["codigo"] =int (request.form["codigo"])
+            p.update({
+                "nombre": request.form["nombre"],
+                "precio": int(request.form["precio"]),
+                "stock": int(request.form["stock"]),
+                "codigo": int(request.form["codigo"]),
+                "categoria": request.form["categoria"],
+                "peso": float(request.form["peso"])
+            })
 
             imagen = request.files.get("imagen")
-            if imagen and imagen.filename != "":
+            if imagen and imagen.filename:
                 nombre = secure_filename(imagen.filename)
                 imagen.save(os.path.join(UPLOADS, nombre))
                 p["imagen"] = nombre
@@ -136,70 +202,17 @@ def editar(id):
 @app.route("/eliminar/<int:id>")
 @login_requerido
 def eliminar(id):
-    productos = cargar_productos()
-    productos = [p for p in productos if p["id"] != id]
+    productos = [p for p in cargar_productos() if p["id"] != id]
     guardar_productos(productos)
     return redirect("/admin")
 
-@app.route("/stock_mas/<int:id>")
-@login_requerido
-def stock_mas(id):
-    productos = cargar_productos()
+# =====================
+# CARRITO
+# =====================
 
-    for p in productos:
-        if p["id"] == id:
-            p["stock"] += 1
-
-    guardar_productos(productos)
-    return redirect("/admin")
-
-
-@app.route("/stock_menos/<int:id>")
-@login_requerido
-def stock_menos(id):
-    productos = cargar_productos()
-
-    for p in productos:
-        if p["id"] == id and p["stock"] > 0:
-            p["stock"] -= 1
-
-    guardar_productos(productos)
-    return redirect("/admin")
-#### ENTRAR AL USUARIO Y SALIR ############
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    app.permanent_session_lifetime = timedelta(minutes=30)
-    if request.method == "GET":
-        session.clear()
-    if request.method == "POST":
-        user = request.form.get("usuario")
-        password = request.form.get("password")
-
-        if user == ADMIN_USER and password == ADMIN_PASS:
-            session.clear()
-            session["admin"] = True
-            session.permanent = True
-            return redirect("/admin")
-        
-
-        return render_template("login.html", error="Usuario o contraseña incorrectos")
-
-    return render_template("login.html")
-
-
-
-@app.route("/logout")
-def logout():
-    session.pop("admin", None)
-    return redirect("/login")
-#########################################
-#####AGREGAR AL CARRITO ,BORRAR ARTICULO O VACIAR CARRITO #####
 @app.route("/agregar_carrito/<int:id>")
 def agregar_carrito(id):
     carrito = session.get("carrito", [])
-
     productos = cargar_productos()
     producto = next((p for p in productos if p["id"] == id), None)
 
@@ -212,12 +225,13 @@ def agregar_carrito(id):
             break
     else:
         carrito.append({
-        "id": producto["id"],
-        "codigo": producto["codigo"],
-        "nombre": producto["nombre"],
-        "precio": producto["precio"],
-        "imagen": producto.get("imagen", ""),
-        "cantidad": 1
+            "id": producto["id"],
+            "codigo": producto["codigo"],
+            "nombre": producto["nombre"],
+            "precio": producto["precio"],
+            "peso": producto["peso"],
+            "imagen": producto.get("imagen", ""),
+            "cantidad": 1
         })
 
     session["carrito"] = carrito
@@ -226,32 +240,52 @@ def agregar_carrito(id):
 @app.route("/carrito")
 def carrito():
     carrito = session.get("carrito", [])
-    total = sum(item["precio"] * item["cantidad"] for item in carrito)
+    total = sum(i["precio"] * i["cantidad"] for i in carrito)
+    peso_total = sum(i["peso"] * i["cantidad"] for i in carrito)
+
+    envio = session.get("envio", 0)
 
     return render_template(
         "carrito.html",
         carrito=carrito,
-        total=total
+        total=total,
+        peso_total=peso_total,
+        envio=envio
     )
-
-
 
 @app.route("/carrito/eliminar/<int:id>")
 def eliminar_del_carrito(id):
-    carrito = session.get("carrito", [])
-
-    carrito = [item for item in carrito if item["id"] != id]
-
-    session["carrito"] = carrito
+    session["carrito"] = [i for i in session.get("carrito", []) if i["id"] != id]
     return redirect("/carrito")
-
 
 @app.route("/carrito/vaciar")
 def vaciar_carrito():
     session["carrito"] = []
+    session.pop("envio", None)
     return redirect("/")
 
+# =====================
+# ENVÍO
+# =====================
 
-    
+@app.route("/calcular_envio", methods=["POST"])
+def calcular_envio():
+    cp = request.form["cp"]
+    zona = zona_por_cp(cp)
+
+    carrito = session.get("carrito", [])
+    peso_total = sum(i["peso"] * i["cantidad"] for i in carrito)
+
+    envio = costo_envio_por_peso(peso_total)
+
+    session["envio"] = envio
+    session["zona_envio"] = zona
+
+    return redirect("/carrito")
+
+# =====================
+# RUN
+# =====================
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)

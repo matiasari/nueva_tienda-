@@ -35,10 +35,24 @@
       
     {% endfor %}
 
-  </div>
+ <div class="envio-contenedor">
+    <h3><i class="fa-solid fa-truck-fast"></i> Calcular costo de envío</h3>
+    
+    <form action="/calcular_envio" method="post" class="envio-form">
+        <input type="text" name="cp" placeholder="Tu Código Postal" required>
+        <button type="submit">Calcular</button>
+    </form>
 
-  <h2>Total: $ {{ total }}</h2>
-
+    {% if session.envio %}
+    <div class="resultado-envio">
+        <p>⚖️ Peso total: <strong>{{ "%.2f"|format(peso_total) }} kg</strong></p>
+        <p>📦 Envío estimado: <strong>$ {{ session.envio }}</strong></p>
+        <p style="margin-top:10px; border-top: 1px solid #ddd; padding-top: 5px;">
+            <span style="font-size: 1.2rem; font-weight: 800;">Total final: $ {{ total + session.envio }}</span>
+        </p>
+    </div>
+    {% endif %}
+</div>
   <div class="acciones-carrito">
   <a href="/" class="btn-seguir">
     ← Seguir comprando
@@ -57,20 +71,29 @@
         <a href="/" class="btn-seguir">← Volver a la tienda</a>
     </div>
 {% endif %}
+<div class="totales-contenedor">
+    <h3>Subtotal productos: $ {{ total }}</h3>
+    
+    {% if session.envio %}
+        <p>⚖️ Peso total del pedido: {{ "%.2f"|format(peso_total) }} kg</p>
+        <p>📦 Costo de envío: $ {{ session.envio }}</p>
+        <hr>
+        <h2 style="color: #27ae60;">Total Final: $ {{ total + session.envio }}</h2>
+    {% endif %}
+</div>
 
 <a 
 href="https://wa.me/5491149899616?text=
 Hola,%20quiero%20comprar:%0A
 {% for item in carrito %}
-🛒%20{{ item.nombre }}%20({{ item.codigo }})%0A
-Cantidad:%20{{ item.cantidad }}%0A
-Precio:%20${{ item.precio }}%0A%0A
+- {{ item.nombre }} (x{{ item.cantidad }})%0A
 {% endfor %}
-Total:%20${{ total }}"
+%0AEnvío: ${{ session.envio if session.envio else 'A convenir' }}
+%0ATOTAL: ${{ total + (session.envio if session.envio else 0) }}"
 target="_blank"
 class="btn-whatsapp"
 >
-Comprar por WhatsApp
+    Confirmar pedido por WhatsApp
 </a>
 
 </body>

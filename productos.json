@@ -6,7 +6,8 @@
         "stock": 3,
         "imagen": "WhatsApp_Image_2025-11-12_at_16.51.23.jpeg",
         "categoria": "Decoración",
-        "codigo": "42731440"
+        "codigo": 42731440,
+        "peso": 0.9
     },
     {
         "id": 3,
@@ -15,7 +16,8 @@
         "stock": 2,
         "categoria": "Decoración",
         "imagen": "mesa_negra.jpeg",
-        "codigo": "42731447"
+        "codigo": 42731447,
+        "peso": 0.9
     },
     {
         "id": 4,
@@ -24,7 +26,8 @@
         "stock": 3,
         "categoria": "Decoración",
         "imagen": "bandeja_de_cama.png",
-        "codigo": "123456"
+        "codigo": 123456,
+        "peso": 0.9
     },
     {
         "id": 5,
@@ -33,7 +36,8 @@
         "stock": 1,
         "categoria": "Cocina",
         "imagen": "4614707.png",
-        "codigo": "4614707"
+        "codigo": 4614707,
+        "peso": 0.25
     },
     {
         "id": 6,
@@ -42,16 +46,18 @@
         "stock": 5,
         "categoria": "Baño",
         "imagen": "4290588.png",
-        "codigo": "4290588"
+        "codigo": 4290588,
+        "peso": 0.1
     },
     {
         "id": 7,
         "nombre": "400 ml TAZA ROSA VIEJO",
         "precio": 5000,
         "stock": 1,
-        "categoria": "Decoración",
+        "categoria": "Cocina",
         "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg",
-        "codigo": "4024273"
+        "codigo": 4024273,
+        "peso": 0.2
     },
     {
         "id": 8,
@@ -60,7 +66,8 @@
         "stock": 4,
         "categoria": "Cocina",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.31.04.jpeg",
-        "codigo": "4960615"
+        "codigo": 4960615,
+        "peso": 0.2
     },
     {
         "id": 9,
@@ -69,7 +76,8 @@
         "stock": 4,
         "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.06.jpeg",
-        "codigo": "4958751"
+        "codigo": 4958751,
+        "peso": 1.5
     },
     {
         "id": 10,
@@ -78,7 +86,8 @@
         "stock": 4,
         "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.21.jpeg",
-        "codigo": "4919704"
+        "codigo": 4919704,
+        "peso": 1.0
     },
     {
         "id": 11,
@@ -87,7 +96,8 @@
         "stock": 3,
         "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.27.14.jpeg",
-        "codigo": "4960997"
+        "codigo": 4960997,
+        "peso": 0.8
     },
     {
         "id": 12,
@@ -96,7 +106,8 @@
         "stock": 3,
         "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.30.08.jpeg",
-        "codigo": "4331232"
+        "codigo": 4331232,
+        "peso": 0.5
     },
     {
         "id": 13,
@@ -114,7 +125,8 @@
         "stock": 3,
         "codigo": 4948914,
         "categoria": "Decoración",
-        "imagen": "bandeja_de_cama_madera.png"
+        "imagen": "bandeja_de_cama_madera.png",
+        "peso": 0.9
     },
     {
         "id": 15,
@@ -123,7 +135,8 @@
         "stock": 3,
         "codigo": 4948914,
         "categoria": "Decoración",
-        "imagen": "imagen_2026-01-22_150818082.png"
+        "imagen": "imagen_2026-01-22_150818082.png",
+        "peso": 0.9
     },
     {
         "id": 16,
@@ -132,6 +145,17 @@
         "stock": 2,
         "codigo": 4948914,
         "categoria": "Decoración",
-        "imagen": "imagen_2026-01-22_150905177.png"
+        "imagen": "imagen_2026-01-22_150905177.png",
+        "peso": 0.9
+    },
+    {
+        "id": 17,
+        "nombre": "20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
+        "precio": 32000,
+        "stock": 1,
+        "codigo": 4963331,
+        "categoria": "Decoración",
+        "peso": 0.98,
+        "imagen": "WhatsApp_Image_2026-01-25_at_15.02.48.jpeg"
     }
 ]
