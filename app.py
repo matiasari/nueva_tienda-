@@ -229,7 +229,7 @@ def agregar_carrito(id):
             "codigo": producto["codigo"],
             "nombre": producto["nombre"],
             "precio": producto["precio"],
-            "peso": producto.get["peso",0],
+            "peso": producto.get("peso", 0),
             "imagen": producto.get("imagen", ""),
             "cantidad": 1
         })
