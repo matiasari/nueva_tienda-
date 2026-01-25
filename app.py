@@ -274,7 +274,7 @@ def calcular_envio():
     zona = zona_por_cp(cp)
 
     carrito = session.get("carrito", [])
-    peso_total = sum(i["peso"] * i["cantidad"] for i in carrito)
+    peso_total = sum(float(i.get("peso", 0)) * int(i.get("cantidad", 1)) for i in carrito)
 
     envio = costo_envio_por_peso(peso_total)
 
