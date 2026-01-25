@@ -22,16 +22,17 @@
         {% endif %}
 
         <div class="info">
-          <h3>{{ item.nombre }}</h3>
-          <p>$ {{ item.precio }} x {{ item.cantidad }}</p>
-          <p><strong>Subtotal:</strong> $ {{ item.precio * item.cantidad }}</p>
-          <p><strong>{{ item.nombre }}</strong></p>
-          <p>Código: {{ item.codigo }}</p>
+    <h3>{{ item.nombre }}</h3>
+    <p>Precio: ${{ item.precio }}</p>
+    
+    <div class="cantidad-control">
+        <a href="/disminuir/{{ item.id }}" class="btn-qty">-</a>
+        <span class="qty-numero">{{ item.cantidad }}</span>
+        <a href="/aumentar/{{ item.id }}" class="btn-qty">+</a>
+    </div>
 
-          <a href="/carrito/eliminar/{{ item.id }}" class="btn-quitar">❌ Quitar</a>
-        </div>
-
-      </div>
+    <a href="/quitar/{{ item.id }}" class="btn-quitar">Eliminar</a>
+</div>
       
     {% endfor %}
 
@@ -82,19 +83,10 @@
     {% endif %}
 </div>
 
-<a 
-href="https://wa.me/5491149899616?text=
-Hola,%20quiero%20comprar:%0A
-{% for item in carrito %}
-- {{ item.nombre }} (x{{ item.cantidad }})%0A
-{% endfor %}
-%0AEnvío: ${{ session.envio if session.envio else 'A convenir' }}
-%0ATOTAL: ${{ total + (session.envio if session.envio else 0) }}"
-target="_blank"
-class="btn-whatsapp"
->
-    Confirmar pedido por WhatsApp
-</a>
-
+<div class="finalizar-compra-contenedor">
+    <a href="{{ link_whatsapp }}" target="_blank" class="btn-whatsapp">
+        <i class="fa-brands fa-whatsapp"></i> Confirmar pedido por WhatsApp
+    </a>
+</div>
 </body>
 </html>

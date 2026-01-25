@@ -636,3 +636,37 @@ body.admin-body {
 .instagram-btn i {
     font-size: 22px;
 }
+
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 10px 0;
+}
+
+.btn-qty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: #f1f1f1;
+    color: #111;
+    border-radius: 50%;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+    border: 1px solid #ddd;
+}
+
+.btn-qty:hover {
+    background: #111;
+    color: white;
+}
+
+.qty-numero {
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 20px;
+    text-align: center;
+}

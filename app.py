@@ -4,7 +4,8 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import json
 import os
-
+from flask import Flask, render_template, request, redirect, url_for, session
+import urllib.parse
 # =====================
 # CONFIGURACIÓN GENERAL
 # =====================
@@ -237,21 +238,31 @@ def agregar_carrito(id):
     session["carrito"] = carrito
     return redirect("/carrito")
 
-@app.route("/carrito")
+@app.route('/carrito')
 def carrito():
     carrito = session.get("carrito", [])
-    total = sum(i["precio"] * i["cantidad"] for i in carrito)
-    peso_total = sum(float(i.get("peso", 0)) * i.get("cantidad", 1) for i in carrito)
-
+    # Calculamos subtotal y peso
+    total = sum(float(i.get("precio", 0)) * int(i.get("cantidad", 1)) for i in carrito)
+    peso_total = sum(float(i.get("peso", 0)) * int(i.get("cantidad", 1)) for i in carrito)
     envio = session.get("envio", 0)
 
-    return render_template(
-        "carrito.html",
-        carrito=carrito,
-        total=total,
-        peso_total=peso_total,
-        envio=envio
-    )
+    # --- GENERACIÓN DE LINK DE WHATSAPP ---
+    mensaje = "*Pedido Bazar Guille*\n\n"
+    for i in carrito:
+        mensaje += f"• {i['nombre']} x{i['cantidad']} - ${i['precio'] * i['cantidad']}\n"
+    
+    if envio > 0:
+        mensaje += f"\nSubtotal: ${total}\nEnvío: ${envio}\n*TOTAL: ${total + envio}*"
+    else:
+        mensaje += f"\n*TOTAL: ${total}*\n(Envío a convenir)"
+
+    link_whatsapp = f"https://wa.me/5491149899616?text={urllib.parse.quote(mensaje)}"
+
+    return render_template('carrito.html', 
+                           carrito=carrito, 
+                           total=total, 
+                           peso_total=peso_total, 
+                           link_whatsapp=link_whatsapp)
 
 @app.route("/carrito/eliminar/<int:id>")
 def eliminar_del_carrito(id):
@@ -263,7 +274,26 @@ def vaciar_carrito():
     session["carrito"] = []
     session.pop("envio", None)
     return redirect("/")
-
+@app.route('/aumentar/<int:producto_id>')
+def aumentar(producto_id):
+    carrito = session.get("carrito", [])
+    # Cargamos productos para ver el stock real
+    productos_db = cargar_productos() 
+    p_db = next((p for p in productos_db if p["id"] == producto_id), None)
+    
+    for item in carrito:
+        if item["id"] == producto_id:
+            # Validamos contra el stock del JSON
+            if p_db and item["cantidad"] < int(p_db.get("stock", 0)):
+                item["cantidad"] += 1
+            else:
+                # Aquí podrías usar flash() para avisar que no hay más stock
+                pass
+            break
+            
+    session["carrito"] = carrito
+    session.modified = True
+    return redirect(url_for('carrito'))
 # =====================
 # ENVÍO
 # =====================
@@ -282,6 +312,32 @@ def calcular_envio():
     session["zona_envio"] = zona
 
     return redirect("/carrito")
+
+@app.route('/aumentar/<int:producto_id>')
+def aumentar(producto_id):
+    carrito = session.get("carrito", [])
+    for item in carrito:
+        if item["id"] == producto_id:
+            item["cantidad"] += 1
+            break
+    session["carrito"] = carrito
+    session.modified = True
+    return redirect(url_for('carrito'))
+
+@app.route('/disminuir/<int:producto_id>')
+def disminuir(producto_id):
+    carrito = session.get("carrito", [])
+    for item in carrito:
+        if item["id"] == producto_id:
+            if item["cantidad"] > 1:
+                item["cantidad"] -= 1
+            else:
+                # Si la cantidad es 1 y resta, lo eliminamos
+                return redirect(url_for('quitar', producto_id=producto_id))
+            break
+    session["carrito"] = carrito
+    session.modified = True
+    return redirect(url_for('carrito'))
 
 # =====================
 # RUN
