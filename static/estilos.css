@@ -518,3 +518,274 @@ opciones-entrega {
     background: #eafff2;
     color: #128c7e;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+    --primary-logo: #1e3a8a; /* Azul profundo (Elegante y profesional) */
+    --secondary-logo: #334155; /* Gris azulado (Para textos secundarios) */
+    --accent: #2563eb; /* Azul vibrante para botones */
+    --bg-body: #f8fafc;
+    --text-main: #1e293b; /* Color de letra principal */
+    --text-titles: #0f172a; /* Color para títulos H1, H2 */
+    --border: #cbd5e1;
+    --radius: 12px;
+}
+body.admin-body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main); /* Letras que combinan con el logo */
+}
+
+h1, h2, h3 {
+    color: var(--primary-logo); /* Títulos en el azul del logo */
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+/* El encabezado del panel */
+.admin-header h1 {
+    color: var(--primary-logo);
+}
+
+
+/* --- HEADER --- */
+.admin-header {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-card);
+    padding: 1rem 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.admin-header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--primary);
+}
+
+.btn-logout {
+    text-decoration: none;
+    color: var(--danger);
+    font-weight: 600;
+    padding: 8px 16px;
+    border: 1.5px solid var(--danger);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* --- FORMULARIO DE AGREGAR --- */
+.admin-form {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.admin-form h2 {
+    margin: 0 0 20px 0;
+    font-size: 1.25rem;
+    color: var(--text-main);
+}
+
+.admin-form form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+/* --- INPUTS Y SELECTS --- */
+input, select {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary);
+}
+
+.admin-form button[type="submit"] {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* --- BUSCADOR POR CÓDIGO --- */
+.admin-buscador-codigo {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.admin-buscador-codigo i {
+    position: absolute;
+    left: 15px;
+    color: var(--text-muted);
+}
+
+.admin-buscador-codigo input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    font-size: 1rem;
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow);
+}
+
+/* --- GRID DE PRODUCTOS --- */
+.admin-productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- TARJETA DE PRODUCTO (ADMIN-CARD) --- */
+.admin-card {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.admin-card input, .admin-card select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* --- ACCIONES --- */
+.acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.acciones button {
+    flex: 4;
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.acciones .eliminar {
+    flex: 1;
+    background: #fee2e2;
+    color: var(--danger);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.acciones .eliminar:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .admin-form form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* --- PALETA DE COLORES BASADA EN EL LOGO --- */
+:root {
+    --primary-logo: #1e3a8a; /* Azul profundo (Elegante y profesional) */
+    --secondary-logo: #334155; /* Gris azulado (Para textos secundarios) */
+    --accent: #2563eb; /* Azul vibrante para botones */
+    --bg-body: #f8fafc;
+    --text-main: #1e293b; /* Color de letra principal */
+    --text-titles: #0f172a; /* Color para títulos H1, H2 */
+    --border: #cbd5e1;
+    --radius: 12px;
+}
+
+/* --- ESTILOS DE TEXTO --- */
+body.admin-body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main); /* Letras que combinan con el logo */
+}
+
+h1, h2, h3 {
+    color: var(--primary-logo); /* Títulos en el azul del logo */
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+/* El encabezado del panel */
+.admin-header h1 {
+    color: var(--primary-logo);
+}
+
+/* Etiquetas y placeholders */
+input::placeholder {
+    color: var(--secondary-logo);
+    opacity: 0.7;
+}
+
+/* Estilo para el nombre del producto en las tarjetas */
+.admin-card input[name="nombre"] {
+    font-weight: 700;
+    color: var(--primary-logo);
+    border-bottom: 2px solid var(--border);
+}
+
+/* El buscador de código */
+.admin-buscador-codigo i {
+    color: var(--primary-logo);
+}
+
+.admin-buscador-codigo input {
+    color: var(--primary-logo);
+    font-weight: 600;
+}
+
+/* Botones con el color de acento */
+.admin-form button[type="submit"] {
+    background: var(--primary-logo);
+    box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2);
+}
+
+.admin-form button[type="submit"]:hover {
+    background: var(--accent);
+}

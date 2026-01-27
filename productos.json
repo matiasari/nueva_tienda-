@@ -158,5 +158,15 @@
         "categoria": "Decoración",
         "imagen": "WhatsApp_Image_2026-01-25_at_15.02.48.jpeg",
         "peso": 0.98
+    },
+    {
+        "id": 18,
+        "nombre": "9 LT CESTO DE BASURA",
+        "precio": 18000,
+        "stock": 2,
+        "codigo": "4960997 ",
+        "categoria": "Baño",
+        "peso": 0.6,
+        "imagen": "WhatsApp_Image_2026-01-22_at_10.27.41.jpeg"
     }
 ]
