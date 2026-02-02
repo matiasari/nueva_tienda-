@@ -46,6 +46,11 @@
     <section class="slider-container">
         {% for b in banners %}
         <div class="slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
+            <div class="slider-dots">
+    {% for b in banners %}
+        <span class="dot {% if loop.first %}active{% endif %}"></span>
+    {% endfor %}
+</div>
             <div class="slide-text-container">
                 <h2>{{ b.titulo }}</h2>
                 <p>{{ b.descripcion }}</p>
