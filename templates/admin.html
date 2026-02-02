@@ -1,98 +1,115 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin - Bazar Guille</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="/static/estilos.css">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
-
+    <meta charset="UTF-8">
+    <title>Panel Admin - Bazar Guille</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    <style>
+        .admin-container { padding: 20px; max-width: 1000px; margin: auto; }
+        .form-seccion { background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 30px; border: 1px solid #ddd; }
+        .admin-tabla { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-tabla th, .admin-tabla td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .btn-eliminar { color: red; text-decoration: none; font-weight: bold; }
+        input, select, btn { display: block; width: 100%; margin-bottom: 10px; padding: 10px; }
+        .btn-negro { background: #000; color: #fff; border: none; cursor: pointer; padding: 10px; border-radius: 5px; }
+    </style>
 </head>
+<body>
 
-<body class="admin-body">
+<div class="admin-container">
+    <h1>Panel de Administración - Bazar Guille</h1>
+    <a href="/" style="text-decoration: none;">⬅ Volver a la Tienda</a>
+    <hr>
 
-<header class="admin-header">
-  <h1>🛠 Panel Administrador</h1>
-  <a href="/logout" class="btn-logout">Cerrar sesión</a>
-</header>
+    <div class="form-seccion">
+        <h2>Añadir Oferta al Banner</h2>
+        <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data">
+            <input type="text" name="titulo" placeholder="Título (ej: CESTO 9 LITROS)" required>
+            <input type="text" name="subtitulo" placeholder="Subtítulo (ej: Oferta imperdible)" required>
+            <label>Imagen del Banner:</label>
+            <input type="file" name="imagen" accept="image/*" required>
+            <button type="submit" class="btn-negro">Subir al Banner</button>
+        </form>
 
-<section class="admin-form">
-  <h2>➕ Agregar nuevo producto</h2>
-  <form action="/agregar" method="post" enctype="multipart/form-data">
-    <input type="text" name="nombre" placeholder="Nombre" required>
-    <input type="text" name="codigo" placeholder="Código" required>
-    <input type="number" name="precio" placeholder="Precio" required>
-    <input type="number" name="stock" placeholder="Stock" required>
-    <input type="number" name="peso" step="0.01" placeholder="Peso en kg" required>
-    <select name="categoria" required>
-      <option value="">Categoría</option>
-      {% for c in categorias %}
-        <option value="{{ c }}">{{ c }}</option>
-      {% endfor %}
-    </select>
-    <input type="file" name="imagen">
-    <button type="submit">Agregar</button>
-  </form>
-</section>
+        <h3>Banners Actuales</h3>
+        <table class="admin-tabla">
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Título</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in banner %}
+                <tr>
+                    <td><img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="80"></td>
+                    <td>{{ b.titulo }}</td>
+                    <td><a href="{{ url_for('eliminar_banner', id=b.id) }}" class="btn-eliminar" onclick="return confirm('¿Eliminar esta oferta?')">Eliminar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<section class="admin-productos">
-  <h2>📦 Gestión de Productos</h2>
 
-  <div class="admin-buscador-codigo">
-    <i class="fa-solid fa-barcode"></i>
-    <input type="text" id="filtroCodigo" onkeyup="buscarPorCodigo()" placeholder="Escanea o escribe un código para editar...">
-  </div>
-
-  <div class="admin-productos-grid" id="contenedorProductos">
-    {% for p in productos %}
-    <form action="/editar/{{ p.id }}" method="post" enctype="multipart/form-data" class="admin-card" data-codigo="{{ p.codigo }}">
-      
-      {% if p.imagen %}
-        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}">
-      {% endif %}
-
-      <input type="text" name="nombre" value="{{ p.nombre }}" placeholder="Nombre" required>
-      <input type="text" name="codigo" value="{{ p.codigo }}" placeholder="Código" required>
-      <input type="number" name="precio" value="{{ p.precio }}" placeholder="Precio" required>
-      <input type="number" name="stock" value="{{ p.stock }}" placeholder="Stock" required>
-      <input type="number" name="peso" step="0.01" value="{{ p.peso }}" placeholder="Peso en kg" required>
-      
-      <select name="categoria" required>
-        {% for c in categorias %}
-          <option value="{{ c }}" {% if c == p.categoria %}selected{% endif %}>{{ c }}</option>
-        {% endfor %}
-      </select>
-
-      <input type="file" name="imagen">
-
-      <div class="acciones">
-        <button type="submit">💾 Guardar</button>
-        <a href="/eliminar/{{ p.id }}" class="eliminar" onclick="return confirm('¿Seguro quieres eliminar este producto?')">🗑</a>
-      </div>
+    <div class="form-seccion">
+    <h2>Añadir Nuevo Producto</h2>
+    <form action="{{ url_for('agregar_producto') }}" method="POST" enctype="multipart/form-data">
+        <input type="text" name="nombre" placeholder="Nombre del producto (ej: Espejo LED)" required>
+        <input type="number" name="precio" placeholder="Precio (solo números)" required>
+        <select name="categoria">
+            {% for cat in categorias %}
+            <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="stock" placeholder="Stock inicial" required>
+        <label>Foto del Producto:</label>
+        <input type="file" name="imagen" accept="image/*" required>
+        <button type="submit" class="btn-negro">Guardar Producto</button>
     </form>
-    {% endfor %}
-  </div>
-</section>
+</div>
 
-<script>
-function buscarPorCodigo() {
-    let input = document.getElementById('filtroCodigo').value.toLowerCase();
-    let productos = document.getElementsByClassName('admin-card');
+<div class="form-seccion">
+    <h2>Productos en Stock</h2>
+    <table class="admin-tabla">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Categoría</th>
+                <th>Stock</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+            <tr>
+                <td>
+                    {% if p.imagen %}
+                    <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" width="50" style="border-radius: 5px;">
+                    {% else %}
+                    <span>Sin foto</span>
+                    {% endif %}
+                </td>
+                <td>{{ p.nombre }}</td>
+                <td>${{ p.precio }}</td>
+                <td>{{ p.categoria }}</td>
+                <td>{{ p.stock }}</td>
+                <td>
+                    <a href="{{ url_for('eliminar_producto', id=p.id) }}" class="btn-eliminar" onclick="return confirm('¿Borrar producto?')">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-    for (let i = 0; i < productos.length; i++) {
-        // Obtenemos el código del atributo data-codigo que pusimos arriba
-        let codigo = productos[i].getAttribute('data-codigo') || "";
-        codigo = codigo.toLowerCase();
-        
-        if (codigo.includes(input)) {
-            productos[i].style.display = "";
-        } else {
-            productos[i].style.display = "none";
-        }
-    }
-}
-</script>
+   
+    <a href="/logout" style="color: gray;">Cerrar Sesión</a>
+</div>
 
 </body>
 </html>

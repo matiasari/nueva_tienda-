@@ -789,3 +789,115 @@ input::placeholder {
 .admin-form button[type="submit"]:hover {
     background: var(--accent);
 }
+
+/* Contenedor principal más alto */
+.slider-container {
+    width: 100%;
+    height: 550px; /* Aumentamos la altura para que no sea tan alargado */
+    overflow: hidden;
+    position: relative;
+    background-color: #fff;
+    margin-bottom: 40px;
+}
+
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Tira el texto a la derecha */
+    transition: opacity 0.8s ease-in-out;
+    background-size: cover;
+    background-position: center;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+/* La caja de texto del espejo */
+.slide-text-container {
+    margin-right: 7%;
+    background: rgba(255, 255, 255, 0.9); /* Más sólido como en la foto */
+    padding: 50px 40px;
+    border-radius: 30px;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15); /* Sombra profunda */
+}
+
+.slide-text-container h2 {
+    font-size: 3rem;
+    color: #333;
+    margin: 10px 0;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.slide-text-container p {
+    font-size: 1.3rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Botón Negro Redondeado */
+.btn-promo {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 15px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-promo:hover {
+    transform: scale(1.05);
+}
+
+.card .precio {
+    font-weight: 800;       /* Negrita bien gruesa */
+    font-size: 1.4rem;      /* Un poco más grande que el resto */
+    color: #000000;         /* Color negro puro */
+    margin: 10px 0;         /* Espacio arriba y abajo del precio */
+    display: block;         /* Asegura que ocupe su propia línea */
+}
+
+.card .precio::first-letter {
+    font-weight: 400;
+    font-size: 1.1rem;
+    margin-right: 2px;
+}
+
+.modal-foto {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 9999; /* Por encima de TODO */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Negro casi total */
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out; /* Indica que al hacer clic se cierra */
+}
+
+/* La imagen dentro del modal */
+.modal-contenido {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    animation: zoomIn 0.3s ease; /* Efecto de aparición */
+}
+
+/* Animación para que la foto "salte" a la vista */
+@keyframes zoomIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}

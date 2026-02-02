@@ -2,18 +2,22 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bazar_Guille</title>
+    <title>Bazar Guille</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ range(1, 1000) | random }}">
 
-    <!-- Tu CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-6Y3MN0GKBN');
+</script>
 
 <body>
 
@@ -22,13 +26,10 @@
         <img src="{{ url_for('static', filename='logo.ico') }}" class="logo">
         <span class="nombre">BAZAR_GUILLE</span>
     </div>
-
     <div class="header-right">
         <a href="/carrito" class="carrito-btn">
             🛒 Carrito
-            {% if carrito_total > 0 %}
-                <span class="contador">{{ carrito_total }}</span>
-            {% endif %}
+            {% if carrito_total > 0 %}<span class="contador">{{ carrito_total }}</span>{% endif %}
         </a>
     </div>
 </header>
@@ -41,27 +42,39 @@
     <a href="/?categoria=Limpieza">Limpieza</a>
 </div>
 
-<form method="get" action="/" class="buscador">
-    <input type="text" name="q" placeholder="Buscar producto...">
-    <button type="submit">Buscar</button>
-</form>
+{% if banner %}
+<div class="slider-container">
+    <div class="slider">
+        {% for b in banner %}
+        <div class="slide {% if loop.first %}active{% endif %}" 
+             style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
+            
+            <div class="slide-text-container">
+                <span class="tag">OFERTA</span>
+                <h2>{{ b.titulo }}</h2>
+                <p>{{ b.subtitulo }}</p>
+                <a href="https://wa.me/541124023140" class="btn-promo" target="_blank">Consultar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
 <div class="productos">
 {% for p in productos %}
     <div class="card">
         {% if p.imagen %}
-           <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
-     onclick="ampliarImagen(this.src)" 
-     style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                 onclick="ampliarImagen(this.src)" 
+                 style="cursor: pointer;" 
+                 alt="{{ p.nombre }}">
         {% endif %}
         <h3>{{ p.nombre }}</h3>
-        <p>$ {{ p.precio }}</p>
-
+        <p class="precio">$ {{ p.precio }}</p>
+        
         {% if p.stock > 0 %}
-            <p class="stock">Stock: {{ p.stock }}</p>
-            <a href="/agregar_carrito/{{ p.id }}" class="btn-carrito">
-                🛒 Agregar al carrito
-            </a>
+            <a href="/agregar_carrito/{{ p.id }}" class="btn-carrito">🛒 Agregar</a>
         {% else %}
             <p class="sin-stock">Sin stock</p>
         {% endif %}
@@ -69,31 +82,40 @@
 {% endfor %}
 </div>
 
-<!-- FOOTER -->
 <footer class="footer">
     <div class="footer-content">
         <a href="https://www.instagram.com/bazar_guille" target="_blank" class="instagram-btn">
             <i class="fa-brands fa-instagram"></i> Seguinos en Instagram
         </a>
-
         <p class="copyright">
             &copy; 2026 Bazar Guille - Todos los derechos reservados.
         </p>
     </div>
 </footer>
+
 <div id="modalImagen" class="modal-foto" onclick="this.style.display='none'">
-    <span class="cerrar-modal">&times;</span>
     <img id="imgExpandida" class="modal-contenido">
 </div>
 
 <script>
+// Función para el Modal de imágenes
 function ampliarImagen(src) {
-    const modal = document.getElementById("modalImagen");
-    const imagenGrande = document.getElementById("imgExpandida");
-    
-    modal.style.display = "flex"; // Muestra el fondo oscuro
-    imagenGrande.src = src;       // Pone la foto que tocaste en el centro
+    document.getElementById("modalImagen").style.display = "flex";
+    document.getElementById("imgExpandida").src = src;
+}
+
+// Lógica del Slider automático
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+if(slides.length > 1) {
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 5000); // Cambia cada 5 segundos para que luzca el zoom
 }
 </script>
+
+
 </body>
 </html>
