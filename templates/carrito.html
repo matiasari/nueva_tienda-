@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>Carrito</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ range(1, 999) | random }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
+    <title>Mi Carrito - Bazar Guille</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ range(1, 999) | random }}">
 </head>
 <body>
+
 <div class="carrito-header">
     <h1>🛒 Mi Carrito</h1>
     <div class="header-line"></div>
 </div>
 
-    {% if carrito %}
+{% if carrito %}
     <div class="carrito-lista">
         {% for item in carrito %}
         <div class="item-carrito">
             {% if item.imagen %}
-                <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}">
+                <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}" alt="{{ item.nombre }}">
             {% endif %}
             <div class="info">
                 <h3>{{ item.nombre }}</h3>
@@ -35,40 +35,48 @@
         {% endfor %}
     </div>
 
-<div class="opciones-entrega">
-    <h3>🚚 Método de Entrega</h3>
-    
-    <div class="entrega-toggle">
-        <label class="opcion">
-            <input type="radio" name="metodo" value="acordar" checked onclick="toggleEnvio(false)">
-            <span>🤝 Acordar con vendedor</span>
-        </label>
-        <label class="opcion">
-            <input type="radio" name="metodo" value="envio" onclick="toggleEnvio(true)">
-            <span>📦 Calcular Envío</span>
-        </label>
-    </div>
+    <div class="opciones-entrega">
+        <h3>🚚 Método de Entrega</h3>
+        
+        <div class="entrega-toggle">
+            <label class="opcion">
+                <input type="radio" name="metodo" value="acordar" {% if zona == 'No seleccionada' or zona == 'Retiro en local' %}checked{% endif %} onclick="toggleEnvio(false)">
+                <span>🤝 Retiro en local / Acordar</span>
+            </label>
+            <label class="opcion">
+                <input type="radio" name="metodo" value="envio" {% if envio > 0 %}checked{% endif %} onclick="toggleEnvio(true)">
+                <span>📦 Envió a domicilio</span>
+            </label>
+        </div>
 
-    <div id="calculador-envio" style="display: none; margin-top: 20px;">
-        <form action="/calcular_envio" method="post" class="envio-form">
-            <input type="text" name="cp" placeholder="Tu Código Postal" required>
-            <button type="submit">Calcular</button>
-        </form>
-    </div>
+        <div id="calculador-envio" style="display: {% if envio > 0 %}block{% else %}none{% endif %}; margin-top: 20px;">
+            <form action="/calcular_envio" method="post" class="envio-form">
+                <select name="zona" required>
+                    <option value="" disabled selected>Seleccioná tu zona</option>
+                    <option value="CABA" {% if zona == 'CABA' %}selected{% endif %}>CABA ($10000)</option>
+                    <option value="Zona Norte" {% if zona == 'Zona Norte' %}selected{% endif %}>Zona Norte ($15000)</option>
+                    <option value="Zona Sur" {% if zona == 'Zona Sur' %}selected{% endif %}>Zona Sur ($7000)</option>
+                    <option value="Zona Oeste" {% if zona == 'Zona Oeste' %}selected{% endif %}>Zona Oeste ($10000)</option>
+                </select>
+                <button type="submit">Calcular Costo</button>
+            </form>
+        </div>
 
-    {% if session.envio and session.envio > 0 %}
-    <div class="resultado-envio">
-        <p>📍 Zona: <strong>{{ session.zona_envio }}</strong></p>
-        <p>📦 Costo: <strong>$ {{ session.envio }}</strong></p>
-        <script>document.getElementById('calculador-envio').style.display = 'block';</script>
+        {% if envio > 0 %}
+        <div class="resultado-envio">
+            <p>📍 Zona seleccionada: <strong>{{ zona }}</strong></p>
+            <p>📦 Costo de envío: <strong>${{ envio }}</strong></p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
 
     <div class="totales-contenedor">
-        <h3>Subtotal productos: $ {{ total }}</h3>
-        {% if session.envio %}
-            <h2 style="color: #27ae60;">Total Final: $ {{ total + session.envio }}</h2>
+        <p>Subtotal productos: ${{ total }}</p>
+        {% if envio > 0 %}
+            <p>Envío: ${{ envio }}</p>
+            <h2 style="color: #27ae60;">Total Final: ${{ total_final }}</h2>
+        {% else %}
+            <h2 style="color: #27ae60;">Total Final: ${{ total }}</h2>
         {% endif %}
     </div>
 
@@ -83,20 +91,30 @@
         </a>
     </div>
 
-    {% else %}
+{% else %}
     <div style="text-align: center; margin-top: 50px;">
         <p>Tu carrito está vacío ☹️</p>
         <a href="/" class="btn-seguir">← Volver a la tienda</a>
     </div>
-    {% endif %}
+{% endif %}
 
 <script>
 function toggleEnvio(mostrar) {
     const div = document.getElementById('calculador-envio');
     div.style.display = mostrar ? 'block' : 'none';
+    
     if (!mostrar) {
-        // Si elige acordar, podrías limpiar el envío en la sesión si quisieras
-        window.location.href = "/limpiar_envio"; 
+        // Si elige retirar/acordar, mandamos al servidor que el envío es $0
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/calcular_envio';
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'zona';
+        input.value = 'Retiro en local';
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 </script>

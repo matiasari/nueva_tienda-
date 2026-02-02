@@ -1,19 +1,21 @@
-/* --- 1. VARIABLES Y CONFIGURACIÓN GENERAL --- */
+/* --- 1. VARIABLES Y BASE --- */
 :root {
     --primary: #111111;
+    --primary-logo: #1e3a8a;
     --success: #25D366;
     --danger: #ef4444;
     --bg-light: #ffffff;
-    --bg-gray: #f9f9f9;
+    --bg-gray: #f4f7f6;
     --text-dark: #1a1a1a;
     --text-muted: #64748b;
     --border: #f0f0f0;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --radius: 12px;
 }
 
 body {
     margin: 0;
-    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.5;
@@ -39,9 +41,9 @@ a { text-decoration: none; }
     gap: 8px;
 }
 
-.logo { width: 100px; height: auto; }
+.logo-img { width: 150px; height: auto; margin-bottom: 5px; } /* Ajustado para el logo */
 .nombre {
-    font-size: 22px;
+    font-size: 50px;
     font-weight: 800;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -65,19 +67,11 @@ a { text-decoration: none; }
 }
 
 .contador {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: var(--success);
-    color: white;
-    font-size: 11px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    border: 2px solid white;
+    position: absolute; top: -5px; right: -5px;
+    background: var(--success); color: white;
+    font-size: 11px; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; border: 2px solid white;
 }
 
 /* --- 3. BUSCADOR Y CATEGORÍAS --- */
@@ -86,818 +80,422 @@ a { text-decoration: none; }
     margin: 20px auto;
     padding: 0 5%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center; /* Centrado para que se vea prolijo */
 }
 
 .buscador input {
-    width: 300px;
-    padding: 12px 20px;
+    width: 300px; padding: 12px 20px;
     border: 2px solid var(--primary);
-    border-radius: 25px 0 0 25px;
-    outline: none;
+    border-radius: 25px 0 0 25px; outline: none;
 }
 
 .buscador button {
-    padding: 12px 25px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 0 25px 25px 0;
-    cursor: pointer;
-    font-weight: bold;
+    padding: 12px 25px; background: var(--primary);
+    color: white; border: none; border-radius: 0 25px 25px 0;
+    cursor: pointer; font-weight: bold;
 }
 
 .categorias {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    padding: 15px;
-    flex-wrap: wrap;
+    display: flex; gap: 10px; justify-content: center;
+    padding: 15px; flex-wrap: wrap;
 }
 
 .categorias a {
-    padding: 8px 18px;
-    background: var(--bg-gray);
-    border-radius: 20px;
-    color: var(--text-dark);
-    border: 1px solid #ddd;
-    font-size: 14px;
-    transition: 0.3s;
+    padding: 8px 18px; background: #f9f9f9;
+    border-radius: 20px; color: var(--text-dark);
+    border: 1px solid #ddd; font-size: 14px; transition: 0.3s;
 }
 
-.categorias a:hover {
-    background: var(--success);
-    color: white;
-}
+.categorias a:hover { background: var(--success); color: white; }
 
 /* --- 4. GRID DE PRODUCTOS (TIENDA) --- */
 .productos {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    padding: 20px 5%;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 20px; padding: 20px 5%;
 }
 
 .card {
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
+    background: white; padding: 15px; border-radius: var(--radius);
+    text-align: center; border: 1px solid var(--border); transition: 0.3s;
 }
 
 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
-.card img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; }
 
-.btn-carrito {
-    display: block;
-    background: var(--primary);
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    margin-top: 15px;
-    cursor: pointer;
+.card img {
+    width: 100%; height: 200px;
+    object-fit: cover; border-radius: 8px; margin-bottom: 10px;
 }
 
-.carrito-lista {
-    display: flex;
-    flex-direction: column; 
-    gap: 20px;
-    max-width: 700px; /* Reducimos un poco para que no se estire tanto en PC */
-    margin: 0 auto;
-    padding: 20px;
-    width: 100%;
-    box-sizing: border-box;
+.card .precio {
+    font-weight: 800; font-size: 1.4rem; color: #000;
+    margin: 10px 0; display: block;
+}
+
+/* --- 5. CARRITO Y FINALIZAR COMPRA --- */
+.carrito-lista, .envio-contenedor, .totales-contenedor, .finalizar-compra-contenedor {
+    display: block; width: 95%; max-width: 600px;
+    margin: 20px auto; clear: both;
 }
 
 .item-carrito {
-    display: flex;
-    flex-direction: row; 
-    align-items: center;
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    width: 100%;
-    box-sizing: border-box;
+    display: flex; align-items: center; background: white;
+    padding: 15px; border-radius: var(--radius);
+    border: 1px solid var(--border); margin-bottom: 15px;
 }
 
-.item-carrito img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-right: 15px;
-}
-
-.item-carrito .info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-/* --- 6. ENVÍO Y TOTALES (DEBAJO DEL CARRITO) --- */
-.envio-contenedor, .totales-contenedor {
-    width: 100%;
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 15px;
-    border: 1px solid var(--border);
-    text-align: center;
-    box-sizing: border-box;
-    display: block; /* Forzamos a que sea un bloque independiente */
-}
-
-/* --- 7. BOTONES DE ACCIÓN --- */
-.acciones-carrito {
-    max-width: 700px;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column; /* Botones uno arriba del otro en móvil */
-    gap: 10px;
-    padding: 0 20px;
-}
-
-@media (min-width: 600px) {
-    .acciones-carrito {
-        flex-direction: row; /* En PC se ponen uno al lado del otro */
-        justify-content: space-between;
-    }
-}
-
-/* --- 8. BOTÓN WHATSAPP FINAL --- */
-.finalizar-compra-contenedor {
-    width: 100%;
-    max-width: 700px;
-    margin: 30px auto 50px auto; /* Mucho margen abajo para que no lo tape nada */
-    text-align: center;
-}
+.item-carrito img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; }
 
 .btn-whatsapp {
-    display: flex; /* Cambiado a flex para centrar contenido */
-    align-items: center;
-    justify-content: center;
-    background-color: var(--success);
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    font-size: 1.2rem;
-    font-weight: 800;
-    text-decoration: none;
-    width: 100%; /* Ocupa todo el ancho del contenedor */
-    box-sizing: border-box;
-}
-/* --- 9. PANEL ADMIN Y OTROS --- */
-.admin-card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; }
-.instagram-btn {
-    display: inline-flex;
-    align-items: center;
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    margin: 20px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--success); color: white; padding: 20px;
+    border-radius: 15px; font-size: 1.2rem; font-weight: 800;
 }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 600px) {
-    .item-carrito { flex-direction: row; }
-    .item-carrito img { width: 80px; height: 80px; }
-    .acciones-carrito { flex-direction: column; gap: 10px; }
-}
+/* --- 6. PANEL ADMIN --- */
+.admin-body { background-color: var(--bg-gray); padding: 20px; }
 
-.carrito-lista, 
-.envio-contenedor, 
-.totales-contenedor, 
-.finalizar-compra-contenedor {
-    display: block !important;
-    width: 95% !important;
-    max-width: 600px !important;
-    margin: 20px auto !important;
-    float: none !important; /* Por si hay algún float viejo */
-    clear: both !important;
-}
-
-.item-carrito {
-    display: flex !important;
-    flex-direction: row !important;
-    width: 100% !important;
-    box-sizing: border-box;
-}
-
-/* El botón de WhatsApp ahora es un bloque gigante al final */
-.btn-whatsapp {
-    display: flex !important;
-    width: 100% !important;
-    position: relative !important; /* Le sacamos lo sticky por ahora para que baje */
-    bottom: 0 !important;
-    left: 0 !important;
-    transform: none !important;
-}
-
-/* Esto asegura que cada bloque ocupe su propio renglón */
-.carrito-lista, 
-.envio-contenedor, 
-.totales-contenedor, 
-.acciones-carrito, 
-.finalizar-compra-contenedor {
-    display: block;
-    width: 95%;
-    max-width: 600px;
-    margin: 20px auto;
-    clear: both;
-}
-
-.item-carrito {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #eee;
-    border-radius: 10px;
-}
-
-.finalizar-compra-contenedor {
-    margin-top: 40px;
-    margin-bottom: 60px;
-}
-
-.btn-whatsapp {
-    display: block;
-    text-align: center;
-    background: #25D366;
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-/* --- 7. BOTONES DE ACCIÓN (SEGUIR COMPRANDO / VACIAR) --- */
-.acciones-carrito {
-    max-width: 600px;
-    margin: 20px auto;
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 0 10px;
-}
-
-/* Botón Seguir Comprando */
-.btn-seguir {
-    flex: 1;
-    text-align: center;
-    background-color: transparent;
-    color: var(--primary);
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: 2px solid var(--primary);
-    font-weight: 700;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.btn-seguir:hover {
-    background-color: var(--primary);
-    color: white;
-}
-
-/* Botón Vaciar Carrito */
-.btn-vaciar {
-    flex: 1;
-    text-align: center;
-    background-color: #fff1f2; /* Un rojo muy clarito de fondo */
-    color: var(--danger);
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: 1px solid #fecaca;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.btn-vaciar:hover {
-    background-color: var(--danger);
-    color: white;
-    border-color: var(--danger);
-}
-
-/* Ajuste para celulares */
-@media (max-width: 480px) {
-    .acciones-carrito {
-        flex-direction: column; /* En celular, uno arriba del otro */
-    }
-}
-
-/* --- 8. FOOTER CENTRADO --- */
-.footer {
-    background: var(--bg-gray);
-    padding: 40px 20px;
-    margin-top: 50px;
-    border-top: 1px solid var(--border);
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column; /* Alinea los elementos uno debajo del otro */
-    align-items: center;    /* Centra horizontalmente */
-    text-align: center;     /* Centra el texto */
-    gap: 20px;              /* Espacio entre el botón y el texto */
-}
-
-/* Ajuste del botón de Instagram para que no flote */
-.instagram-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-    color: white;
-    padding: 12px 25px;
-    border-radius: 30px;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(214, 36, 159, 0.3);
-    transition: transform 0.3s;
-}
-
-.instagram-btn:hover {
-    transform: scale(1.05);
-}
-
-/* Estilo del Copyright */
-.copyright {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin: 0;
-}
-
-/* --- ESTILO TÍTULO CARRITO --- */
-.carrito-header {
-    text-align: center;
-    margin: 40px auto 20px;
-    max-width: 600px;
-}
-
-.carrito-header h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-.header-line {
-    width: 60px;
-    height: 4px;
-    background: var(--primary);
-    margin: 0 auto;
-    border-radius: 2px;
-    /* Un pequeño detalle de color para que no sea solo negro */
-    background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%);
-}
-
-/* Efecto suave al cargar */
-@keyframes fadeInTitle {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.carrito-header {
-    animation: fadeInTitle 0.6s ease-out;
-}
-
-
-opciones-entrega {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid var(--border);
-    max-width: 600px;
-    margin: 20px auto;
-}
-
-.entrega-toggle {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.entrega-toggle .opcion {
-    flex: 1;
-    cursor: pointer;
-}
-
-.entrega-toggle input {
-    display: none; /* Escondemos el radio button original */
-}
-
-.entrega-toggle span {
-    display: block;
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: 600;
-    transition: 0.3s;
-}
-
-.entrega-toggle input:checked + span {
-    border-color: var(--success);
-    background: #eafff2;
-    color: #128c7e;
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-:root {
-    --primary-logo: #1e3a8a; /* Azul profundo (Elegante y profesional) */
-    --secondary-logo: #334155; /* Gris azulado (Para textos secundarios) */
-    --accent: #2563eb; /* Azul vibrante para botones */
-    --bg-body: #f8fafc;
-    --text-main: #1e293b; /* Color de letra principal */
-    --text-titles: #0f172a; /* Color para títulos H1, H2 */
-    --border: #cbd5e1;
-    --radius: 12px;
-}
-body.admin-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-body);
-    color: var(--text-main); /* Letras que combinan con el logo */
-}
-
-h1, h2, h3 {
-    color: var(--primary-logo); /* Títulos en el azul del logo */
-    font-weight: 700;
-    letter-spacing: -0.025em;
-}
-
-/* El encabezado del panel */
-.admin-header h1 {
-    color: var(--primary-logo);
-}
-
-
-/* --- HEADER --- */
 .admin-header {
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg-card);
-    padding: 1rem 2rem;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    background-color: var(--primary); color: #fff;
+    padding: 20px; display: flex; justify-content: space-between;
+    align-items: center; border-radius: 8px; margin-bottom: 20px;
 }
 
-.admin-header h1 {
-    font-size: 1.5rem;
-    margin: 0;
-    color: var(--primary);
+.admin-container { max-width: 1100px; margin: 0 auto; }
+
+.form-seccion {
+    background: white; padding: 25px; border-radius: 8px;
+    margin-bottom: 30px; border: 1px solid #ddd;
 }
 
-.btn-logout {
-    text-decoration: none;
-    color: var(--danger);
-    font-weight: 600;
-    padding: 8px 16px;
-    border: 1.5px solid var(--danger);
-    border-radius: 8px;
-    transition: all 0.2s;
+.admin-tabla { width: 100%; border-collapse: collapse; background: white; }
+
+.admin-tabla th, .admin-tabla td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+
+.admin-tabla th { background-color: #f8f8f8; text-transform: uppercase; font-size: 0.8rem; }
+
+/* --- 7. BOTONES GENERALES --- */
+.btn-negro {
+    background: var(--primary); color: #fff; padding: 12px 25px;
+    border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
 }
 
-.btn-logout:hover {
-    background: var(--danger);
-    color: white;
+.btn-eliminar {
+    background-color: var(--danger); color: white;
+    padding: 6px 12px; border-radius: 4px; font-size: 0.85rem;
 }
 
-/* --- FORMULARIO DE AGREGAR --- */
-.admin-form {
-    max-width: 1200px;
-    margin: 0 auto 40px;
-    background: var(--bg-card);
-    padding: 25px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+.btn-logout { color: #fff; border: 1px solid #fff; padding: 8px 15px; border-radius: 4px; }
+
+/* --- 8. FOOTER --- */
+.footer {
+    background: #f9f9f9; padding: 40px 20px; margin-top: 50px;
+    border-top: 1px solid var(--border); text-align: center;
 }
 
-.admin-form h2 {
-    margin: 0 0 20px 0;
-    font-size: 1.25rem;
-    color: var(--text-main);
+.instagram-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold;
 }
 
-.admin-form form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-}
-
-/* --- INPUTS Y SELECTS --- */
-input, select {
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-input:focus, select:focus {
-    border-color: var(--primary);
-}
-
-.admin-form button[type="submit"] {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* --- BUSCADOR POR CÓDIGO --- */
-.admin-buscador-codigo {
-    max-width: 1200px;
-    margin: 0 auto 20px;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.admin-buscador-codigo i {
-    position: absolute;
-    left: 15px;
-    color: var(--text-muted);
-}
-
-.admin-buscador-codigo input {
-    width: 100%;
-    padding: 15px 15px 15px 45px;
-    font-size: 1rem;
-    border: 2px solid var(--primary);
-    box-shadow: var(--shadow);
-}
-
-/* --- GRID DE PRODUCTOS --- */
-.admin-productos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* --- TARJETA DE PRODUCTO (ADMIN-CARD) --- */
-.admin-card {
-    background: var(--bg-card);
-    padding: 20px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.admin-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: contain;
-    background: #f1f5f9;
-    border-radius: 8px;
-}
-
-.admin-card input, .admin-card select {
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* --- ACCIONES --- */
-.acciones {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.acciones button {
-    flex: 4;
-    background: var(--success);
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.acciones .eliminar {
-    flex: 1;
-    background: #fee2e2;
-    color: var(--danger);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    transition: background 0.2s;
-}
-
-.acciones .eliminar:hover {
-    background: var(--danger);
-    color: white;
-}
-
-/* RESPONSIVO */
-@media (max-width: 768px) {
-    .admin-form form {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-/* --- PALETA DE COLORES BASADA EN EL LOGO --- */
-:root {
-    --primary-logo: #1e3a8a; /* Azul profundo (Elegante y profesional) */
-    --secondary-logo: #334155; /* Gris azulado (Para textos secundarios) */
-    --accent: #2563eb; /* Azul vibrante para botones */
-    --bg-body: #f8fafc;
-    --text-main: #1e293b; /* Color de letra principal */
-    --text-titles: #0f172a; /* Color para títulos H1, H2 */
-    --border: #cbd5e1;
-    --radius: 12px;
-}
-
-/* --- ESTILOS DE TEXTO --- */
-body.admin-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-body);
-    color: var(--text-main); /* Letras que combinan con el logo */
-}
-
-h1, h2, h3 {
-    color: var(--primary-logo); /* Títulos en el azul del logo */
-    font-weight: 700;
-    letter-spacing: -0.025em;
-}
-
-/* El encabezado del panel */
-.admin-header h1 {
-    color: var(--primary-logo);
-}
-
-/* Etiquetas y placeholders */
-input::placeholder {
-    color: var(--secondary-logo);
-    opacity: 0.7;
-}
-
-/* Estilo para el nombre del producto en las tarjetas */
-.admin-card input[name="nombre"] {
-    font-weight: 700;
-    color: var(--primary-logo);
-    border-bottom: 2px solid var(--border);
-}
-
-/* El buscador de código */
-.admin-buscador-codigo i {
-    color: var(--primary-logo);
-}
-
-.admin-buscador-codigo input {
-    color: var(--primary-logo);
-    font-weight: 600;
-}
-
-/* Botones con el color de acento */
-.admin-form button[type="submit"] {
-    background: var(--primary-logo);
-    box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2);
-}
-
-.admin-form button[type="submit"]:hover {
-    background: var(--accent);
-}
-
-/* Contenedor principal más alto */
+/* Contenedor del Banner */
 .slider-container {
     width: 100%;
-    height: 550px; /* Aumentamos la altura para que no sea tan alargado */
+    height: 500px; 
     overflow: hidden;
     position: relative;
-    background-color: #fff;
     margin-bottom: 40px;
 }
 
 .slide {
-    position: absolute;
     width: 100%;
     height: 100%;
-    opacity: 0;
     display: flex;
     align-items: center;
     justify-content: flex-end; /* Tira el texto a la derecha */
-    transition: opacity 0.8s ease-in-out;
+    background-size: cover;
+    background-position: center;
+}
+
+/* La caja de texto blanca sobre la foto */
+.slide-text-container {
+    margin-right: 7%;
+    background: rgba(255, 255, 255, 0.85); /* Blanco con transparencia */
+    padding: 40px;
+    border-radius: 30px;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.slide-text-container h2 {
+    font-size: 2.5rem;
+    color: var(--primary-logo);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.slide-text-container p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.btn-promo {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+}
+
+/* Mejora el aspecto de los campos en el panel de admin */
+.form-seccion form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espacio entre cuadritos */
+}
+
+.form-seccion textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.slider-container {
+    position: relative;
+    height: 550px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out; /* Efecto de desvanecido */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     background-size: cover;
     background-position: center;
 }
 
 .slide.active {
     opacity: 1;
+    z-index: 1;
 }
 
-/* La caja de texto del espejo */
-.slide-text-container {
-    margin-right: 7%;
-    background: rgba(255, 255, 255, 0.9); /* Más sólido como en la foto */
-    padding: 50px 40px;
-    border-radius: 30px;
-    max-width: 450px;
+.admin-tabla img {
+    max-width: 120px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.productos {
+    display: grid;
+    /* Esto es lo más importante: obliga a crear columnas de máximo 280px */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 25px;
+    padding: 40px 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* LA TARJETA DEL PRODUCTO */
+.card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 20px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15); /* Sombra profunda */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Para que todas midan lo mismo */
 }
 
-.slide-text-container h2 {
-    font-size: 3rem;
-    color: #333;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* LA IMAGEN DENTRO DE LA TARJETA */
+.card img {
+    width: 100%;
+    height: 220px; /* Altura fija para que no se deforme */
+    object-fit: contain; /* Cambié a contain para que veas el producto entero sin cortes */
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+
+/* Contenedor del + y - */
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     margin: 10px 0;
+}
+
+.btn-qty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 50%; /* Los hace redondos */
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.2s;
+}
+
+.btn-qty:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.qty-numero {
     font-weight: 800;
-    text-transform: uppercase;
+    font-size: 1.1rem;
+    min-width: 20px;
+    text-align: center;
 }
 
-.slide-text-container p {
-    font-size: 1.3rem;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-/* Botón Negro Redondeado */
-.btn-promo {
+.btn-quitar {
+    color: var(--danger);
+    font-size: 0.85rem;
+    text-decoration: underline;
+    margin-top: 10px;
     display: inline-block;
-    background: #000;
-    color: #fff;
-    padding: 15px 40px;
-    border-radius: 50px;
+}
+
+/* Contenedor de los botones de abajo */
+.acciones-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+/* Estilo general para ambos botones */
+.btn-seguir, .btn-vaciar {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
     text-decoration: none;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+/* Botón Seguir Comprando (Negro/Elegante) */
+.btn-seguir {
+    background-color: #222;
+    color: white;
+    border: 1px solid #222;
+}
+
+.btn-seguir:hover {
+    background-color: transparent;
+    color: #222;
+}
+
+/* Botón Vaciar Carrito (Gris/Rojo suave) */
+.btn-vaciar {
+    background-color: #f8f9fa;
+    color: #dc3545; /* Rojo para indicar que borra */
+    border: 1px solid #dc3545;
+}
+
+.btn-vaciar:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para el botón de WhatsApp (El más importante) */
+.finalizar-compra-contenedor {
+    text-align: center;
+    margin-top: 20px;
+    padding-bottom: 50px;
+}
+
+.btn-whatsapp {
+    display: inline-block;
+    background-color: #25d366; /* Verde WhatsApp */
+    color: white;
+    padding: 18px 35px;
+    border-radius: 50px;
     font-weight: bold;
     font-size: 1.1rem;
-    transition: transform 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+    transition: 0.3s;
 }
 
-.btn-promo:hover {
+.btn-whatsapp:hover {
     transform: scale(1.05);
+    background-color: #128c7e;
 }
 
-.card .precio {
-    font-weight: 800;       /* Negrita bien gruesa */
-    font-size: 1.4rem;      /* Un poco más grande que el resto */
-    color: #000000;         /* Color negro puro */
-    margin: 10px 0;         /* Espacio arriba y abajo del precio */
-    display: block;         /* Asegura que ocupe su propia línea */
+
+/* Estilo para la imagen miniatura */
+.zoom-img {
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.card .precio::first-letter {
-    font-weight: 400;
-    font-size: 1.1rem;
-    margin-right: 2px;
+.zoom-img:hover {
+    opacity: 0.8;
 }
 
-.modal-foto {
+/* El fondo del modal */
+.modal-zoom {
     display: none; /* Oculto por defecto */
     position: fixed;
-    z-index: 9999; /* Por encima de TODO */
+    z-index: 9999;
+    padding-top: 50px;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); /* Negro casi total */
-    justify-content: center;
-    align-items: center;
-    cursor: zoom-out; /* Indica que al hacer clic se cierra */
+    background-color: rgba(0,0,0,0.9);
 }
 
-/* La imagen dentro del modal */
+/* La imagen ampliada */
 .modal-contenido {
-    max-width: 90%;
-    max-height: 80%;
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    animation: zoomIn 0.3s ease; /* Efecto de aparición */
+    animation: zoom 0.3s;
 }
 
-/* Animación para que la foto "salte" a la vista */
-@keyframes zoomIn {
-    from { transform: scale(0.7); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+/* Botón cerrar */
+.cerrar-zoom {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
 }

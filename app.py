@@ -1,215 +1,284 @@
-from flask import Flask, render_template, request, redirect, session, url_for
-from datetime import timedelta
+import os
+import json
+from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from functools import wraps
-import json
-import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
-app.secret_key = "1124023140aA@"  # Cambiá esto por algo más seguro luego
-app.permanent_session_lifetime = timedelta(days=7)
+app.secret_key = 'bazar_guille_key_secret'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# --- CONFIGURACIÓN DE CREDENCIALES ---
-# Intentamos obtenerlas de las variables de entorno (para Render)
-# Si no existen, usamos los valores por defecto (para tu PC local)
-ADMIN_USER = os.environ.get("ADMIN_USER", "mariasotelo")
-ADMIN_PASS = os.environ.get("ADMIN_PASS", "241289maria@")
+# Archivos de datos
+PRODUCTOS_JSON = 'productos.json'
+BANNERS_JSON = 'banners.json'
 
-# Esto es muy útil para saber si Render las tomó bien:
-if os.environ.get("ADMIN_USER"):
-    print("Corriendo con variables de entorno de producción")
+# --- FUNCIONES DE PERSISTENCIA ---
+def cargar_datos(archivo):
+    if not os.path.exists(archivo):
+        # Si no existe, devuelve una lista vacía
+        return []
+    with open(archivo, 'r', encoding='utf-8') as f:
+        try:
+            return json.load(f)
+        except:
+            return []
 
-# Rutas de archivos
-ARCHIVO = os.path.join(BASE_DIR, "productos.json")
-ARCHIVO_BANNER = os.path.join(BASE_DIR, "banner.json")
-UPLOADS = os.path.join(BASE_DIR, "static", "uploads")
+def guardar_datos(archivo, datos):
+    with open(archivo, 'w', encoding='utf-8') as f:
+        json.dump(datos, f, indent=4, ensure_ascii=False)
 
-os.makedirs(UPLOADS, exist_ok=True)
+# Asegurar carpeta de fotos
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# --- DECORADOR DE SEGURIDAD ---
+# --- SEGURIDAD ---
 def login_requerido(f):
     @wraps(f)
-    def decorador(*args, **kwargs):
-        if not session.get("admin"):
-            return redirect(url_for("login"))
+    def decorated_function(*args, **kwargs):
+        if 'admin' not in session:
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
-    return decorador
+    return decorated_function
 
-# --- FUNCIONES DE PERSISTENCIA (JSON) ---
-def cargar_productos():
-    if not os.path.exists(ARCHIVO): return []
-    with open(ARCHIVO, "r", encoding="utf-8") as f: return json.load(f)
+# --- RUTAS PÚBLICAS ---
 
-def guardar_productos(productos):
-    with open(ARCHIVO, "w", encoding="utf-8") as f: 
-        json.dump(productos, f, indent=4, ensure_ascii=False)
-
-def cargar_banner():
-    if not os.path.exists(ARCHIVO_BANNER): return []
-    with open(ARCHIVO_BANNER, "r", encoding="utf-8") as f: return json.load(f)
-
-def guardar_banner(banner):
-    with open(ARCHIVO_BANNER, "w", encoding="utf-8") as f: 
-        json.dump(banner, f, indent=4, ensure_ascii=False)
-
-# --- RUTAS PÚBLICAS (TIENDA) ---
-
-@app.route("/")
+@app.route('/')
 def index():
-    categoria = request.args.get("categoria")
-    busqueda = request.args.get("q", "").lower()
-    productos = cargar_productos()
-    banner = cargar_banner()
-
-    if categoria:
-        productos = [p for p in productos if p.get("categoria") == categoria]
-    if busqueda:
-        productos = [p for p in productos if busqueda in p["nombre"].lower() or busqueda in p.get("codigo", "").lower()]
-
-    # Cálculo del total de items en el carrito para el contador
-    carrito = session.get("carrito", [])
-    total_items = sum(item["cantidad"] for item in carrito)
+    productos = cargar_datos(PRODUCTOS_JSON)
+    banners = cargar_datos(BANNERS_JSON)
     
-    return render_template("tienda.html", productos=productos, carrito_total=total_items, banner=banner)
-
-@app.route("/agregar_carrito/<int:id>")
-def agregar_carrito(id):
-    if "carrito" not in session:
-        session["carrito"] = []
+    cat = request.args.get('cat')
+    q = request.args.get('q')
     
-    carrito = session["carrito"]
-    encontrado = False
-    for item in carrito:
-        if item["id"] == id:
-            item["cantidad"] += 1
-            encontrado = True
-            break
+    # Filtrado
+    productos_mostrar = productos
+    if cat and cat != "Todos":
+        productos_mostrar = [p for p in productos_mostrar if p.get('categoria') == cat]
     
-    if not encontrado:
-        carrito.append({"id": id, "cantidad": 1})
+    if q:
+        productos_mostrar = [p for p in productos_mostrar if q.lower() in p.get('nombre', '').lower()]
+        
+    # --- LIMPIEZA DE CARRITO (FANTASMAS) ---
+    carrito = session.get('carrito', [])
+    ids_existentes = [str(p['id']) for p in productos]
+    # Solo dejamos en el carrito los IDs que realmente están en el JSON
+    carrito_limpio = [p_id for p_id in carrito if str(p_id) in ids_existentes]
     
-    session["carrito"] = carrito
-    session.modified = True
-    return redirect(url_for("index"))
+    if len(carrito) != len(carrito_limpio):
+        session['carrito'] = carrito_limpio
+        session.modified = True
 
-@app.route("/carrito")
-def ver_carrito():
-    productos_db = cargar_productos()
-    carrito_session = session.get("carrito", [])
-    productos_carrito = []
-    total = 0
-
-    for item in carrito_session:
-        producto = next((p for p in productos_db if p["id"] == item["id"]), None)
-        if producto:
-            subtotal = producto["precio"] * item["cantidad"]
-            total += subtotal
-            productos_carrito.append({
-                "id": producto["id"],
-                "nombre": producto["nombre"],
-                "precio": producto["precio"],
-                "cantidad": item["cantidad"],
-                "imagen": producto.get("imagen"),
-                "subtotal": subtotal
-            })
+    return render_template('tienda.html', 
+                           productos=productos_mostrar, 
+                           banners=banners, 
+                           carrito_total=len(carrito_limpio))
     
-    return render_template("carrito.html", productos=productos_carrito, total=total)
-
-# --- RUTAS DE ADMINISTRACIÓN ---
-
-@app.route("/login", methods=["GET", "POST"])
+    
+    
+    
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == "POST":
-        if request.form.get("usuario") == ADMIN_USER and request.form.get("password") == ADMIN_PASS:
-            session["admin"] = True
-            return redirect(url_for("admin"))
-        return render_template("login.html", error="Credenciales incorrectas")
-    return render_template("login.html")
+    if request.method == 'POST':
+        if request.form.get('usuario') == 'admin' and request.form.get('password') == 'guille123':
+            session['admin'] = True
+            return redirect(url_for('admin'))
+    return render_template('login.html')
 
-@app.route("/logout")
+@app.route('/logout')
 def logout():
-    session.pop("admin", None)
-    return redirect(url_for("index"))
+    session.pop('admin', None)
+    return redirect(url_for('index'))
 
-@app.route("/admin")
+# --- PANEL DE ADMINISTRACIÓN ---
+
+@app.route('/admin')
 @login_requerido
 def admin():
-    productos = cargar_productos()
-    banner = cargar_banner()
-    categorias = ["Cocina", "Baño", "Decoración", "Limpieza"]
-    return render_template("admin.html", productos=productos, categorias=categorias, banner=banner)
+    productos = cargar_datos(PRODUCTOS_JSON)
+    banners = cargar_datos(BANNERS_JSON)
+    categorias = ["Cocina", "Baño", "Decoración", "Otros"]
+    return render_template('admin.html', productos=productos, banners=banners, categorias=categorias)
 
-@app.route("/admin/banner/agregar", methods=["POST"])
-@login_requerido
-def agregar_banner():
-    banner = cargar_banner()
-    titulo = request.form.get("titulo")
-    subtitulo = request.form.get("subtitulo")
-    imagen = request.files.get("imagen")
-    
-    nombre_img = ""
-    if imagen and imagen.filename != "":
-        nombre_img = secure_filename(imagen.filename)
-        imagen.save(os.path.join(UPLOADS, nombre_img))
-    
-    # Genera un ID aleatorio para el slide del banner
-    import random
-    nuevo_slide = {
-        "id": random.randint(1000, 9999),
-        "titulo": titulo,
-        "subtitulo": subtitulo,
-        "imagen": nombre_img
-    }
-    banner.append(nuevo_slide)
-    guardar_banner(banner)
-    return redirect(url_for("admin"))
-
-@app.route("/admin/banner/eliminar/<int:id>")
-@login_requerido
-def eliminar_banner(id):
-    banner = cargar_banner()
-    banner = [b for b in banner if b["id"] != id]
-    guardar_banner(banner)
-    return redirect(url_for("admin"))
-
-@app.route("/admin/producto/agregar", methods=["POST"])
+@app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
-    productos = cargar_productos()
-    nombre = request.form.get("nombre")
-    precio = float(request.form.get("precio"))
-    categoria = request.form.get("categoria")
-    stock = int(request.form.get("stock"))
-    imagen = request.files.get("imagen")
+    productos = cargar_datos(PRODUCTOS_JSON)
+    nombre = request.form.get('nombre')
+    precio = request.form.get('precio')
+    categoria = request.form.get('categoria')
+    stock = request.form.get('stock')
+    imagen = request.files.get('imagen')
     
     nombre_img = ""
-    if imagen and imagen.filename != "":
+    if imagen:
         nombre_img = secure_filename(imagen.filename)
-        imagen.save(os.path.join(UPLOADS, nombre_img))
+        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_img))
+    
+    # Generar ID nuevo
+    nuevo_id = max([p['id'] for p in productos], default=0) + 1
     
     nuevo_p = {
-        "id": int(os.urandom(2).hex(), 16),
+        "id": nuevo_id,
         "nombre": nombre,
-        "precio": precio,
+        "precio": float(precio),
         "categoria": categoria,
-        "stock": stock,
+        "stock": int(stock) if stock else 0,
         "imagen": nombre_img
     }
     
     productos.append(nuevo_p)
-    guardar_productos(productos)
-    return redirect(url_for("admin"))
+    guardar_datos(PRODUCTOS_JSON, productos)
+    return redirect(url_for('admin'))
 
-@app.route("/admin/producto/eliminar/<int:id>")
+@app.route('/admin/producto/eliminar/<int:id>')
 @login_requerido
 def eliminar_producto(id):
-    productos = cargar_productos()
-    productos = [p for p in productos if p["id"] != id]
-    guardar_productos(productos)
-    return redirect(url_for("admin"))
+    productos = cargar_datos(PRODUCTOS_JSON)
+    productos = [p for p in productos if p['id'] != id]
+    guardar_datos(PRODUCTOS_JSON, productos)
+    return redirect(url_for('admin'))
 
-if __name__ == "__main__":
-    # En Render, el puerto lo da la variable de entorno PORT
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+# --- SISTEMA DE CARRITO ---
+
+@app.route('/agregar_al_carrito', methods=['POST'])
+def agregar_al_carrito():
+    p_id = request.form.get('id')
+    carrito = session.get('carrito', [])
+    carrito.append(str(p_id))
+    session['carrito'] = carrito
+    session.modified = True
+    return redirect(url_for('index'))
+
+@app.route('/carrito')
+def mostrar_carrito():
+    ids_en_carrito = session.get('carrito', [])
+    todos_los_productos = cargar_datos(PRODUCTOS_JSON)
+    
+    conteo = {}
+    for p_id in ids_en_carrito:
+        conteo[str(p_id)] = conteo.get(str(p_id), 0) + 1
+    
+    carrito_render = []
+    total_productos = 0
+    for p_id, cantidad in conteo.items():
+        p = next((prod for prod in todos_los_productos if str(prod['id']) == p_id), None)
+        if p:
+            subtotal = p['precio'] * cantidad
+            total_productos += subtotal
+            item = p.copy()
+            item['cantidad'] = cantidad
+            carrito_render.append(item)
+    
+    # --- LÓGICA DE ENVÍO ---
+    costo_envio = session.get('envio', 0)
+    zona_envio = session.get('zona_envio', 'No seleccionada')
+    total_final = total_productos + costo_envio
+    
+    # Preparar mensaje de WhatsApp
+    mensaje = "Hola Bazar Guille! Mi pedido:\n"
+    for item in carrito_render:
+        mensaje += f"- {item['nombre']} x{item['cantidad']} (${item['precio']})\n"
+    
+    if costo_envio > 0:
+        mensaje += f"\nEnvío ({zona_envio}): ${costo_envio}"
+    
+    mensaje += f"\n*Total Final: ${total_final}*"
+    
+    mensaje_limpio = mensaje.replace(' ', '%20').replace('\n', '%0A')
+    link_wa = f"https://wa.me/5491149899616?text={mensaje_limpio}"
+
+    return render_template('carrito.html', 
+                           carrito=carrito_render, 
+                           total=total_productos, 
+                           envio=costo_envio,
+                           zona=zona_envio,
+                           total_final=total_final,
+                           link_whatsapp=link_wa)
+    
+
+@app.route('/aumentar/<int:id>')
+def aumentar(id):
+    carrito = session.get('carrito', [])
+    carrito.append(str(id))
+    session['carrito'] = carrito
+    session.modified = True
+    return redirect(url_for('mostrar_carrito'))
+
+@app.route('/disminuir/<int:id>')
+def disminuir(id):
+    carrito = session.get('carrito', [])
+    if str(id) in carrito:
+        carrito.remove(str(id))
+        session['carrito'] = carrito
+        session.modified = True
+    return redirect(url_for('mostrar_carrito'))
+
+@app.route('/carrito/eliminar/<int:id>')
+def eliminar_del_carrito(id):
+    carrito = session.get('carrito', [])
+    nuevo_carrito = [p_id for p_id in carrito if str(p_id) != str(id)]
+    session['carrito'] = nuevo_carrito
+    session.modified = True
+    return redirect(url_for('mostrar_carrito'))
+
+@app.route('/carrito/vaciar')
+def vaciar_carrito():
+    session.pop('carrito', None)
+    return redirect(url_for('index'))
+
+@app.route('/admin/banner/agregar', methods=['POST'])
+@login_requerido
+def agregar_banner():
+    banners = cargar_datos(BANNERS_JSON)
+    titulo = request.form.get('titulo')
+    descripcion = request.form.get('descripcion')
+    imagen = request.files.get('imagen')
+    
+    if imagen:
+        nombre_img = secure_filename(imagen.filename)
+        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_img))
+        
+        nuevo_id = max([b['id'] for b in banners], default=0) + 1
+        nuevo_b = {
+            "id": nuevo_id,
+            "imagen": nombre_img,
+            "titulo": titulo,
+            "descripcion": descripcion
+        }
+        banners.append(nuevo_b)
+        guardar_datos(BANNERS_JSON, banners)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/banner/eliminar/<int:id>')
+@login_requerido
+def eliminar_banner(id):
+    banners = cargar_datos(BANNERS_JSON)
+    banners = [b for b in banners if b['id'] != id]
+    guardar_datos(BANNERS_JSON, banners)
+    return redirect(url_for('admin'))
+
+
+@app.route('/calcular_envio', methods=['POST'])
+def calcular_envio():
+    zona = request.form.get('zona')
+    
+    # Definí acá tus costos por zona
+    tarifas = {
+        "CABA": 10000,
+        "Zona Norte": 15000,
+        "Zona Sur": 7000,
+        "Zona Oeste": 10000,
+        "Retiro en local": 0
+    }
+    
+    costo = tarifas.get(zona, 0)
+    
+    # Guardamos en la sesión
+    session['envio'] = costo
+    session['zona_envio'] = zona
+    session.modified = True
+    
+    return redirect(url_for('mostrar_carrito'))
+
+if __name__ == '__main__':
+    app.run(debug=True)

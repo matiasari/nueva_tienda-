@@ -2,122 +2,144 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    
-    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
-    <title>Bazar Guille</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ range(1, 1000) | random }}">
-
-
+    <title>Bazar Guille - Tienda</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    <style>
+        /* ESTILOS PARA EL ZOOM (Agregalos aquí o en tu estilos.css) */
+        .zoom-img { cursor: pointer; transition: 0.3s; }
+        .zoom-img:hover { opacity: 0.9; transform: scale(1.02); }
+        .modal-zoom {
+            display: none; position: fixed; z-index: 10000; padding-top: 50px;
+            left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);
+        }
+        .modal-contenido {
+            margin: auto; display: block; width: 80%; max-width: 700px;
+            border-radius: 10px; animation: zoom 0.3s;
+        }
+        @keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
+        .cerrar-zoom {
+            position: absolute; top: 15px; right: 35px; color: #fff;
+            font-size: 40px; font-weight: bold; cursor: pointer;
+        }
+    </style>
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-6Y3MN0GKBN');
-</script>
-
 <body>
 
-<header class="header">
-    <div class="header-left">
-        <img src="{{ url_for('static', filename='logo.ico') }}" class="logo">
-        <span class="nombre">BAZAR_GUILLE</span>
-    </div>
-    <div class="header-right">
-        <a href="/carrito" class="carrito-btn">
-            🛒 Carrito
-            {% if carrito_total > 0 %}<span class="contador">{{ carrito_total }}</span>{% endif %}
-        </a>
-    </div>
-</header>
+    <header class="header">
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo" class="logo-img">
+            <span class="nombre">BAZAR GUILLE</span>
+        </div>
+        <div class="header-right">
+            <a href="/carrito" class="carrito-btn">
+                🛒 Carrito
+                {% if carrito_total > 0 %}
+                    <span class="contador">{{ carrito_total }}</span>
+                {% endif %}
+            </a>
+        </div>
+    </header>
 
-<div class="categorias">
-    <a href="/">Todos</a>
-    <a href="/?categoria=Cocina">Cocina</a>
-    <a href="/?categoria=Baño">Baño</a>
-    <a href="/?categoria=Decoración">Decoración</a>
-    <a href="/?categoria=Limpieza">Limpieza</a>
-</div>
-
-{% if banner %}
-<div class="slider-container">
-    <div class="slider">
-        {% for b in banner %}
-        <div class="slide {% if loop.first %}active{% endif %}" 
-             style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
-            
+    {% if banners %}
+    <section class="slider-container">
+        {% for b in banners %}
+        <div class="slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
             <div class="slide-text-container">
-                <span class="tag">OFERTA</span>
                 <h2>{{ b.titulo }}</h2>
-                <p>{{ b.subtitulo }}</p>
-                <a href="https://wa.me/541124023140" class="btn-promo" target="_blank">Consultar</a>
+                <p>{{ b.descripcion }}</p>
+                <a href="#productos" class="btn-promo">Ver Productos</a>
             </div>
         </div>
         {% endfor %}
-    </div>
-</div>
-{% endif %}
+    </section>
+    {% endif %}
 
-<div class="productos">
-{% for p in productos %}
-    <div class="card">
-        {% if p.imagen %}
-            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
-                 onclick="ampliarImagen(this.src)" 
-                 style="cursor: pointer;" 
-                 alt="{{ p.nombre }}">
-        {% endif %}
-        <h3>{{ p.nombre }}</h3>
-        <p class="precio">$ {{ p.precio }}</p>
-        
-        {% if p.stock > 0 %}
-            <a href="/agregar_carrito/{{ p.id }}" class="btn-carrito">🛒 Agregar</a>
+    <div class="buscador">
+        <form action="/" method="GET">
+            <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" required>
+            <button type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <div class="categorias">
+        <a href="/">Todos</a>
+        <a href="/?cat=Cocina">Cocina</a>
+        <a href="/?cat=Baño">Baño</a>
+        <a href="/?cat=Decoración">Decoración</a>
+    </div>
+
+    <main class="productos" id="productos">
+        {% for p in productos %}
+        <div class="card">
+            {% if p.imagen %}
+                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                     alt="{{ p.nombre }}" 
+                     class="zoom-img" 
+                     onclick="abrirModal(this.src)">
+            {% else %}
+                <img src="{{ url_for('static', filename='logo.ico') }}" alt="Sin imagen">
+            {% endif %}
+            
+            <h3>{{ p.nombre }}</h3>
+            <p class="precio">${{ p.precio }}</p>
+            <p class="categoria">{{ p.categoria }}</p>
+            
+            <form action="/agregar_al_carrito" method="POST">
+                <input type="hidden" name="id" value="{{ p.id }}">
+                <button type="submit" class="btn-negro">Agregar al Carrito</button>
+            </form>
+        </div>
         {% else %}
-            <p class="sin-stock">Sin stock</p>
-        {% endif %}
+        <p style="text-align: center; grid-column: 1 / -1;">No hay productos cargados todavía.</p>
+        {% endfor %}
+    </main>
+
+    <div id="modalZoom" class="modal-zoom" onclick="cerrarModal()">
+        <span class="cerrar-zoom">&times;</span>
+        <img class="modal-contenido" id="imgAmpliada">
     </div>
-{% endfor %}
-</div>
 
-<footer class="footer">
-    <div class="footer-content">
-        <a href="https://www.instagram.com/bazar_guille" target="_blank" class="instagram-btn">
-            <i class="fa-brands fa-instagram"></i> Seguinos en Instagram
-        </a>
-        <p class="copyright">
-            &copy; 2026 Bazar Guille - Todos los derechos reservados.
-        </p>
-    </div>
-</footer>
+    <footer class="footer">
+        <div class="footer-content">
+            <a href="https://instagram.com/bazar_guille" class="instagram-btn">Síguenos en Instagram</a>
+            <p class="copyright">© 2026 Bazar Guille - Todos los derechos reservados</p>
+        </div>
+    </footer>
 
-<div id="modalImagen" class="modal-foto" onclick="this.style.display='none'">
-    <img id="imgExpandida" class="modal-contenido">
-</div>
+    <script>
+        // Lógica del Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
 
-<script>
-// Función para el Modal de imágenes
-function ampliarImagen(src) {
-    document.getElementById("modalImagen").style.display = "flex";
-    document.getElementById("imgExpandida").src = src;
-}
+        function nextSlide() {
+            if (slides.length > 0) {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+        }
 
-// Lógica del Slider automático
-let currentSlide = 0;
-const slides = document.querySelectorAll('.slide');
-if(slides.length > 1) {
-    setInterval(() => {
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
-    }, 5000); // Cambia cada 5 segundos para que luzca el zoom
-}
-</script>
+        if (slides.length > 1) {
+            setInterval(nextSlide, 5000);
+        }
 
+        // Lógica del Zoom
+        function abrirModal(src) {
+            document.getElementById("modalZoom").style.display = "block";
+            document.getElementById("imgAmpliada").src = src;
+        }
 
+        function cerrarModal() {
+            document.getElementById("modalZoom").style.display = "none";
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                cerrarModal();
+            }
+        });
+    </script>
 </body>
 </html>
