@@ -10,8 +10,15 @@ app = Flask(__name__)
 app.secret_key = "1124023140aA@"  # Cambiá esto por algo más seguro luego
 app.permanent_session_lifetime = timedelta(days=7)
 
-ADMIN_USER = "mariasotelo"
-ADMIN_PASS = "241289maria@"
+# --- CONFIGURACIÓN DE CREDENCIALES ---
+# Intentamos obtenerlas de las variables de entorno (para Render)
+# Si no existen, usamos los valores por defecto (para tu PC local)
+ADMIN_USER = os.environ.get("ADMIN_USER", "mariasotelo")
+ADMIN_PASS = os.environ.get("ADMIN_PASS", "241289maria@")
+
+# Esto es muy útil para saber si Render las tomó bien:
+if os.environ.get("ADMIN_USER"):
+    print("Corriendo con variables de entorno de producción")
 
 # Rutas de archivos
 ARCHIVO = os.path.join(BASE_DIR, "productos.json")
