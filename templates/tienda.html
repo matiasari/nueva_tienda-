@@ -6,24 +6,7 @@
     <title>Bazar Guille - Tienda</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
-    <style>
-        /* ESTILOS PARA EL ZOOM (Agregalos aquí o en tu estilos.css) */
-        .zoom-img { cursor: pointer; transition: 0.3s; }
-        .zoom-img:hover { opacity: 0.9; transform: scale(1.02); }
-        .modal-zoom {
-            display: none; position: fixed; z-index: 10000; padding-top: 50px;
-            left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);
-        }
-        .modal-contenido {
-            margin: auto; display: block; width: 80%; max-width: 700px;
-            border-radius: 10px; animation: zoom 0.3s;
-        }
-        @keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
-        .cerrar-zoom {
-            position: absolute; top: 15px; right: 35px; color: #fff;
-            font-size: 40px; font-weight: bold; cursor: pointer;
-        }
-    </style>
+  
 </head>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
@@ -97,7 +80,8 @@
             {% endif %}
             
             <h3>{{ p.nombre }}</h3>
-            <p class="precio">${{ p.precio }}</p>
+          <p class="precio">{{ p.precio | pesos }}</p>
+            </p>
             <p class="categoria">{{ p.categoria }}</p>
             
             <form action="/agregar_al_carrito" method="POST">
@@ -139,12 +123,14 @@
             setInterval(nextSlide, 5000);
         }
 
-        // Lógica del Zoom
-        function abrirModal(src) {
-            document.getElementById("modalZoom").style.display = "block";
-            document.getElementById("imgAmpliada").src = src;
-        }
-
+     // Ejemplo de cómo deberías abrirlo en tu JS
+        function abrirModal(imgSrc) {
+        const modal = document.querySelector('.modal-zoom');
+        const modalImg = document.querySelector('.modal-contenido');
+        modalImg.src = imgSrc;
+    
+        modal.style.display = 'flex'; // <--- USAR FLEX PARA CENTRAR
+}
         function cerrarModal() {
             document.getElementById("modalZoom").style.display = "none";
         }

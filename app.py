@@ -280,6 +280,15 @@ def calcular_envio():
     
     return redirect(url_for('mostrar_carrito'))
 
+
+def formato_pesos(valor):
+    try:
+        return f"${int(valor):,}".replace(",", ".")
+    except:
+        return "$0"
+
+app.jinja_env.filters['pesos'] = formato_pesos
+
 if __name__ == '__main__':
     # Render asigna un puerto dinámico, lo capturamos con os.environ
     port = int(os.environ.get("PORT", 5000))

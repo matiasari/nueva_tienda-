@@ -23,7 +23,6 @@
             {% endif %}
             <div class="info">
                 <h3>{{ item.nombre }}</h3>
-                <p>Precio: ${{ item.precio }}</p>
                 <div class="cantidad-control">
                     <a href="/disminuir/{{ item.id }}" class="btn-qty">-</a>
                     <span class="qty-numero">{{ item.cantidad }}</span>
@@ -61,24 +60,37 @@
                 <button type="submit">Calcular Costo</button>
             </form>
         </div>
+{% if envio > 0 %}
+<div class="resultado-envio">
+    <p>📍 Zona seleccionada: <strong>{{ zona }}</strong></p>
+    <p>📦 Costo de envío: <strong>{{ envio | pesos }}</strong></p>
+</div>
+{% endif %}
 
-        {% if envio > 0 %}
-        <div class="resultado-envio">
-            <p>📍 Zona seleccionada: <strong>{{ zona }}</strong></p>
-            <p>📦 Costo de envío: <strong>${{ envio }}</strong></p>
-        </div>
-        {% endif %}
-    </div>
+    <div class="resumen-compra">
+    <h3>🧾 Resumen de tu compra</h3>
 
-    <div class="totales-contenedor">
-        <p>Subtotal productos: ${{ total }}</p>
-        {% if envio > 0 %}
-            <p>Envío: ${{ envio }}</p>
-            <h2 style="color: #27ae60;">Total Final: ${{ total_final }}</h2>
-        {% else %}
-            <h2 style="color: #27ae60;">Total Final: ${{ total }}</h2>
-        {% endif %}
+    {% for item in carrito %}
+    <div class="resumen-item">
+        <span>{{ item.nombre }} x{{ item.cantidad }}</span>
+        <strong>{{ (item.precio * item.cantidad) | pesos }}</strong>
     </div>
+    {% endfor %}
+
+    {% if envio > 0 %}
+    <div class="resumen-item">
+        <span>Envío</span>
+        <strong>{{ envio | pesos }}</strong>
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <div class="resumen-total">
+        <span>Total Final</span>
+        <strong>{{ total_final | pesos if envio > 0 else total | pesos }}</strong>
+    </div>
+</div>
 
     <div class="acciones-carrito">
         <a href="/" class="btn-seguir">← Seguir comprando</a>

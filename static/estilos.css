@@ -451,54 +451,55 @@ a { text-decoration: none; }
 }
 
 
-/* Estilo para la imagen miniatura */
+* Imagen miniatura */
 .zoom-img {
-    cursor: pointer;
-    transition: 0.3s;
+    cursor: zoom-in;
 }
 
-.zoom-img:hover {
-    opacity: 0.8;
-}
-
-/* El fondo del modal */
+/* Modal fondo */
+/* Modal fondo - CORREGIDO */
 .modal-zoom {
-    display: none; /* Oculto por defecto */
+    display: none;        /* Se mantiene oculto al inicio */
     position: fixed;
     z-index: 9999;
-    padding-top: 50px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background-color: rgba(0,0,0,0.9);
+    
+    /* Estas 3 líneas centran la foto cuando el modal se activa */
+    align-items: center;
+    justify-content: center;
+    display: none;        /* Asegúrate de que esta sea la última línea de display */
 }
 
-/* La imagen ampliada */
+/* Imagen ampliada */
 .modal-contenido {
-    margin: auto;
-    display: block;
-    width: 80%;
-    max-width: 700px;
-    border-radius: 10px;
-    animation: zoom 0.3s;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    animation: zoomIn 0.25s ease;
 }
 
-@keyframes zoom {
-    from {transform:scale(0)} 
-    to {transform:scale(1)}
+/* Animación suave */
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0 }
+    to { transform: scale(1); opacity: 1 }
 }
 
 /* Botón cerrar */
 .cerrar-zoom {
     position: absolute;
-    top: 15px;
-    right: 35px;
+    top: 20px;
+    right: 25px;
     color: #fff;
-    font-size: 40px;
+    font-size: 35px;
     font-weight: bold;
     cursor: pointer;
+    z-index: 10000;
 }
+
 
 /* ================= BANNER / SLIDER LIMPIO ================= */
 
@@ -641,4 +642,40 @@ a { text-decoration: none; }
     .buscador button {
         text-align: center;
     }
+}
+
+.resumen-compra {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 520px;
+    margin: 30px auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.resumen-compra h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.resumen-compra hr {
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin: 15px 0;
+}
+
+.resumen-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #27ae60;
 }

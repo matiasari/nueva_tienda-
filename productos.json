@@ -1,35 +1,5 @@
 [
     {
-        "id": 2,
-        "nombre": "46X60CM Bandeja de cama madera",
-        "precio": 15000,
-        "stock": 3,
-        "imagen": "WhatsApp_Image_2025-11-12_at_16.51.23.jpeg",
-        "categoria": "Decoración",
-        "codigo": 42731440,
-        "peso": 0.9
-    },
-    {
-        "id": 3,
-        "nombre": "46X60CM Bandeja de cama negra",
-        "precio": 15000,
-        "stock": 2,
-        "categoria": "Decoración",
-        "imagen": "mesa_negra.jpeg",
-        "codigo": 42731447,
-        "peso": 0.9
-    },
-    {
-        "id": 4,
-        "nombre": "46X60CM Bandeja de cama madera clarita",
-        "precio": 15000,
-        "stock": 3,
-        "categoria": "Decoración",
-        "imagen": "bandeja_de_cama.png",
-        "codigo": 123456,
-        "peso": 0.9
-    },
-    {
         "id": 5,
         "nombre": "450ML TAZA CON BATIDOR A PILA",
         "precio": 15000,
@@ -150,13 +120,171 @@
         "peso": 0.9
     },
     {
-        "id": 17,
-        "nombre": "20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
-        "precio": 32000,
+        "id": 18,
+        "nombre": "4335514-12X9CM SETX4 ESPONJA COCINA SURT",
+        "precio": 3500,
+        "categoria": "Cocina",
+        "stock": 10,
+        "imagen": "4335514.jpg"
+    },
+    {
+        "id": 19,
+        "nombre": "4336082-14CM FRASCO ESPECIERO C/CUCHARA SURT",
+        "precio": 3000,
+        "categoria": "Cocina",
+        "stock": 6,
+        "imagen": "4336082.jpg"
+    },
+    {
+        "id": 20,
+        "nombre": "4614313-250ML TAZA DOBLE FONDO",
+        "precio": 6000,
+        "categoria": "Cocina",
+        "stock": 4,
+        "imagen": "4614313.jpg"
+    },
+    {
+        "id": 21,
+        "nombre": "4621473\t40X25CM TABLA PICAR PVC BLANCO",
+        "precio": 6000,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "4621473.jpg"
+    },
+    {
+        "id": 22,
+        "nombre": "488122-20CM ESCURRIDOR VEGETALES PLEGABLE",
+        "precio": 4500,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "488122.jpg"
+    },
+    {
+        "id": 23,
+        "nombre": "4910648\t13CM SET VASO MEDIDOR C/CUCHARAS MEDIDORAS",
+        "precio": 6000,
+        "categoria": "Cocina",
         "stock": 1,
-        "codigo": 4963331,
-        "categoria": "Decoración",
-        "imagen": "WhatsApp_Image_2026-01-25_at_15.02.48.jpeg",
-        "peso": 0.98
+        "imagen": "4910648.jpg"
+    },
+    {
+        "id": 24,
+        "nombre": "4911219-13CM PIMENTERO SURT",
+        "precio": 4500,
+        "categoria": "Cocina",
+        "stock": 4,
+        "imagen": "4911219.jpg"
+    },
+    {
+        "id": 25,
+        "nombre": "4916253\t29X13CM CANASTO P/PARED METAL AUTOADHESIVO SURT",
+        "precio": 6500,
+        "categoria": "Baño",
+        "stock": 2,
+        "imagen": "4916253.jpg"
+    },
+    {
+        "id": 26,
+        "nombre": "4916367-480ML BOTELLA VIDRIO SURT",
+        "precio": 3500,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "4916367.jpg"
+    },
+    {
+        "id": 27,
+        "nombre": "4917900-28CM CUBRE ALIMENTOS METAL SURT",
+        "precio": 3500,
+        "categoria": "Cocina",
+        "stock": 2,
+        "imagen": "4917900.jpg"
+    },
+    {
+        "id": 28,
+        "nombre": "4938100-9CM FILTRO DE AGUA P/CANILLA",
+        "precio": 2600,
+        "categoria": "Cocina",
+        "stock": 4,
+        "imagen": "4938100.jpg"
+    },
+    {
+        "id": 29,
+        "nombre": "4941259-10CM ESPECIERO VIDRIO",
+        "precio": 2500,
+        "categoria": "Cocina",
+        "stock": 10,
+        "imagen": "4941259.jpg"
+    },
+    {
+        "id": 30,
+        "nombre": "4944711-18CM DOSIFICADOR ACEITE VIDRIO",
+        "precio": 3200,
+        "categoria": "Cocina",
+        "stock": 6,
+        "imagen": "4944711.jpg"
+    },
+    {
+        "id": 31,
+        "nombre": "4946094-DISPENSER DE JABON C/ESPONJA",
+        "precio": 4000,
+        "categoria": "Cocina",
+        "stock": 4,
+        "imagen": "4946094.jpg"
+    },
+    {
+        "id": 32,
+        "nombre": "4950701-HUEVERA P/15 HUEVOS",
+        "precio": 4000,
+        "categoria": "Cocina",
+        "stock": 6,
+        "imagen": "4950701.jpg"
+    },
+    {
+        "id": 33,
+        "nombre": "4952126-10CM + 8 CM SETX2 MOLDE EMPANADAS",
+        "precio": 3200,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "4952126.jpg"
+    },
+    {
+        "id": 34,
+        "nombre": "4961443-16CM SETX50 PAPEL RESPUESTO P/AIRFRYER",
+        "precio": 2700,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4961443.jpg"
+    },
+    {
+        "id": 35,
+        "nombre": "4961458-20CM SETX50 PAPEL REPUESTO P/AIRFYER",
+        "precio": 3500,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4961458.jpg"
+    },
+    {
+        "id": 36,
+        "nombre": "4961462-16CM SETX50 PAPEL REPUESTO P/AIRFRYER CUAD",
+        "precio": 3100,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4961462.jpg"
+    },
+    {
+        "id": 37,
+        "nombre": "4961848-400ML VASO VIDRIO C/SORBETE SURT",
+        "precio": 6000,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "4961848.jpg"
+    },
+    {
+        "id": 38,
+        "nombre": "4963331 - 20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
+        "precio": 30000.0,
+        "categoria": "Baño",
+        "stock": 1,
+        "imagen": "4963331.jpg"
     }
 ]
