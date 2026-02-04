@@ -16,79 +16,73 @@
 
     <main class="admin-container">
         
-    <div class="form-seccion">
-    <h2>Actualizar Banner Principal</h2>
-    <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data">
-        <input type="text" name="titulo" placeholder="Título (ej: ¡Bienvenidos a Bazar Guille!)" required>
-        
-        <textarea name="descripcion" placeholder="Escribí una observación o frase para el banner..." rows="3" required></textarea>
-        
-        <label>Imagen de fondo:</label>
-        <input type="file" name="imagen" accept="image/*" required>
-        
-        <button type="submit" class="btn-negro">Subir Banner Completo</button>
-    </form>
-</div>
-<div class="form-seccion">
-    <h2>Banners Activos (Slider)</h2>
-    <table class="admin-tabla">
-        <thead>
-            <tr>
-                <th>Miniatura</th>
-                <th>Título</th>
-                <th>Observación</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for b in banners %}
-            <tr>
-                <td>
-                    <img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="100" style="border-radius: 5px;">
-                </td>
-                <td>{{ b.titulo }}</td>
-                <td>{{ b.descripcion }}</td>
-                <td>
-                    <a href="{{ url_for('eliminar_banner', id=b.id) }}" 
-                       class="btn-eliminar" 
-                       onclick="return confirm('¿Seguro que querés borrar este banner?')">
-                       Eliminar
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <div class="form-seccion">
+            <h2>Actualizar Banner Principal</h2>
+            <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data">
+                <input type="text" name="titulo" placeholder="Título del banner" required>
+                <textarea name="descripcion" placeholder="Descripción..." rows="2" required></textarea>
+                <label>Imagen:</label>
+                <input type="file" name="imagen" accept="image/*" required>
+                <button type="submit" class="btn-negro">Subir Banner</button>
+            </form>
+        </div>
 
+        <div class="form-seccion">
+            <h2>Banners Activos</h2>
+            <table class="admin-tabla">
+                <thead>
+                    <tr>
+                        <th>Miniatura</th>
+                        <th>Título</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in banners %}
+                    <tr>
+                        <td><img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="80"></td>
+                        <td>{{ b.titulo }}</td>
+                        <td>
+                            <a href="{{ url_for('eliminar_banner', id=b.id) }}" class="btn-eliminar" onclick="return confirm('¿Borrar banner?')">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <hr>
 
         <div class="form-seccion">
             <h2>Añadir Nuevo Producto</h2>
             <form action="{{ url_for('agregar_producto') }}" method="POST" enctype="multipart/form-data">
-                <input type="text" name="nombre" placeholder="Nombre (ej: Espejo LED)" required>
+                <input type="text" name="nombre" placeholder="Nombre del producto" required>
                 <input type="number" step="0.01" name="precio" placeholder="Precio" required>
-                
                 <select name="categoria">
                     {% for cat in categorias %}
                         <option value="{{ cat }}">{{ cat }}</option>
                     {% endfor %}
                 </select>
-
-                <input type="number" name="stock" placeholder="Stock disponible" required>
+                <input type="number" name="stock" placeholder="Stock" required>
                 <input type="file" name="imagen" accept="image/*" required>
-                <button type="submit" class="btn-negro">Guardar en Base de Datos</button>
+                <button type="submit" class="btn-negro">Guardar Producto</button>
             </form>
         </div>
 
         <hr>
 
         <div class="form-seccion">
-            <h2>Listado de Productos (en Supabase)</h2>
-            <table class="admin-tabla">
+            <h2>Listado de Productos</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="buscadorAdmin" placeholder="🔍 Buscar por nombre o ID..." 
+                       style="padding: 12px; width: 100%; max-width: 450px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
+            </div>
+
+            <table class="admin-tabla" id="tablaProductos">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Foto</th>
                         <th>Nombre</th>
                         <th>Precio</th>
@@ -99,15 +93,12 @@
                 </thead>
                 <tbody>
                     {% for p in productos %}
-                    <tr>
+                    <tr class="fila-producto">
+                        <td class="id-prod">{{ p.id }}</td>
                         <td>
-                            {% if p.imagen %}
-                                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" width="60" style="border-radius: 5px;">
-                            {% else %}
-                                <span>No hay foto</span>
-                            {% endif %}
+                            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" width="50" style="border-radius: 5px;">
                         </td>
-                        <td>{{ p.nombre }}</td>
+                        <td class="nombre-prod"><strong>{{ p.nombre }}</strong></td>
                         <td>${{ p.precio }}</td>
                         <td>{{ p.categoria }}</td>
                         <td>{{ p.stock }} u.</td>
@@ -123,8 +114,24 @@
                 </tbody>
             </table>
         </div>
-
     </main>
 
+    <script>
+    document.getElementById('buscadorAdmin').addEventListener('keyup', function() {
+        let filtro = this.value.toLowerCase();
+        let filas = document.querySelectorAll('.fila-producto');
+
+        filas.forEach(fila => {
+            let nombre = fila.querySelector('.nombre-prod').textContent.toLowerCase();
+            let id = fila.querySelector('.id-prod').textContent.toLowerCase();
+            
+            if (nombre.includes(filtro) || id.includes(filtro)) {
+                fila.style.display = "";
+            } else {
+                fila.style.display = "none";
+            }
+        });
+    });
+    </script>
 </body>
 </html>

@@ -96,8 +96,11 @@ def logout():
 def admin():
     productos = cargar_datos(PRODUCTOS_JSON)
     banners = cargar_datos(BANNERS_JSON)
-    categorias = ["Cocina", "Baño", "Decoración", "Otros"]
+    # Agregamos la nueva categoría aquí:
+    categorias = ["Cocina", "Baño", "Decoración", "Electrónica", "Otros"]
     return render_template('admin.html', productos=productos, banners=banners, categorias=categorias)
+
+
 
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido

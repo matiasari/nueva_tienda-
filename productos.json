@@ -286,5 +286,61 @@
         "categoria": "Baño",
         "stock": 1,
         "imagen": "4963331.jpg"
+    },
+    {
+        "id": 39,
+        "nombre": "Auricular In Ear Bluetooth Damix Dx-29 ",
+        "precio": 15000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "Auricular_In_Ear_Bluetooth_Damix_Dx-29_Tactil_Hi-fi_TransparenteAuricular_In_Ear_Bluetooth_Damix_Dx-29_Tactil_Hi-fi_Transparente.png"
+    },
+    {
+        "id": 40,
+        "nombre": "AURICULARES BLUETOOTH 895B",
+        "precio": 12000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "Auricular_in-ear_gamer_inalambrico_Skululu_895B_BT5.4_895B_TWS_negro_con_luz_LED.png"
+    },
+    {
+        "id": 41,
+        "nombre": "Auriculares Y30",
+        "precio": 9500.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "Auriculares_Inalambricos_Y30_Bluetooth_5.0_Tws_Tactiles_Color_Negro.png"
+    },
+    {
+        "id": 42,
+        "nombre": "Auriculares X15",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 2,
+        "imagen": "Auriculares_Gamer_In-ear_Fan_Pro_X15_Bluetooth_5.0_TWS_Microfono_Negro_LED.png"
+    },
+    {
+        "id": 43,
+        "nombre": "Smartband UNI-B6",
+        "precio": 9500.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "Smartband_UNI-B6_negro.png"
+    },
+    {
+        "id": 44,
+        "nombre": "Smartwatch d20",
+        "precio": 12500.0,
+        "categoria": "Electrónica",
+        "stock": 4,
+        "imagen": "Reloj_Inteligente_D20_Pro_Monitor_Cardiaco_Deportivo_Negro_IP67.png"
+    },
+    {
+        "id": 45,
+        "nombre": "Smartwatch D20",
+        "precio": 12500.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "Smartwatch_D20_Bluetooth_Color_blanco.png"
     }
 ]
