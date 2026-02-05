@@ -681,3 +681,58 @@ a { text-decoration: none; }
     font-weight: 900;
     color: #27ae60;
 }
+
+CSS
+
+/* AJUSTES PARA EL PANEL ADMIN */
+
+/* Contenedor de botones en la tabla para que no se encimen */
+.acciones-celda {
+    display: flex;
+    flex-direction: column; /* Uno arriba del otro en pantallas chicas */
+    gap: 5px;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .acciones-celda {
+        flex-direction: row; /* Uno al lado del otro en PC */
+        justify-content: center;
+    }
+}
+
+/* Modal de edición más compacto */
+.modal-contenido-scroll {
+    background: white;
+    width: 95%;
+    max-width: 450px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 12px;
+    max-height: 90vh; /* Que no supere el alto de la pantalla */
+    overflow-y: auto; /* Si es muy largo, permite hacer scroll adentro del modal */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* Achicamos un poco los inputs del modal */
+.modal-contenido-scroll label {
+    font-size: 14px;
+    margin-top: 8px;
+    display: block;
+    font-weight: bold;
+}
+
+.modal-contenido-scroll input, 
+.modal-contenido-scroll select {
+    margin-bottom: 5px;
+    padding: 8px;
+}
+.form-seccion {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    height: auto; /* IMPORTANTE: Que crezca según el contenido */
+    overflow: visible; /* Que no corte nada */
+}

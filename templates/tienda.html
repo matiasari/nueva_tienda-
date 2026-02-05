@@ -6,7 +6,6 @@
     <title>Bazar Guille - Tienda</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
-  
 </head>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
@@ -14,9 +13,9 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-6Y3MN0GKBN');
 </script>
+
 <body>
 
     <header class="header">
@@ -34,24 +33,31 @@
         </div>
     </header>
 
-    {% if banners %}
-    <section class="slider-container">
-        {% for b in banners %}
-        <div class="slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
-            <div class="slider-dots">
+{% if banners %}
+<section class="slider-container">
     {% for b in banners %}
-        <span class="dot {% if loop.first %}active{% endif %}"></span>
-    {% endfor %}
-</div>
-            <div class="slide-text-container">
+    <div class="slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
+        
+        {# SOLO MOSTRAR EL CONTENEDOR SI HAY TEXTO O BOTÓN #}
+        {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
+        <div class="slide-text-container">
+            {% if b.titulo %}
                 <h2>{{ b.titulo }}</h2>
+            {% endif %}
+            
+            {% if b.descripcion %}
                 <p>{{ b.descripcion }}</p>
-                <a href="#productos" class="btn-promo">Ver Productos</a>
-            </div>
+            {% endif %}
+
+            {% if b.link and b.link != "/?q=" and b.link != "#productos" %}
+                <a href="{{ b.link }}" class="btn-promo">Ver Producto</a>
+            {% endif %}
         </div>
-        {% endfor %}
-    </section>
-    {% endif %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
 
     <div class="buscador">
         <form action="/" method="GET">
@@ -61,11 +67,12 @@
     </div>
 
     <div class="categorias">
-    <a href="/">Todos</a>
-    <a href="/?cat=Cocina">Cocina</a>
-    <a href="/?cat=Baño">Baño</a>
-    <a href="/?cat=Decoración">Decoración</a>
-    <a href="/?cat=Electrónica">Electrónica</a> </div>
+        <a href="/">Todos</a>
+        <a href="/?cat=Cocina">Cocina</a>
+        <a href="/?cat=Baño">Baño</a>
+        <a href="/?cat=Decoración">Decoración</a>
+        <a href="/?cat=Electrónica">Electrónica</a>
+    </div>
 
     <main class="productos" id="productos">
         {% for p in productos %}
@@ -80,8 +87,7 @@
             {% endif %}
             
             <h3>{{ p.nombre }}</h3>
-          <p class="precio">{{ p.precio | pesos }}</p>
-            </p>
+            <p class="precio">{{ p.precio | pesos }}</p>
             <p class="categoria">{{ p.categoria }}</p>
             
             <form action="/agregar_al_carrito" method="POST">
@@ -90,7 +96,7 @@
             </form>
         </div>
         {% else %}
-        <p style="text-align: center; grid-column: 1 / -1;">No hay productos cargados todavía.</p>
+        <p style="text-align: center; grid-column: 1 / -1;">No hay productos que coincidan con tu búsqueda.</p>
         {% endfor %}
     </main>
 
@@ -123,14 +129,14 @@
             setInterval(nextSlide, 5000);
         }
 
-     // Ejemplo de cómo deberías abrirlo en tu JS
+        // Modal Zoom
         function abrirModal(imgSrc) {
-        const modal = document.querySelector('.modal-zoom');
-        const modalImg = document.querySelector('.modal-contenido');
-        modalImg.src = imgSrc;
-    
-        modal.style.display = 'flex'; // <--- USAR FLEX PARA CENTRAR
-}
+            const modal = document.getElementById('modalZoom');
+            const modalImg = document.getElementById('imgAmpliada');
+            modalImg.src = imgSrc;
+            modal.style.display = 'flex'; 
+        }
+
         function cerrarModal() {
             document.getElementById("modalZoom").style.display = "none";
         }
@@ -140,6 +146,15 @@
                 cerrarModal();
             }
         });
+
+        // Scrollear al buscar
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('q')) {
+            const productosSection = document.getElementById('productos');
+            if (productosSection) {
+                productosSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     </script>
 </body>
 </html>

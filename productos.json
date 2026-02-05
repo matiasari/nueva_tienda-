@@ -14,7 +14,7 @@
         "nombre": "300ML DISPENSER JABON VIDRIO FUME",
         "precio": 4000,
         "stock": 5,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "imagen": "4290588.png",
         "codigo": 4290588,
         "peso": 0.1
@@ -41,20 +41,20 @@
     },
     {
         "id": 9,
-        "nombre": "6SET DE BAÑO PVC C/TAPA BAMBOO GRIS",
+        "nombre": "6SET DE BA\u00d1O PVC C/TAPA BAMBOO GRIS",
         "precio": 45000,
         "stock": 4,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.06.jpeg",
         "codigo": 4958751,
         "peso": 1.5
     },
     {
         "id": 10,
-        "nombre": "SET DE BAÑO PVC 6PCS NEGRO",
+        "nombre": "SET DE BA\u00d1O PVC 6PCS NEGRO",
         "precio": 30000,
         "stock": 4,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.21.jpeg",
         "codigo": 4919704,
         "peso": 1.0
@@ -64,7 +64,7 @@
         "nombre": " 9 LT CESTO DE BASURA",
         "precio": 20000,
         "stock": 3,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.27.14.jpeg",
         "codigo": 4960997,
         "peso": 0.8
@@ -74,7 +74,7 @@
         "nombre": "52CM PORTARROLLO PAPEL HIGIENICO",
         "precio": 18000,
         "stock": 3,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.30.08.jpeg",
         "codigo": 4331232,
         "peso": 0.5
@@ -95,7 +95,7 @@
         "precio": 12000,
         "stock": 3,
         "codigo": 4948914,
-        "categoria": "Decoración",
+        "categoria": "Decoraci\u00f3n",
         "imagen": "bandeja_de_cama_madera.png",
         "peso": 0.9
     },
@@ -105,7 +105,7 @@
         "precio": 12000,
         "stock": 3,
         "codigo": 4948914,
-        "categoria": "Decoración",
+        "categoria": "Decoraci\u00f3n",
         "imagen": "imagen_2026-01-22_150818082.png",
         "peso": 0.9
     },
@@ -115,7 +115,7 @@
         "precio": 12000,
         "stock": 2,
         "codigo": 4948914,
-        "categoria": "Decoración",
+        "categoria": "Decoraci\u00f3n",
         "imagen": "imagen_2026-01-22_150905177.png",
         "peso": 0.9
     },
@@ -179,7 +179,7 @@
         "id": 25,
         "nombre": "4916253\t29X13CM CANASTO P/PARED METAL AUTOADHESIVO SURT",
         "precio": 6500,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "stock": 2,
         "imagen": "4916253.jpg"
     },
@@ -283,7 +283,7 @@
         "id": 38,
         "nombre": "4963331 - 20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
         "precio": 30000.0,
-        "categoria": "Baño",
+        "categoria": "Ba\u00f1o",
         "stock": 1,
         "imagen": "4963331.jpg"
     },
@@ -291,7 +291,7 @@
         "id": 39,
         "nombre": "Auricular In Ear Bluetooth Damix Dx-29 ",
         "precio": 15000.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 1,
         "imagen": "Auricular_In_Ear_Bluetooth_Damix_Dx-29_Tactil_Hi-fi_TransparenteAuricular_In_Ear_Bluetooth_Damix_Dx-29_Tactil_Hi-fi_Transparente.png"
     },
@@ -299,7 +299,7 @@
         "id": 40,
         "nombre": "AURICULARES BLUETOOTH 895B",
         "precio": 12000.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 1,
         "imagen": "Auricular_in-ear_gamer_inalambrico_Skululu_895B_BT5.4_895B_TWS_negro_con_luz_LED.png"
     },
@@ -307,7 +307,7 @@
         "id": 41,
         "nombre": "Auriculares Y30",
         "precio": 9500.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 1,
         "imagen": "Auriculares_Inalambricos_Y30_Bluetooth_5.0_Tws_Tactiles_Color_Negro.png"
     },
@@ -315,7 +315,7 @@
         "id": 42,
         "nombre": "Auriculares X15",
         "precio": 10000.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 2,
         "imagen": "Auriculares_Gamer_In-ear_Fan_Pro_X15_Bluetooth_5.0_TWS_Microfono_Negro_LED.png"
     },
@@ -323,7 +323,7 @@
         "id": 43,
         "nombre": "Smartband UNI-B6",
         "precio": 9500.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 1,
         "imagen": "Smartband_UNI-B6_negro.png"
     },
@@ -331,7 +331,7 @@
         "id": 44,
         "nombre": "Smartwatch d20",
         "precio": 12500.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 4,
         "imagen": "Reloj_Inteligente_D20_Pro_Monitor_Cardiaco_Deportivo_Negro_IP67.png"
     },
@@ -339,13 +339,13 @@
         "id": 45,
         "nombre": "Smartwatch D20",
         "precio": 12500.0,
-        "categoria": "Electrónica",
+        "categoria": "Electr\u00f3nica",
         "stock": 1,
         "imagen": "Smartwatch_D20_Bluetooth_Color_blanco.png"
     },
     {
         "id": 46,
-        "nombre": "TAZA DE VIDRIO CON FLOR SECA",
+        "nombre": "TAZA DE VIDRIO FLORAL 350 mL",
         "precio": 8000.0,
         "categoria": "Cocina",
         "stock": 1,
@@ -353,7 +353,7 @@
     },
     {
         "id": 47,
-        "nombre": "TAZA VASO DOBLE VIDRIO FLORAL 150 mL ROSA ",
+        "nombre": "TAZA VASO DOBLE VIDRIO FLORAL 350 mL ROSA ",
         "precio": 8000.0,
         "categoria": "Cocina",
         "stock": 1,

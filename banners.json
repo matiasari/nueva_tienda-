@@ -1,20 +1,30 @@
 [
     {
         "id": 1,
-        "imagen": "WhatsApp_Image_2026-01-22_at_10.25.06_1.jpeg",
-        "titulo": "SET DE BAÑO 6 PCS",
-        "descripcion": "OFERTA EXPRESS $42000"
+        "titulo": "TAZA VASO DOBLE VIDRIO FLORAL 350 mL ROSA",
+        "descripcion": "NUEVO INGRESO $8000",
+        "imagen": "WhatsApp Image 2026-02-05 at 08.17.04 (1) (1) (2).jpeg",
+        "link": "/?q=47"
     },
     {
         "id": 2,
-        "imagen": "Gemini_Generated_Image_igzvfxigzvfxigzv_1.png",
-        "titulo": "TAZA DE VIDRIO DOBLE FONDO CON FLOR SECA",
-        "descripcion": "NUEVO INGRESO $8000"
+        "titulo": "TAZA VASO DOBLE VIDRIO FLORAL 350 mL ",
+        "descripcion": "NUEVO INGRESO $8000",
+        "imagen": "Gemini_Generated_Image_igzvfxigzvfxigzv (1).png",
+        "link": "/?q=46"
     },
     {
         "id": 3,
-        "imagen": "WhatsApp_Image_2026-02-05_at_08.17.04_1_2.jpeg",
-        "titulo": "TAZA VASO DOBLE VIDRIO FLORAL 150 mL ROSA",
-        "descripcion": "NUEVO INGRESO $8000"
+        "titulo": "LLEGARON LOS AURICULARES A BAZAR GUILLE ",
+        "descripcion": "Auriculares X15 $10000",
+        "imagen": "Auriculares Gamer In-ear Fan Pro X15 Bluetooth 5.0 TWS Micr\u00f3fono Negro LED.png",
+        "link": "/?q=42"
+    },
+    {
+        "id": 4,
+        "titulo": "",
+        "descripcion": "",
+        "imagen": "ADMINISTRACION (1).jpg",
+        "link": ""
     }
 ]

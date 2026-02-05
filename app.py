@@ -52,15 +52,23 @@ def index():
     
     # Filtrado
     productos_mostrar = productos
+    
+    # 1. Filtrar por categoría
     if cat and cat != "Todos":
         productos_mostrar = [p for p in productos_mostrar if p.get('categoria') == cat]
     
+    # 2. Filtrar por búsqueda (Nombre o ID exacto)
     if q:
-        productos_mostrar = [p for p in productos_mostrar if q.lower() in p.get('nombre', '').lower()]
+        q_lower = q.lower()
+        productos_mostrar = [
+            p for p in productos_mostrar 
+            if q_lower in p.get('nombre', '').lower() or str(p.get('id')) == q_lower
+        ]
         
     # --- LIMPIEZA DE CARRITO (FANTASMAS) ---
     carrito = session.get('carrito', [])
     ids_existentes = [str(p['id']) for p in productos]
+    
     # Solo dejamos en el carrito los IDs que realmente están en el JSON
     carrito_limpio = [p_id for p_id in carrito if str(p_id) in ids_existentes]
     
@@ -72,7 +80,6 @@ def index():
                            productos=productos_mostrar, 
                            banners=banners, 
                            carrito_total=len(carrito_limpio))
-    
     
     
     
@@ -139,6 +146,34 @@ def eliminar_producto(id):
     productos = cargar_datos(PRODUCTOS_JSON)
     productos = [p for p in productos if p['id'] != id]
     guardar_datos(PRODUCTOS_JSON, productos)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/producto/editar', methods=['POST'])
+def editar_producto():
+    p_id = request.form.get('id')
+    nombre = request.form.get('nombre')
+    precio = float(request.form.get('precio'))
+    categoria = request.form.get('categoria')
+    stock = int(request.form.get('stock'))
+    
+    productos = cargar_datos(PRODUCTOS_JSON)
+    for p in productos:
+        if str(p['id']) == str(p_id):
+            p['nombre'] = nombre
+            p['precio'] = precio
+            p['categoria'] = categoria
+            p['stock'] = stock
+            # Si se sube una imagen nueva, la cambiamos. Si no, queda la anterior.
+            if 'imagen' in request.files and request.files['imagen'].filename != '':
+                archivo = request.files['imagen']
+                filename = archivo.filename
+                archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                p['imagen'] = filename
+            break
+            
+    with open(PRODUCTOS_JSON, 'w', encoding='utf-8') as f:
+        json.dump(productos, f, indent=4)
+        
     return redirect(url_for('admin'))
 
 # --- SISTEMA DE CARRITO ---
@@ -230,28 +265,36 @@ def vaciar_carrito():
     return redirect(url_for('index'))
 
 @app.route('/admin/banner/agregar', methods=['POST'])
-@login_requerido
 def agregar_banner():
     banners = cargar_datos(BANNERS_JSON)
     titulo = request.form.get('titulo')
     descripcion = request.form.get('descripcion')
-    imagen = request.files.get('imagen')
     
-    if imagen:
-        nombre_img = secure_filename(imagen.filename)
-        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_img))
-        
-        nuevo_id = max([b['id'] for b in banners], default=0) + 1
-        nuevo_b = {
-            "id": nuevo_id,
-            "imagen": nombre_img,
-            "titulo": titulo,
-            "descripcion": descripcion
-        }
-        banners.append(nuevo_b)
-        guardar_datos(BANNERS_JSON, banners)
-    return redirect(url_for('admin'))
+    prod_id = request.form.get('producto_id')
+# Si hay ID, armamos el link. Si no, lo dejamos vacío o directo a productos
+    enlace = f"/?q={prod_id}" if prod_id else ""
 
+    if 'imagen' in request.files:
+        archivo = request.files['imagen']
+        if archivo.filename != '':
+            filename = archivo.filename
+            archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            nuevo_id = 1 if not banners else max([b['id'] for b in banners]) + 1
+            nuevo_b = {
+                "id": nuevo_id,
+                "titulo": titulo,
+                "descripcion": descripcion,
+                "imagen": filename,
+                "link": enlace  # Acá ya se guarda como /?q=9
+            }
+            
+            banners.append(nuevo_b)
+            with open(BANNERS_JSON, 'w', encoding='utf-8') as f:
+                json.dump(banners, f, indent=4)
+                
+    return redirect(url_for('admin'))
+    
 @app.route('/admin/banner/eliminar/<int:id>')
 @login_requerido
 def eliminar_banner(id):
