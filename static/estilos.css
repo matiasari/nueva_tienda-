@@ -736,3 +736,48 @@ CSS
     height: auto; /* IMPORTANTE: Que crezca según el contenido */
     overflow: visible; /* Que no corte nada */
 }
+
+/* Ajustes para Celular (Header) */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column; /* Apila los elementos uno arriba del otro */
+        padding: 15px 10px;
+        text-align: center;
+        gap: 15px; /* Les da aire para que no se peguen */
+    }
+
+    .header-left {
+        flex-direction: column; /* Logo arriba, nombre abajo */
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo-img {
+        width: 80px; /* Un poquito más grande para que luzca */
+        height: auto;
+    }
+
+    .nombre {
+        font-size: 24px; /* Un poco más chico para que no ocupe tanto */
+        letter-spacing: 2px;
+    }
+
+    .header-right {
+        width: 100%; /* El carrito ocupa todo el ancho para poder centrarse */
+        display: flex;
+        justify-content: center;
+    }
+
+    .carrito-btn {
+        width: fit-content; /* El botón se ajusta a su texto y queda centrado */
+    }
+}
+
+@media (max-width: 768px) {
+    .slider-container {
+        height: 300px; /* Le damos una altura fija más cómoda para el celu */
+    }
+    .slide {
+        background-position: center; /* Asegura que se vea el centro de tu flyer */
+    }
+}
