@@ -138,7 +138,7 @@
     {
         "id": 20,
         "nombre": "4614313-250ML TAZA DOBLE FONDO",
-        "precio": 6000,
+        "precio": 7000,
         "categoria": "Cocina",
         "stock": 4,
         "imagen": "4614313.jpg"
@@ -342,5 +342,21 @@
         "categoria": "Electrónica",
         "stock": 1,
         "imagen": "Smartwatch_D20_Bluetooth_Color_blanco.png"
+    },
+    {
+        "id": 46,
+        "nombre": "TAZA DE VIDRIO CON FLOR SECA",
+        "precio": 8000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "Gemini_Generated_Image_igzvfxigzvfxigzv.png"
+    },
+    {
+        "id": 47,
+        "nombre": "TAZA VASO DOBLE VIDRIO FLORAL 150 mL ROSA ",
+        "precio": 8000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-05_at_08.17.04.jpeg"
     }
 ]
