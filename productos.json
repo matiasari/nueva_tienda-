@@ -14,7 +14,7 @@
         "nombre": "300ML DISPENSER JABON VIDRIO FUME",
         "precio": 4000,
         "stock": 5,
-        "categoria": "Ba\u00f1o",
+        "categoria": "Baño",
         "imagen": "4290588.png",
         "codigo": 4290588,
         "peso": 0.1
@@ -41,20 +41,20 @@
     },
     {
         "id": 9,
-        "nombre": "6SET DE BA\u00d1O PVC C/TAPA BAMBOO GRIS",
+        "nombre": "6SET DE BAÑO PVC C/TAPA BAMBOO GRIS",
         "precio": 45000,
         "stock": 4,
-        "categoria": "Ba\u00f1o",
+        "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.06.jpeg",
         "codigo": 4958751,
         "peso": 1.5
     },
     {
         "id": 10,
-        "nombre": "SET DE BA\u00d1O PVC 6PCS NEGRO",
+        "nombre": "SET DE BAÑO PVC 6PCS NEGRO",
         "precio": 30000,
         "stock": 4,
-        "categoria": "Ba\u00f1o",
+        "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.21.jpeg",
         "codigo": 4919704,
         "peso": 1.0
@@ -64,7 +64,7 @@
         "nombre": "52CM PORTARROLLO PAPEL HIGIENICO",
         "precio": 18000,
         "stock": 3,
-        "categoria": "Ba\u00f1o",
+        "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.30.08.jpeg",
         "codigo": 4331232,
         "peso": 0.5
@@ -85,7 +85,7 @@
         "precio": 12000,
         "stock": 3,
         "codigo": 4948914,
-        "categoria": "Decoraci\u00f3n",
+        "categoria": "Decoración",
         "imagen": "bandeja_de_cama_madera.png",
         "peso": 0.9
     },
@@ -95,7 +95,7 @@
         "precio": 12000,
         "stock": 3,
         "codigo": 4948914,
-        "categoria": "Decoraci\u00f3n",
+        "categoria": "Decoración",
         "imagen": "imagen_2026-01-22_150818082.png",
         "peso": 0.9
     },
@@ -105,7 +105,7 @@
         "precio": 12000,
         "stock": 2,
         "codigo": 4948914,
-        "categoria": "Decoraci\u00f3n",
+        "categoria": "Decoración",
         "imagen": "imagen_2026-01-22_150905177.png",
         "peso": 0.9
     },
@@ -169,7 +169,7 @@
         "id": 25,
         "nombre": "4916253\t29X13CM CANASTO P/PARED METAL AUTOADHESIVO SURT",
         "precio": 6500,
-        "categoria": "Ba\u00f1o",
+        "categoria": "Baño",
         "stock": 2,
         "imagen": "4916253.jpg"
     },
@@ -273,7 +273,7 @@
         "id": 38,
         "nombre": "4963331 - 20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
         "precio": 30000.0,
-        "categoria": "Ba\u00f1o",
+        "categoria": "Baño",
         "stock": 1,
         "imagen": "4963331.jpg"
     },
@@ -281,7 +281,7 @@
         "id": 39,
         "nombre": "Auricular In Ear Bluetooth Damix Dx-29 ",
         "precio": 16000.0,
-        "categoria": "Electr\u00f3nica",
+        "categoria": "Electrónica",
         "stock": 1,
         "imagen": "Auricular_In_Ear_Bluetooth_Damix_Dx-29_Tactil_Hi-fi_TransparenteAuricular_In_Ear_Bluetooth_Damix_Dx-29_Tactil_Hi-fi_Transparente.png"
     },
@@ -289,7 +289,7 @@
         "id": 41,
         "nombre": "Auriculares Y30",
         "precio": 10000.0,
-        "categoria": "Electr\u00f3nica",
+        "categoria": "Electrónica",
         "stock": 1,
         "imagen": "Auriculares_Inalambricos_Y30_Bluetooth_5.0_Tws_Tactiles_Color_Negro.png"
     },
@@ -297,7 +297,7 @@
         "id": 42,
         "nombre": "Auriculares X15",
         "precio": 12000.0,
-        "categoria": "Electr\u00f3nica",
+        "categoria": "Electrónica",
         "stock": 2,
         "imagen": "Auriculares_Gamer_In-ear_Fan_Pro_X15_Bluetooth_5.0_TWS_Microfono_Negro_LED.png"
     },
@@ -305,7 +305,7 @@
         "id": 43,
         "nombre": "Smartband UNI-B6",
         "precio": 10000.0,
-        "categoria": "Electr\u00f3nica",
+        "categoria": "Electrónica",
         "stock": 1,
         "imagen": "Smartband_UNI-B6_negro.png"
     },
@@ -313,7 +313,7 @@
         "id": 44,
         "nombre": "Smartwatch d20",
         "precio": 12000.0,
-        "categoria": "Electr\u00f3nica",
+        "categoria": "Electrónica",
         "stock": 4,
         "imagen": "Reloj_Inteligente_D20_Pro_Monitor_Cardiaco_Deportivo_Negro_IP67.png"
     },
@@ -332,5 +332,29 @@
         "categoria": "Cocina",
         "stock": 1,
         "imagen": "WhatsApp_Image_2026-02-05_at_08.17.04.jpeg"
+    },
+    {
+        "id": 48,
+        "nombre": "4936101-230ML SETX3 TAZA SURT",
+        "precio": 8000.0,
+        "categoria": "Cocina",
+        "stock": 10,
+        "imagen": "4936101.jpg"
+    },
+    {
+        "id": 49,
+        "nombre": "4952502-Ø8X7CM SETX6 PORTAVELA A PILA",
+        "precio": 15000.0,
+        "categoria": "Decoración",
+        "stock": 10,
+        "imagen": "4952502.jpg"
+    },
+    {
+        "id": 50,
+        "nombre": "4619406-21X31CM CUADRO RETROILUM. MADERA LOVES",
+        "precio": 15000.0,
+        "categoria": "Decoración",
+        "stock": 10,
+        "imagen": "4619406.jpg"
     }
 ]
