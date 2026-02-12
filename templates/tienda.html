@@ -6,15 +6,15 @@
     <title>Bazar Guille - Tienda</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6Y3MN0GKBN');
+    </script>
 </head>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-6Y3MN0GKBN');
-</script>
 
 <body>
 
@@ -32,22 +32,15 @@
         </a>
     </div>
 </header>
+
 {% if banners %}
 <section class="slider-container">
     {% for b in banners %}
     <div class="slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
-        
-        {# SOLO MOSTRAR EL CONTENEDOR SI HAY TEXTO O BOTÓN #}
         {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
         <div class="slide-text-container">
-            {% if b.titulo %}
-                <h2>{{ b.titulo }}</h2>
-            {% endif %}
-            
-            {% if b.descripcion %}
-                <p>{{ b.descripcion }}</p>
-            {% endif %}
-
+            {% if b.titulo %}<h2>{{ b.titulo }}</h2>{% endif %}
+            {% if b.descripcion %}<p>{{ b.descripcion }}</p>{% endif %}
             {% if b.link and b.link != "/?q=" and b.link != "#productos" %}
                 <a href="{{ b.link }}" class="btn-promo">Ver Producto</a>
             {% endif %}
@@ -58,20 +51,20 @@
 </section>
 {% endif %}
 
-    <div class="buscador">
-        <form action="/" method="GET">
-            <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" required>
-            <button type="submit">Buscar</button>
-        </form>
-    </div>
+<div class="buscador">
+    <form action="/" method="GET">
+        <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" required>
+        <button type="submit">Buscar</button>
+    </form>
+</div>
 
-    <div class="categorias">
-        <a href="/">Todos</a>
-        <a href="/?cat=Cocina">Cocina</a>
-        <a href="/?cat=Baño">Baño</a>
-        <a href="/?cat=Decoración">Decoración</a>
-        <a href="/?cat=Electrónica">Electrónica</a>
-    </div>
+<div class="categorias">
+    <a href="/">Todos</a>
+    <a href="/?cat=Cocina">Cocina</a>
+    <a href="/?cat=Baño">Baño</a>
+    <a href="/?cat=Decoración">Decoración</a>
+    <a href="/?cat=Electrónica">Electrónica</a>
+</div>
 
 <div class="contenedor-categorias" id="productos">
     {% for categoria, items in productos | groupby('categoria') %}
@@ -85,16 +78,15 @@
                                  id="main-{{ p.id }}" 
                                  class="foto-principal"
                                  onclick="abrirModal(this.src)" 
-                                 title="Click para ampliar">
+                                 title="Click para ampliar"
+                                 loading="lazy">
                         </div>
                         
                         <div class="galeria-miniaturas">
-                            {# Foto principal como miniatura #}
                             <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
                                  onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
                                  class="mini-foto">
                             
-                            {# Fotos extras si existen #}
                             {% if p.imagenes_extras %}
                                 {% for foto in p.imagenes_extras %}
                                     <img src="{{ url_for('static', filename='uploads/' + foto) }}" 
@@ -117,67 +109,68 @@
             </div>
         </section>
     {% endfor %}
-    
-    <div id="modalZoom" class="modal-zoom" onclick="cerrarModal()">
-        <span class="cerrar-zoom">&times;</span>
-        <img class="modal-contenido" id="imgAmpliada">
+</div>
+
+<div id="modalZoom" class="modal-zoom" onclick="cerrarModal()" style="display: none;">
+    <span class="cerrar-zoom">&times;</span>
+    <img class="modal-contenido" id="imgAmpliada">
+</div>
+
+<footer class="footer">
+    <div class="footer-content">
+        <a href="https://instagram.com/bazar_guille" class="instagram-btn" target="_blank">Síguenos en Instagram</a>
+        <p class="copyright">© 2026 Bazar Guille - Todos los derechos reservados</p>
     </div>
+</footer>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <a href="https://instagram.com/bazar_guille" class="instagram-btn">Síguenos en Instagram</a>
-            <p class="copyright">© 2026 Bazar Guille - Todos los derechos reservados</p>
-        </div>
-    </footer>
+<script>
+    // Lógica del Slider
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
 
-    <script>
-        // Lógica del Slider
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-
-        function nextSlide() {
-            if (slides.length > 0) {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }
+    function nextSlide() {
+        if (slides.length > 0) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
         }
+    }
 
-        if (slides.length > 1) {
-            setInterval(nextSlide, 5000);
+    if (slides.length > 1) {
+        setInterval(nextSlide, 5000);
+    }
+
+    // Modal Zoom (Corregido)
+    function abrirModal(imgSrc) {
+        const modal = document.getElementById('modalZoom');
+        const modalImg = document.getElementById('imgAmpliada');
+        modalImg.src = imgSrc;
+        modal.style.display = 'flex'; 
+    }
+
+    function cerrarModal() {
+        document.getElementById("modalZoom").style.display = "none";
+    }
+
+    // Cerrar con tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            cerrarModal();
         }
+    });
 
-        // Modal Zoom
-        function abrirModal(imgSrc) {
-            const modal = document.getElementById('modalZoom');
-            const modalImg = document.getElementById('imgAmpliada');
-            modalImg.src = imgSrc;
-            modal.style.display = 'flex'; 
+    // Auto-scroll si hay búsqueda
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('q') || urlParams.has('cat')) {
+        const productosSection = document.getElementById('productos');
+        if (productosSection) {
+            productosSection.scrollIntoView({ behavior: 'smooth' });
         }
+    }
+</script>
 
-        function cerrarModal() {
-            document.getElementById("modalZoom").style.display = "none";
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === "Escape") {
-                cerrarModal();
-            }
-        });
-
-        // Scrollear al buscar
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('q')) {
-            const productosSection = document.getElementById('productos');
-            if (productosSection) {
-                productosSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    </script>
-
-<a href="https://wa.me/5491149899616?text=Hola!%20Tengo%20una%20consulta%20sobre%20un%20producto" 
-   class="whatsapp-float" 
-   target="_blank">
+<a href="https://wa.me/5491149899616?text=Hola!%20Tengo%20una%20consulta" 
+   class="whatsapp-float" target="_blank">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
 </a>
  
@@ -187,5 +180,6 @@
         <span class="contador-float">{{ carrito_total }}</span>
     {% endif %}
 </a>
+
 </body>
 </html>
