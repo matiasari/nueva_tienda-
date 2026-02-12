@@ -356,5 +356,109 @@
         "categoria": "Decoración",
         "stock": 10,
         "imagen": "4619406.jpg"
+    },
+    {
+        "id": 51,
+        "nombre": "Smartwatch Z69 Ultra S8",
+        "precio": 24000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_091648591.png"
+    },
+    {
+        "id": 52,
+        "nombre": "PARLANTE RGB TIPO AIR Z6",
+        "precio": 24000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_091757760.png"
+    },
+    {
+        "id": 53,
+        "nombre": "Parlante Bluetooth Portátil Recargable Sonido Potente V1",
+        "precio": 24000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_091854912.png"
+    },
+    {
+        "id": 54,
+        "nombre": "Lámpara, Velador Led Rohs Conejo Silicona, Luz Nocturna 20cm Blanco Multicolor",
+        "precio": 18000.0,
+        "categoria": "Decoración",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_092018240.png"
+    },
+    {
+        "id": 55,
+        "nombre": "Mini Parlante Portatil Inalambrico Bluetooth Powerful X1",
+        "precio": 9000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_092319379.png"
+    },
+    {
+        "id": 56,
+        "nombre": "Auricular Bluetooth Suono P47 Rojo",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-09_at_15.40.43.jpeg"
+    },
+    {
+        "id": 57,
+        "nombre": " Auricular Inalambrico Bluetooth Vincha P47",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-09_at_15.41.10.jpeg"
+    },
+    {
+        "id": 58,
+        "nombre": "Parlante Mini A005 NEGRO",
+        "precio": 13000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-09_at_15.41.49.jpeg"
+    },
+    {
+        "id": 59,
+        "nombre": "Parlante Greatnice GTS-1345 portátil con bluetooth negro",
+        "precio": 12000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-09_at_15.42.29.jpeg"
+    },
+    {
+        "id": 60,
+        "nombre": "Parlante Recargable Bluetooth Gts 1362 Usb Fm Sd Speaker Rojo",
+        "precio": 13000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-09_at_15.43.14.jpeg"
+    },
+    {
+        "id": 61,
+        "nombre": "Parlante Bluetooth 3x2 Extra Bass Gts 1558 Rgb Portatil Negro",
+        "precio": 20000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-09_at_15.44.06.jpeg"
+    },
+    {
+        "id": 62,
+        "nombre": "PARLANTE KARAOKE PORTÁTIL 3X8 RGB CON MICRÓFONO",
+        "precio": 180000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_093402320.png"
+    },
+    {
+        "id": 63,
+        "nombre": "Mochila Matera Urbana Marwal Caqui",
+        "precio": 25000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "imagen_2026-02-12_093504796.png"
     }
 ]
