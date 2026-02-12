@@ -74,31 +74,34 @@
         <a href="/?cat=Electrónica">Electrónica</a>
     </div>
 
-    <main class="productos" id="productos">
-        {% for p in productos %}
-        <div class="card">
-            {% if p.imagen %}
-                <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
-                     alt="{{ p.nombre }}" 
-                     class="zoom-img" 
-                     onclick="abrirModal(this.src)">
-            {% else %}
-                <img src="{{ url_for('static', filename='logo.ico') }}" alt="Sin imagen">
-            {% endif %}
-            
-            <h3>{{ p.nombre }}</h3>
-            <p class="precio">{{ p.precio | pesos }}</p>
-            <p class="categoria">{{ p.categoria }}</p>
-            
-            <form action="/agregar_al_carrito" method="POST">
-                <input type="hidden" name="id" value="{{ p.id }}">
-                <button type="submit" class="btn-negro">Agregar al Carrito</button>
-            </form>
-        </div>
-        {% else %}
-        <p style="text-align: center; grid-column: 1 / -1;">No hay productos que coincidan con tu búsqueda.</p>
-        {% endfor %}
-    </main>
+<div class="contenedor-categorias" id="productos">
+    
+    {# Agrupamos por categoría según tu JSON #}
+    {% for categoria, items in productos | groupby('categoria') %}
+        <section class="categoria-bloque">
+            <h2 class="titulo-categoria">{{ categoria | upper if categoria else 'VARIOS' }}</h2>
+            <div class="grid-productos">
+                {% for p in items %}
+                    <div class="card" id="prod-{{ p.id }}">
+                        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                             alt="{{ p.nombre }}" 
+                             onclick="abrirModal(this.src)">
+                        
+                        <div class="card-content">
+                            <h3>{{ p.nombre }}</h3>
+                            <p class="precio">{{ p.precio | pesos }}</p>
+                            
+                            <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
+                                <input type="hidden" name="id" value="{{ p.id }}">
+                                <button type="submit" class="btn-comprar">🛒 Añadir al Carrito</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+</div>
 
     <div id="modalZoom" class="modal-zoom" onclick="cerrarModal()">
         <span class="cerrar-zoom">&times;</span>
