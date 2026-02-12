@@ -1,18 +1,8 @@
 [
     {
-        "id": 5,
-        "nombre": "450ML TAZA CON BATIDOR A PILA",
-        "precio": 15000,
-        "stock": 1,
-        "categoria": "Cocina",
-        "imagen": "4614707.png",
-        "codigo": 4614707,
-        "peso": 0.25
-    },
-    {
         "id": 6,
-        "nombre": "300ML DISPENSER JABON VIDRIO FUME",
-        "precio": 4000,
+        "nombre": " DISPENSER JABON VIDRIO FUME 300ML",
+        "precio": 4000.0,
         "stock": 5,
         "categoria": "Baño",
         "imagen": "4290588.png",
@@ -21,8 +11,8 @@
     },
     {
         "id": 7,
-        "nombre": "400 ml TAZA ROSA VIEJO",
-        "precio": 5000,
+        "nombre": "TAZA ROSA VIEJO 400 ml ",
+        "precio": 5000.0,
         "stock": 1,
         "categoria": "Cocina",
         "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg",
@@ -31,8 +21,8 @@
     },
     {
         "id": 8,
-        "nombre": "260ML SETX6 COMPOTERA VIDRIO RAYADO",
-        "precio": 15000,
+        "nombre": "COMPOTERA VIDRIO RAYADO SETX6 260ML ",
+        "precio": 15000.0,
         "stock": 4,
         "categoria": "Cocina",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.31.04.jpeg",
@@ -41,8 +31,8 @@
     },
     {
         "id": 9,
-        "nombre": "6SET DE BAÑO PVC C/TAPA BAMBOO GRIS",
-        "precio": 45000,
+        "nombre": "SET DE BAÑO 6 PVC C/TAPA BAMBOO GRIS",
+        "precio": 45000.0,
         "stock": 4,
         "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.25.06.jpeg",
@@ -61,8 +51,8 @@
     },
     {
         "id": 12,
-        "nombre": "52CM PORTARROLLO PAPEL HIGIENICO",
-        "precio": 18000,
+        "nombre": "PORTARROLLO PAPEL HIGIENICO 52CM ",
+        "precio": 18000.0,
         "stock": 3,
         "categoria": "Baño",
         "imagen": "WhatsApp_Image_2026-01-22_at_10.30.08.jpeg",
@@ -81,8 +71,8 @@
     },
     {
         "id": 14,
-        "nombre": " 30X50CM BANDEJA DE CAMA MADERA",
-        "precio": 12000,
+        "nombre": " BANDEJA DE CAMA MADERA 30X50CM ",
+        "precio": 12000.0,
         "stock": 3,
         "codigo": 4948914,
         "categoria": "Decoración",
@@ -91,8 +81,8 @@
     },
     {
         "id": 15,
-        "nombre": "30X50CM BANDEJA DE CAMA NEGRA",
-        "precio": 12000,
+        "nombre": "BANDEJA DE CAMA NEGRA 30X50CM ",
+        "precio": 12000.0,
         "stock": 3,
         "codigo": 4948914,
         "categoria": "Decoración",
@@ -101,8 +91,8 @@
     },
     {
         "id": 16,
-        "nombre": " 30X50CM BANDEJA DE CAMA CLARITA",
-        "precio": 12000,
+        "nombre": "BANDEJA DE CAMA CLARITA  30X50CM ",
+        "precio": 12000.0,
         "stock": 2,
         "codigo": 4948914,
         "categoria": "Decoración",
@@ -111,167 +101,167 @@
     },
     {
         "id": 18,
-        "nombre": "4335514-12X9CM SETX4 ESPONJA COCINA SURT",
-        "precio": 3500,
+        "nombre": "SETX4 ESPONJA COCINA SURT 12X9CM ",
+        "precio": 3500.0,
         "categoria": "Cocina",
         "stock": 10,
         "imagen": "4335514.jpg"
     },
     {
         "id": 19,
-        "nombre": "4336082-14CM FRASCO ESPECIERO C/CUCHARA SURT",
-        "precio": 3000,
+        "nombre": "FRASCO ESPECIERO C/CUCHARA SURT 14CM ",
+        "precio": 3000.0,
         "categoria": "Cocina",
         "stock": 6,
         "imagen": "4336082.jpg"
     },
     {
         "id": 20,
-        "nombre": "4614313-250ML TAZA DOBLE FONDO",
-        "precio": 7000,
+        "nombre": "TAZA DOBLE FONDO 250ML ",
+        "precio": 7000.0,
         "categoria": "Cocina",
         "stock": 4,
         "imagen": "4614313.jpg"
     },
     {
         "id": 21,
-        "nombre": "4621473\t40X25CM TABLA PICAR PVC BLANCO",
-        "precio": 6000,
+        "nombre": "TABLA PICAR PVC BLANCO 40X25CM ",
+        "precio": 6000.0,
         "categoria": "Cocina",
         "stock": 3,
         "imagen": "4621473.jpg"
     },
     {
         "id": 22,
-        "nombre": "488122-20CM ESCURRIDOR VEGETALES PLEGABLE",
-        "precio": 4500,
+        "nombre": "ESCURRIDOR VEGETALES PLEGABLE 20CM ",
+        "precio": 4500.0,
         "categoria": "Cocina",
         "stock": 3,
         "imagen": "488122.jpg"
     },
     {
         "id": 23,
-        "nombre": "4910648\t13CM SET VASO MEDIDOR C/CUCHARAS MEDIDORAS",
-        "precio": 6000,
+        "nombre": "SET VASO MEDIDOR C/CUCHARAS MEDIDORAS 13CM ",
+        "precio": 6000.0,
         "categoria": "Cocina",
         "stock": 1,
         "imagen": "4910648.jpg"
     },
     {
         "id": 24,
-        "nombre": "4911219-13CM PIMENTERO SURT",
-        "precio": 4500,
+        "nombre": "PIMENTERO SURT 13CM ",
+        "precio": 4500.0,
         "categoria": "Cocina",
         "stock": 4,
         "imagen": "4911219.jpg"
     },
     {
         "id": 25,
-        "nombre": "4916253\t29X13CM CANASTO P/PARED METAL AUTOADHESIVO SURT",
-        "precio": 6500,
+        "nombre": "CANASTO P/PARED METAL AUTOADHESIVO SURT 29X13CM ",
+        "precio": 6500.0,
         "categoria": "Baño",
         "stock": 2,
         "imagen": "4916253.jpg"
     },
     {
         "id": 26,
-        "nombre": "4916367-480ML BOTELLA VIDRIO SURT",
-        "precio": 3500,
+        "nombre": "BOTELLA VIDRIO SURT 480ML ",
+        "precio": 3500.0,
         "categoria": "Cocina",
         "stock": 3,
         "imagen": "4916367.jpg"
     },
     {
         "id": 27,
-        "nombre": "4917900-28CM CUBRE ALIMENTOS METAL SURT",
-        "precio": 3500,
+        "nombre": "CUBRE ALIMENTOS METAL SURT 28CM ",
+        "precio": 3500.0,
         "categoria": "Cocina",
         "stock": 2,
         "imagen": "4917900.jpg"
     },
     {
         "id": 28,
-        "nombre": "4938100-9CM FILTRO DE AGUA P/CANILLA",
-        "precio": 2600,
+        "nombre": "FILTRO DE AGUA P/CANILLA 9CM ",
+        "precio": 2600.0,
         "categoria": "Cocina",
         "stock": 4,
         "imagen": "4938100.jpg"
     },
     {
         "id": 29,
-        "nombre": "4941259-10CM ESPECIERO VIDRIO",
-        "precio": 2500,
+        "nombre": "ESPECIERO VIDRIO 10CM ",
+        "precio": 2500.0,
         "categoria": "Cocina",
         "stock": 10,
         "imagen": "4941259.jpg"
     },
     {
         "id": 30,
-        "nombre": "4944711-18CM DOSIFICADOR ACEITE VIDRIO",
-        "precio": 3200,
+        "nombre": "DOSIFICADOR ACEITE VIDRIO 18CM ",
+        "precio": 3200.0,
         "categoria": "Cocina",
         "stock": 6,
         "imagen": "4944711.jpg"
     },
     {
         "id": 31,
-        "nombre": "4946094-DISPENSER DE JABON C/ESPONJA",
-        "precio": 4000,
+        "nombre": "DISPENSER DE JABON C/ESPONJA",
+        "precio": 4000.0,
         "categoria": "Cocina",
         "stock": 4,
         "imagen": "4946094.jpg"
     },
     {
         "id": 32,
-        "nombre": "4950701-HUEVERA P/15 HUEVOS",
-        "precio": 4000,
+        "nombre": "HUEVERA P/15 HUEVOS",
+        "precio": 4000.0,
         "categoria": "Cocina",
         "stock": 6,
         "imagen": "4950701.jpg"
     },
     {
         "id": 33,
-        "nombre": "4952126-10CM + 8 CM SETX2 MOLDE EMPANADAS",
-        "precio": 3200,
+        "nombre": "10CM + 8 CM SETX2 MOLDE EMPANADAS",
+        "precio": 3200.0,
         "categoria": "Cocina",
         "stock": 3,
         "imagen": "4952126.jpg"
     },
     {
         "id": 34,
-        "nombre": "4961443-16CM SETX50 PAPEL RESPUESTO P/AIRFRYER",
-        "precio": 3000,
+        "nombre": "16CM SETX50 PAPEL RESPUESTO P/AIRFRYER",
+        "precio": 3000.0,
         "categoria": "Cocina",
         "stock": 1,
         "imagen": "4961443.jpg"
     },
     {
         "id": 35,
-        "nombre": "4961458-20CM SETX50 PAPEL REPUESTO P/AIRFYER",
-        "precio": 3500,
+        "nombre": "20CM SETX50 PAPEL REPUESTO P/AIRFYER",
+        "precio": 3500.0,
         "categoria": "Cocina",
         "stock": 1,
         "imagen": "4961458.jpg"
     },
     {
         "id": 36,
-        "nombre": "4961462-16CM SETX50 PAPEL REPUESTO P/AIRFRYER CUAD",
-        "precio": 3000,
+        "nombre": "16CM SETX50 PAPEL REPUESTO P/AIRFRYER CUAD",
+        "precio": 3000.0,
         "categoria": "Cocina",
         "stock": 1,
         "imagen": "4961462.jpg"
     },
     {
         "id": 37,
-        "nombre": "4961848-400ML VASO VIDRIO C/SORBETE SURT",
-        "precio": 6000,
+        "nombre": "400ML VASO VIDRIO C/SORBETE SURT",
+        "precio": 6000.0,
         "categoria": "Cocina",
         "stock": 3,
         "imagen": "4961848.jpg"
     },
     {
         "id": 38,
-        "nombre": "4963331 - 20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
+        "nombre": "20X31CM ESPEJO LED TRIPTICO USB RECARGABLE",
         "precio": 30000.0,
         "categoria": "Baño",
         "stock": 1,
@@ -279,7 +269,7 @@
     },
     {
         "id": 39,
-        "nombre": "Auricular In Ear Bluetooth Damix Dx-29 ",
+        "nombre": "AURICULAR DAMIX Dx-29 ",
         "precio": 16000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -287,7 +277,7 @@
     },
     {
         "id": 41,
-        "nombre": "Auriculares Y30",
+        "nombre": "AURICULARES Y30",
         "precio": 10000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -295,7 +285,7 @@
     },
     {
         "id": 42,
-        "nombre": "Auriculares X15",
+        "nombre": "AURICULARES X15",
         "precio": 12000.0,
         "categoria": "Electrónica",
         "stock": 2,
@@ -303,7 +293,7 @@
     },
     {
         "id": 43,
-        "nombre": "Smartband UNI-B6",
+        "nombre": "SMARTBAND UNI-B6",
         "precio": 10000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -311,7 +301,7 @@
     },
     {
         "id": 44,
-        "nombre": "Smartwatch d20",
+        "nombre": "SMARTWACH D20",
         "precio": 12000.0,
         "categoria": "Electrónica",
         "stock": 4,
@@ -335,7 +325,7 @@
     },
     {
         "id": 48,
-        "nombre": "4936101-230ML SETX3 TAZA SURT",
+        "nombre": "SETX3 TAZA SURT 230ML ",
         "precio": 8000.0,
         "categoria": "Cocina",
         "stock": 10,
@@ -343,7 +333,7 @@
     },
     {
         "id": 49,
-        "nombre": "4952502-Ø8X7CM SETX6 PORTAVELA A PILA",
+        "nombre": "SETX6 PORTAVELA A PILA Ø8X7CM ",
         "precio": 15000.0,
         "categoria": "Decoración",
         "stock": 10,
@@ -351,7 +341,7 @@
     },
     {
         "id": 50,
-        "nombre": "4619406-21X31CM CUADRO RETROILUM. MADERA LOVES",
+        "nombre": "CUADRO RETROILUM. MADERA LOVES 21X31CM ",
         "precio": 15000.0,
         "categoria": "Decoración",
         "stock": 10,
@@ -359,7 +349,7 @@
     },
     {
         "id": 51,
-        "nombre": "Smartwatch Z69 Ultra S8",
+        "nombre": "SMARTWACH Z69 ULTRA S8",
         "precio": 24000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -375,7 +365,7 @@
     },
     {
         "id": 53,
-        "nombre": "Parlante Bluetooth Portátil Recargable Sonido Potente V1",
+        "nombre": "PARLANTE BLUETOOTH  V1",
         "precio": 24000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -383,7 +373,7 @@
     },
     {
         "id": 54,
-        "nombre": "Lámpara, Velador Led Rohs Conejo Silicona, Luz Nocturna 20cm Blanco Multicolor",
+        "nombre": "LAMPARA CONEJO SILICONA 20cm MULTICOLOR",
         "precio": 18000.0,
         "categoria": "Decoración",
         "stock": 1,
@@ -391,7 +381,7 @@
     },
     {
         "id": 55,
-        "nombre": "Mini Parlante Portatil Inalambrico Bluetooth Powerful X1",
+        "nombre": "MINI PARLANTE POWEFUL X1",
         "precio": 9000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -399,7 +389,7 @@
     },
     {
         "id": 56,
-        "nombre": "Auricular Bluetooth Suono P47 Rojo",
+        "nombre": "AURICULAR BLUETOOHT SUONO P47 Rojo",
         "precio": 10000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -407,7 +397,7 @@
     },
     {
         "id": 57,
-        "nombre": " Auricular Inalambrico Bluetooth Vincha P47",
+        "nombre": "AURICULAR BLUETOOHT SUONO P47 NEGRO",
         "precio": 10000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -415,7 +405,7 @@
     },
     {
         "id": 58,
-        "nombre": "Parlante Mini A005 NEGRO",
+        "nombre": "PARLANTE MINI A005 NEGRO",
         "precio": 13000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -423,7 +413,7 @@
     },
     {
         "id": 59,
-        "nombre": "Parlante Greatnice GTS-1345 portátil con bluetooth negro",
+        "nombre": "PARLANTE GREATNICE GTS-1345 ",
         "precio": 12000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -431,7 +421,7 @@
     },
     {
         "id": 60,
-        "nombre": "Parlante Recargable Bluetooth Gts 1362 Usb Fm Sd Speaker Rojo",
+        "nombre": "PARLANTE BLUETOOTH GTS 1362",
         "precio": 13000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -439,7 +429,7 @@
     },
     {
         "id": 61,
-        "nombre": "Parlante Bluetooth 3x2 Extra Bass Gts 1558 Rgb Portatil Negro",
+        "nombre": "PARLANTE GTS 1558 RGB PORTATIL NEGRO",
         "precio": 20000.0,
         "categoria": "Electrónica",
         "stock": 1,
@@ -455,10 +445,23 @@
     },
     {
         "id": 63,
-        "nombre": "Mochila Matera Urbana Marwal Caqui",
+        "nombre": "MOCHILA MATERA URBANA MARWAL CAQUI",
         "precio": 25000.0,
         "categoria": "Otros",
         "stock": 1,
         "imagen": "imagen_2026-02-12_093504796.png"
+    },
+    {
+        "id": 64,
+        "nombre": "TAZA CON BATIDOR A PILA 450ml",
+        "precio": 15000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4951049_1.png",
+        "imagenes_extras": [
+            "4951049_3.png",
+            "4951049_2.png",
+            "4951049_1.png"
+        ]
     }
 ]

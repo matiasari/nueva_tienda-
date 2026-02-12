@@ -761,3 +761,156 @@ a { text-decoration: none; }
     cursor: pointer !important;
     border: none !important;
 }
+
+/* --- FOOTER BAZAR GUILLE --- */
+.footer {
+    background-color: #2c3e50; /* Un tono oscuro elegante */
+    color: white;
+    padding: 40px 0;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* BOTÓN INSTAGRAM CON DEGRADADO */
+.instagram-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 30px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.instagram-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* COPYRIGHT */
+.copyright {
+    font-size: 14px;
+    color: #bdc3c7; /* Gris claro para que no canse la vista */
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* Botones de navegación del Zoom */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    font-size: 40px;
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: 0.3s;
+    user-select: none;
+    z-index: 10001;
+}
+
+.nav-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.prev { left: 20px; }
+.next { right: 20px; }
+
+/* En celulares las hacemos un poco más chicas */
+@media (max-width: 600px) {
+    .nav-btn {
+        font-size: 25px;
+        padding: 10px;
+    }
+}
+
+/* --- TÍTULOS PANEL ADMIN --- */
+.admin-header h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* Títulos de las Secciones (Banners, Productos, etc.) */
+.form-seccion h2 {
+    font-size: 22px;
+    color: #34495e;
+    border-bottom: 2px solid #3498db;
+    display: inline-block;
+    padding-bottom: 5px;
+    margin-bottom: 25px;
+}
+
+/* --- TÍTULO DE LA TIENDA (Header principal) --- */
+.header-left .nombre {
+    font-size: 24px;
+    font-weight: 900;
+    color: #000;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-left: 10px;
+}
+
+/* Títulos de Categorías en la Tienda */
+.titulo-categoria {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 30px 0 15px 0;
+    padding-left: 10px;
+    border-left: 5px solid #000;
+}
+
+/* --- BOTÓN CERRAR SESIÓN --- */
+.btn-logout {
+    background-color: #e74c3c; /* Rojo elegante */
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+    border: none;
+    display: inline-block;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b; /* Rojo más oscuro al pasar el mouse */
+    transform: scale(1.05); /* Se agranda un pelín */
+}
+
+/* --- AJUSTE DEL HEADER ADMIN --- */
+.admin-header {
+    display: flex;
+    justify-content: space-between; /* Título a la izquierda, botón a la derecha */
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #ffffff;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 30px;
+}
+
+.admin-header h1 {
+    margin: 0; /* Quitamos el margen para que no se desalinee con el botón */
+    font-size: 24px;
+    color: #2c3e50;
+    font-weight: 800;
+}

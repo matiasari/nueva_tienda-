@@ -16,27 +16,18 @@
 
     <main class="admin-container">
         
-<div class="form-seccion">
-    <h2 style="text-align: center;">📸 Actualizar Banner Principal</h2>
-    <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data" class="form-banner-guille">
-        
-        <input type="text" name="titulo" placeholder="Título del Banner">
-        <textarea name="descripcion" placeholder="Descripción corta" rows="2"></textarea>
-        <input type="number" name="producto_id" placeholder="ID del Producto para el link">
-        
-        <label style="font-weight: bold; font-size: 14px;">Imagen (1920x600):</label>
-        <input type="file" name="imagen" accept="image/*" required>
-        
-        <button type="submit" class="btn-banner-pro">🚀 Subir y Publicar Banner</button>
-    </form>
-</div>
-        
-        <label style="font-size: 14px; margin-top: 5px;">Imagen de fondo (Recomendado 1920x600):</label>
-        <input type="file" name="imagen" accept="image/*" required>
-        
-        <button type="submit" class="btn-negro" style="margin-top: 10px;">Subir Banner Completo</button>
-    </form>
-</div>
+        <div class="form-seccion">
+            <h2 style="text-align: center;">📸 Actualizar Banner Principal</h2>
+            <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data" class="form-banner-guille">
+                <input type="text" name="titulo" placeholder="Título del Banner">
+                <textarea name="descripcion" placeholder="Descripción corta" rows="2"></textarea>
+                <input type="number" name="producto_id" placeholder="ID del Producto para el link">
+                <label style="font-weight: bold; font-size: 14px;">Imagen (1920x600):</label>
+                <input type="file" name="imagen" accept="image/*" required>
+                <button type="submit" class="btn-banner-pro">🚀 Subir y Publicar Banner</button>
+            </form>
+        </div>
+
         <div class="form-seccion">
             <h2>Banners Activos</h2>
             <table class="admin-tabla">
@@ -74,42 +65,35 @@
                     {% endfor %}
                 </select>
                 <input type="number" name="stock" placeholder="Stock" required>
-                <div class="input-group">
-    <label>Fotos del Producto (Seleccioná una o varias):</label>
-    <input type="file" name="imagenes_extras" multiple class="input-admin">
-    <small>La primera imagen será la que se vea en la tienda principal.</small>
-</div>
-                <button type="submit" class="btn-negro">Guardar Producto</button>
+                <div class="input-group" style="background: #fdfdfd; padding: 15px; border: 1px dashed #ccc; border-radius: 5px;">
+                    <label style="font-weight: bold;">Fotos del Producto (Seleccioná una o varias):</label>
+                    <input type="file" name="imagenes_extras" multiple class="input-admin" accept="image/*">
+                    <p style="font-size: 11px; color: #666; margin-top: 5px;">
+                        💡 <strong>TIP:</strong> La primera imagen será la principal de la tienda.
+                    </p>
+                </div>
+                <button type="submit" class="btn-negro" style="margin-top: 15px;">Guardar Producto</button>
             </form>
         </div>
 
         <hr>
-<div class="form-seccion">
-    <h2>📊 Carga Masiva por Excel</h2>
-    
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
-        <a href="{{ url_for('descargar_plantilla') }}" class="btn-seguir" style="text-decoration: none; padding: 10px 20px; background: #3498db !important;">
-            📥 Descargar Plantilla Excel
-        </a>
-    </div>
 
-    <form action="{{ url_for('importar_excel') }}" method="POST" enctype="multipart/form-data" class="form-banner-guille">
-        <label>Seleccioná tu archivo Excel completado:</label>
-        <input type="file" name="archivo_excel" accept=".xlsx, .xls" required>
-        <button type="submit" class="btn-banner-pro" style="background: #27ae60 !important;">
-            🚀 Subir y Cargar Artículos
-        </button>
-        <small style="display: block; margin-top: 10px; color: #666;">
-            * Descargá la plantilla, completala sin cambiar los nombres de las columnas y subila acá.
-        </small>
-    </form>
-</div>
-
-        
         <div class="form-seccion">
+            <h2>📊 Carga Masiva por Excel</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+                <a href="{{ url_for('descargar_plantilla') }}" class="btn-seguir" style="text-decoration: none; padding: 10px 20px; background: #3498db !important; color: white; border-radius: 5px;">
+                    📥 Descargar Plantilla Excel
+                </a>
+            </div>
+            <form action="{{ url_for('importar_excel') }}" method="POST" enctype="multipart/form-data" class="form-banner-guille">
+                <label>Seleccioná tu archivo Excel:</label>
+                <input type="file" name="archivo_excel" accept=".xlsx, .xls" required>
+                <button type="submit" class="btn-banner-pro" style="background: #27ae60 !important;">🚀 Cargar Artículos</button>
+            </form>
+        </div>
 
+        <div class="form-seccion">
             <h2>Listado de Productos</h2>
-            
             <div style="margin-bottom: 20px;">
                 <input type="text" id="buscadorAdmin" placeholder="🔍 Buscar por nombre o ID..." 
                        style="padding: 12px; width: 100%; max-width: 450px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
@@ -122,7 +106,6 @@
                         <th>Foto</th>
                         <th>Nombre</th>
                         <th>Precio</th>
-                        <th>Categoría</th>
                         <th>Stock</th>
                         <th>Acciones</th>
                     </tr>
@@ -131,91 +114,190 @@
                     {% for p in productos %}
                     <tr class="fila-producto">
                         <td class="id-prod">{{ p.id }}</td>
-                        <td>
-                            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" width="50" style="border-radius: 5px;">
-                        </td>
+                        <td><img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" width="50" style="border-radius: 5px;"></td>
                         <td class="nombre-prod"><strong>{{ p.nombre }}</strong></td>
                         <td>${{ p.precio }}</td>
-                        <td>{{ p.categoria }}</td>
                         <td>{{ p.stock }} u.</td>
-                 <td>
-    <div class="acciones-celda">
-        <button class="btn-negro" style="padding: 5px 10px; font-size: 12px; min-width: 70px;" 
-                onclick="abrirEditar('{{ p.id }}', '{{ p.nombre }}', '{{ p.precio }}', '{{ p.categoria }}', '{{ p.stock }}')">
-            Editar
-        </button>
-        <a href="{{ url_for('eliminar_producto', id=p.id) }}" 
-           class="btn-eliminar" style="padding: 5px 10px; font-size: 12px; min-width: 70px;"
-           onclick="return confirm('¿Borrar?')">
-            Eliminar
-        </a>
-    </div>
-</td>
+                        <td>
+                            <div class="acciones-celda">
+                                <button class="btn-negro" style="padding: 5px 10px; font-size: 12px;" 
+                                    onclick="abrirEditar('{{ p.id }}', '{{ p.nombre }}', '{{ p.precio }}', '{{ p.categoria }}', '{{ p.stock }}', '{{ p.imagen }}', '{{ (p.imagenes_extras if p.imagenes_extras is defined else []) | tojson | forceescape }}')">
+                                 Editar
+                                </button>
+                                <a href="{{ url_for('eliminar_producto', id=p.id) }}" class="btn-eliminar" onclick="return confirm('¿Borrar?')">Eliminar</a>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-<div id="modalEditar" class="modal-zoom" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 20000;">
-    <div class="modal-contenido-scroll">
-        <h3 style="margin-top: 0;">Editar Producto</h3>
-        <form action="/admin/producto/editar" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="id" id="edit-id">
-            
-            <label>Nombre:</label>
-            <input type="text" name="nombre" id="edit-nombre" style="width: 100%;" required>
-            
-            <label>Precio:</label>
-            <input type="number" step="0.01" name="precio" id="edit-precio" style="width: 100%;" required>
-            
-            <label>Categoría:</label>
-            <select name="categoria" id="edit-categoria" style="width: 100%;">
-                {% for cat in categorias %}
-                    <option value="{{ cat }}">{{ cat }}</option>
-                {% endfor %}
-            </select>
-            
-            <label>Stock:</label>
-            <input type="number" name="stock" id="edit-stock" style="width: 100%;" required>
-            
-            <label>Nueva Imagen (opcional):</label>
-            <input type="file" name="imagen" accept="image/*" style="width: 100%; font-size: 12px;">
-            
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button type="submit" class="btn-negro" style="flex: 1; padding: 10px;">Guardar</button>
-                <button type="button" onclick="cerrarEditar()" style="flex: 1; background: #ddd; border: none; border-radius: 5px; cursor: pointer;">Cancelar</button>
+        <div id="modalEditar" class="modal-zoom" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 20000;">
+            <div class="modal-contenido-scroll" style="background: white; padding: 25px; border-radius: 10px; max-width: 600px; margin: 30px auto; max-height: 90vh; overflow-y: auto;">
+                <h3 style="margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">✏️ Editar Producto</h3>
+                
+                <form action="/admin/producto/editar" method="POST" enctype="multipart/form-data" id="formEditar">
+                    <input type="hidden" name="id" id="edit-id">
+                    
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" id="edit-nombre" class="input-admin-edit" required>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label>Precio:</label>
+                            <input type="number" step="0.01" name="precio" id="edit-precio" class="input-admin-edit" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Stock:</label>
+                            <input type="number" name="stock" id="edit-stock" class="input-admin-edit" required>
+                        </div>
+                    </div>
+
+                    <label>Categoría:</label>
+                    <select name="categoria" id="edit-categoria" class="input-admin-edit">
+                        {% for cat in categorias %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                        <label style="font-weight: bold; color: #2c3e50;">📸 Gestionar Galería de Fotos:</label>
+                        <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 10px;">Arrastrá para reordenar. La primera es la PRINCIPAL.</p>
+                        
+                        <div id="contenedor-fotos-edit" class="grid-fotos-edit-sortable">
+                            </div>
+
+                        <label style="display:block; margin-top: 15px; font-weight: bold;">➕ Subir más fotos:</label>
+                        <input type="file" name="fotos_extras" multiple accept="image/*" style="font-size: 12px;">
+                    </div>
+                    
+                    <div style="margin-top: 25px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn-negro" style="flex: 2; padding: 12px;">💾 Guardar Cambios</button>
+                        <button type="button" onclick="cerrarEditar()" style="flex: 1; background: #bdc3c7; border: none; border-radius: 5px; cursor: pointer;">Cancelar</button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-</div> </div>
+        </div>
     </main>
 
     <script>
-        // Buscador
+        // BUSCADOR
         document.getElementById('buscadorAdmin').addEventListener('keyup', function() {
             let filtro = this.value.toLowerCase();
-            let filas = document.querySelectorAll('.fila-producto');
-            filas.forEach(fila => {
+            document.querySelectorAll('.fila-producto').forEach(fila => {
                 let nombre = fila.querySelector('.nombre-prod').textContent.toLowerCase();
                 let id = fila.querySelector('.id-prod').textContent.toLowerCase();
                 fila.style.display = (nombre.includes(filtro) || id.includes(filtro)) ? "" : "none";
             });
         });
 
-        // Modal
-        function abrirEditar(id, nombre, precio, categoria, stock) {
+        // LÓGICA DE FOTOS Y DRAG & DROP
+        let fotosActuales = [];
+
+        function abrirEditar(id, nombre, precio, categoria, stock, imgPrincipal, extrasJson) {
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-nombre').value = nombre;
             document.getElementById('edit-precio').value = precio;
             document.getElementById('edit-categoria').value = categoria;
             document.getElementById('edit-stock').value = stock;
+
+            // Limpiamos y cargamos las fotos
+            try {
+                const extras = JSON.parse(extrasJson);
+                fotosActuales = [imgPrincipal, ...extras].filter(f => f && f !== '');
+            } catch (e) {
+                fotosActuales = [imgPrincipal];
+            }
+
+            renderizarFotosEdit();
             document.getElementById('modalEditar').style.display = 'block';
+        }
+
+        function renderizarFotosEdit() {
+            const container = document.getElementById('contenedor-fotos-edit');
+            container.innerHTML = '';
+
+            fotosActuales.forEach((foto, index) => {
+                const item = document.createElement('div');
+                item.className = 'foto-edit-item';
+                item.draggable = true;
+                item.innerHTML = `
+                    <img src="/static/uploads/${foto}">
+                    <button type="button" class="btn-del-foto" onclick="quitarFoto(${index})">×</button>
+                    <input type="hidden" name="orden_fotos[]" value="${foto}">
+                `;
+
+                // Eventos Drag
+                item.addEventListener('dragstart', () => item.classList.add('dragging'));
+                item.addEventListener('dragend', () => item.classList.remove('dragging'));
+
+                container.appendChild(item);
+            });
+
+            // Lógica de Reordenar al arrastrar
+            container.addEventListener('dragover', e => {
+                e.preventDefault();
+                const draggable = document.querySelector('.dragging');
+                const afterElement = getDragAfterElement(container, e.clientY);
+                if (afterElement == null) {
+                    container.appendChild(draggable);
+                } else {
+                    container.insertBefore(draggable, afterElement);
+                }
+            });
+        }
+
+        function quitarFoto(index) {
+            if(confirm("¿Quitar esta foto?")) {
+                fotosActuales.splice(index, 1);
+                renderizarFotosEdit();
+            }
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.foto-edit-item:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
         function cerrarEditar() {
             document.getElementById('modalEditar').style.display = 'none';
         }
+
+        window.onclick = (e) => { if (e.target.id == 'modalEditar') cerrarEditar(); }
     </script>
+
+    <style>
+        .input-admin-edit { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        
+        .grid-fotos-edit-sortable { 
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; 
+            min-height: 80px; background: #eee; padding: 10px; border-radius: 5px;
+        }
+
+        .foto-edit-item { 
+            position: relative; width: 70px; height: 70px; 
+            border: 2px solid white; cursor: grab; background: #fff;
+        }
+
+        .foto-edit-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-del-foto { 
+            position: absolute; top: -5px; right: -5px; background: #e74c3c; 
+            color: white; border: none; border-radius: 50%; width: 20px; height: 20px; 
+            font-size: 12px; cursor: pointer; 
+        }
+
+        .dragging { opacity: 0.5; border: 2px dashed #3498db; }
+    </style>
+
 </body>
 </html>

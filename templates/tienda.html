@@ -111,9 +111,14 @@
     {% endfor %}
 </div>
 
-<div id="modalZoom" class="modal-zoom" onclick="cerrarModal()" style="display: none;">
+<div id="modalZoom" class="modal-zoom" style="display: none;" onclick="cerrarModal()">
     <span class="cerrar-zoom">&times;</span>
-    <img class="modal-contenido" id="imgAmpliada">
+    
+    <button class="nav-btn prev" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
+    
+    <img class="modal-contenido" id="imgAmpliada" onclick="event.stopPropagation()">
+    
+    <button class="nav-btn next" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
 </div>
 
 <footer class="footer">
@@ -140,17 +145,44 @@
         setInterval(nextSlide, 5000);
     }
 
-    // Modal Zoom (Corregido)
-    function abrirModal(imgSrc) {
-        const modal = document.getElementById('modalZoom');
-        const modalImg = document.getElementById('imgAmpliada');
-        modalImg.src = imgSrc;
-        modal.style.display = 'flex'; 
+  let fotosProductoActual = [];
+let indiceFotoActual = 0;
+
+function abrirModal(imgSrc) {
+    const modal = document.getElementById('modalZoom');
+    const modalImg = document.getElementById('imgAmpliada');
+    
+    // Buscamos todas las fotos del producto donde hiciste clic
+    // Esto detecta automáticamente la principal y las miniaturas de esa Card
+    const card = event.target.closest('.card');
+    const todasLasFotos = card.querySelectorAll('img');
+    
+    fotosProductoActual = Array.from(todasLasFotos).map(img => img.src);
+    indiceFotoActual = fotosProductoActual.indexOf(imgSrc);
+
+    modalImg.src = fotosProductoActual[indiceFotoActual];
+    modal.style.display = 'flex';
+}
+
+function cambiarFoto(direccion) {
+    indiceFotoActual += direccion;
+
+    if (indiceFotoActual >= fotosProductoActual.length) {
+        indiceFotoActual = 0; // Vuelve a la primera
+    } else if (indiceFotoActual < 0) {
+        indiceFotoActual = fotosProductoActual.length - 1; // Va a la última
     }
 
-    function cerrarModal() {
-        document.getElementById("modalZoom").style.display = "none";
-    }
+    document.getElementById('imgAmpliada').src = fotosProductoActual[indiceFotoActual];
+}
+
+function cerrarModal() {
+    const modal = document.getElementById("modalZoom");
+    modal.style.display = "none";
+    // Limpiamos la lista de fotos para que no queden fantasmas
+    fotosProductoActual = [];
+}
+
 
     // Cerrar con tecla Escape
     document.addEventListener('keydown', function(event) {
