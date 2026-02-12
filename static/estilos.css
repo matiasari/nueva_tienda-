@@ -914,3 +914,30 @@ a { text-decoration: none; }
     color: #2c3e50;
     font-weight: 800;
 }
+
+/* --- ARREGLO DE CATEGORÍAS --- */
+.categorias {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap; /* Para que en el celu no se amontonen */
+}
+
+.categorias a {
+    text-decoration: none; /* Esto le saca cualquier subrayado o tachado */
+    background-color: #f0f0f0; /* Un gris clarito de fondo */
+    color: #333; /* Texto oscuro para que se lea bien */
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid #ddd;
+}
+
+.categorias a:hover {
+    background-color: #000; /* Fondo negro al pasar el mouse */
+    color: #fff; /* Texto blanco */
+    transform: translateY(-2px);
+}
