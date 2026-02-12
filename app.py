@@ -117,14 +117,21 @@ def agregar_producto():
     precio = request.form.get('precio')
     categoria = request.form.get('categoria')
     stock = request.form.get('stock')
-    imagen = request.files.get('imagen')
     
-    nombre_img = ""
-    if imagen:
-        nombre_img = secure_filename(imagen.filename)
-        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_img))
-    
-    # Generar ID nuevo
+    # Manejo de múltiples imágenes
+    imagenes_subidas = request.files.getlist('imagenes_extras')
+    nombres_fotos = []
+
+    for img in imagenes_subidas:
+        if img.filename != '':
+            filename = secure_filename(img.filename)
+            img.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            nombres_fotos.append(filename)
+
+    # La primera foto será la principal, el resto van a la lista 'imagenes_extras'
+    foto_principal = nombres_fotos[0] if nombres_fotos else ""
+    fotos_adicionales = nombres_fotos[1:] if len(nombres_fotos) > 1 else []
+
     nuevo_id = max([p['id'] for p in productos], default=0) + 1
     
     nuevo_p = {
@@ -133,12 +140,14 @@ def agregar_producto():
         "precio": float(precio),
         "categoria": categoria,
         "stock": int(stock) if stock else 0,
-        "imagen": nombre_img
+        "imagen": foto_principal,
+        "imagenes_extras": fotos_adicionales  # Nueva clave en tu JSON
     }
     
     productos.append(nuevo_p)
     guardar_datos(PRODUCTOS_JSON, productos)
     return redirect(url_for('admin'))
+
 
 @app.route('/admin/producto/eliminar/<int:id>')
 @login_requerido
@@ -334,6 +343,70 @@ def formato_pesos(valor):
         return "$0"
 
 app.jinja_env.filters['pesos'] = formato_pesos
+
+import pandas as pd
+
+@app.route('/admin/importar_excel', methods=['POST'])
+@login_requerido
+def importar_excel():
+    if 'archivo_excel' not in request.files:
+        return redirect(url_for('admin'))
+    
+    file = request.files['archivo_excel']
+    if file.filename == '':
+        return redirect(url_for('admin'))
+
+    if file:
+        # Leemos el Excel
+        df = pd.read_excel(file)
+        productos = cargar_datos(PRODUCTOS_JSON)
+        
+        # Obtenemos el último ID para no repetir
+        nuevo_id = max([p['id'] for p in productos], default=0) + 1
+
+        for index, row in df.iterrows():
+            nuevo_p = {
+                "id": nuevo_id,
+                "nombre": str(row['Nombre']),
+                "precio": float(row['Precio']),
+                "categoria": str(row['Categoría']),
+                "stock": int(row['Stock']) if 'Stock' in row else 0,
+                "imagen": "default.jpg", # Foto temporal
+                "imagenes_extras": []
+            }
+            productos.append(nuevo_p)
+            nuevo_id += 1
+
+        guardar_datos(PRODUCTOS_JSON, productos)
+        return redirect(url_for('admin'))
+    
+from flask import send_file
+import io
+
+@app.route('/admin/descargar_plantilla')
+@login_requerido
+def descargar_plantilla():
+    # Creamos un DataFrame de ejemplo con las columnas exactas
+    df = pd.DataFrame(columns=['Nombre', 'Precio', 'Categoría', 'Stock'])
+    
+    # Agregamos una fila de ejemplo (opcional, para que veas cómo se llena)
+    df.loc[0] = ['Ejemplo Producto', 1500.50, 'Cocina', 10]
+    
+    # Guardamos el Excel en memoria para no crear archivos basura en el servidor
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Productos')
+    
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name='plantilla_bazar_guille.xlsx'
+    )    
+    
+    
 
 if __name__ == '__main__':
     # Render asigna un puerto dinámico, lo capturamos con os.environ

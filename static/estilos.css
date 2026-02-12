@@ -7,7 +7,6 @@
     --bg-light: #ffffff;
     --bg-gray: #f4f7f6;
     --text-dark: #1a1a1a;
-    --text-muted: #64748b;
     --border: #f0f0f0;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     --radius: 12px;
@@ -15,852 +14,750 @@
 
 body {
     margin: 0;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg-light);
     color: var(--text-dark);
-    line-height: 1.5;
 }
 
 a { text-decoration: none; }
 
 /* --- 2. HEADER --- */
 .header {
-    display: grid; 
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     padding: 20px 5%;
     background: var(--bg-light);
     border-bottom: 1px solid var(--border);
+    gap: 10px;
 }
 
-.header-left {
-    grid-column: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.logo-img { width: 150px; height: auto; margin-bottom: 5px; } /* Ajustado para el logo */
+.logo-img { width: 120px; height: auto; }
 .nombre {
-    font-size: 50px;
+    font-size: 38px;
     font-weight: 800;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--primary);
 }
 
-.header-right {
-    grid-column: 3;
-    display: flex;
-    justify-content: flex-end;
-}
-
+.header-right { width: 100%; display: flex; justify-content: center; margin-top: 10px; }
 .carrito-btn {
-    position: relative;
-    background: var(--primary);
-    color: white;
-    padding: 10px 16px;
-    border-radius: 30px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    position: relative; background: var(--primary); color: white;
+    padding: 10px 22px; border-radius: 30px; font-weight: 600;
 }
 
 .contador {
     position: absolute; top: -5px; right: -5px;
     background: var(--success); color: white;
-    font-size: 11px; width: 20px; height: 20px;
+    font-size: 11px; width: 22px; height: 22px;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%; border: 2px solid white;
 }
 
-/* --- 3. BUSCADOR Y CATEGORÍAS --- */
-.buscador {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 5%;
-    display: flex;
-    justify-content: center; /* Centrado para que se vea prolijo */
+/* --- 3. BANNER / SLIDER --- */
+.slider-container {
+    position: relative; width: 100%; height: 450px;
+    overflow: hidden; margin-bottom: 30px;
 }
 
-.buscador input {
-    width: 300px; padding: 12px 20px;
-    border: 2px solid var(--primary);
-    border-radius: 25px 0 0 25px; outline: none;
+.slide {
+    position: absolute; inset: 0; background-size: cover; background-position: center;
+    opacity: 0; transition: opacity 1s ease; display: flex; align-items: center; justify-content: center;
 }
 
-.buscador button {
-    padding: 12px 25px; background: var(--primary);
-    color: white; border: none; border-radius: 0 25px 25px 0;
-    cursor: pointer; font-weight: bold;
+.slide.active { opacity: 1; z-index: 1; }
+.slide::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.35); }
+
+.slide-text-container { position: relative; z-index: 2; text-align: center; color: white; padding: 20px; }
+.slide-text-container h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; }
+.btn-promo {
+    display: inline-block; background: #fff; color: #000;
+    padding: 12px 30px; border-radius: 30px; font-weight: 800; margin-top: 15px;
 }
 
-.categorias {
-    display: flex; gap: 10px; justify-content: center;
-    padding: 15px; flex-wrap: wrap;
+/* --- 4. TIENDA Y CATEGORÍAS --- */
+.contenedor-categorias { max-width: 1300px; margin: 0 auto; padding: 20px; }
+.titulo-categoria {
+    background: #2c3e50; color: white; padding: 10px 25px;
+    border-radius: 50px; display: inline-block; margin-bottom: 25px;
+    font-size: 1.1rem; font-weight: bold; box-shadow: var(--shadow);
 }
 
-.categorias a {
-    padding: 8px 18px; background: #f9f9f9;
-    border-radius: 20px; color: var(--text-dark);
-    border: 1px solid #ddd; font-size: 14px; transition: 0.3s;
-}
-
-.categorias a:hover { background: var(--success); color: white; }
-
-/* --- 4. GRID DE PRODUCTOS (TIENDA) --- */
-.productos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-    gap: 20px; padding: 20px 5%;
+.grid-productos {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px;
 }
 
 .card {
-    background: white; padding: 15px; border-radius: var(--radius);
-    text-align: center; border: 1px solid var(--border); transition: 0.3s;
+    background: white; border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 15px; text-align: center; transition: 0.3s; display: flex; flex-direction: column;
 }
 
 .card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
 
-.card img {
-    width: 100%; height: 200px;
-    object-fit: cover; border-radius: 8px; margin-bottom: 10px;
+.contenedor-foto-principal {
+    width: 100%; height: 220px; display: flex; align-items: center; justify-content: center;
+    background: #f9f9f9; border-radius: 10px; overflow: hidden;
 }
 
-.card .precio {
-    font-weight: 800; font-size: 1.4rem; color: #000;
-    margin: 10px 0; display: block;
+.foto-principal { max-width: 100%; max-height: 100%; object-fit: contain; cursor: zoom-in; }
+
+.galeria-miniaturas { display: flex; justify-content: center; gap: 6px; margin: 12px 0; }
+.mini-foto { width: 45px; height: 45px; object-fit: cover; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; }
+
+.btn-comprar {
+    background-color: var(--success); color: white; border: none;
+    padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
 }
 
-/* --- 5. CARRITO Y FINALIZAR COMPRA --- */
-.carrito-lista, .envio-contenedor, .totales-contenedor, .finalizar-compra-contenedor {
-    display: block; width: 95%; max-width: 600px;
-    margin: 20px auto; clear: both;
+/* --- 5. CARRITO --- */
+.resumen-compra {
+    background: #fff; border-radius: 16px; padding: 25px;
+    max-width: 600px; margin: 30px auto; box-shadow: var(--shadow);
 }
 
 .item-carrito {
-    display: flex; align-items: center; background: white;
-    padding: 15px; border-radius: var(--radius);
-    border: 1px solid var(--border); margin-bottom: 15px;
+    display: flex; align-items: center; padding: 15px;
+    border-bottom: 1px solid var(--border);
 }
 
-.item-carrito img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; }
+.item-carrito img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; margin-right: 15px; }
+
+.cantidad-control { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
+.btn-qty {
+    width: 32px; height: 32px; background: #eee; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-weight: bold;
+}
 
 .btn-whatsapp {
-    display: flex; align-items: center; justify-content: center;
-    background: var(--success); color: white; padding: 20px;
-    border-radius: 15px; font-size: 1.2rem; font-weight: 800;
+    display: block; background: var(--success); color: white;
+    text-align: center; padding: 18px; border-radius: 50px;
+    font-weight: 800; font-size: 1.1rem; margin-top: 20px;
 }
 
 /* --- 6. PANEL ADMIN --- */
-.admin-body { background-color: var(--bg-gray); padding: 20px; }
-
-.admin-header {
-    background-color: var(--primary); color: #fff;
-    padding: 20px; display: flex; justify-content: space-between;
-    align-items: center; border-radius: 8px; margin-bottom: 20px;
-}
-
-.admin-container { max-width: 1100px; margin: 0 auto; }
-
+.admin-container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
 .form-seccion {
-    background: white; padding: 25px; border-radius: 8px;
+    background: white; padding: 25px; border-radius: var(--radius);
     margin-bottom: 30px; border: 1px solid #ddd;
 }
 
-.admin-tabla { width: 100%; border-collapse: collapse; background: white; }
-
+.admin-tabla { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
 .admin-tabla th, .admin-tabla td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+.admin-tabla th { background: #f8f8f8; font-size: 0.85rem; text-transform: uppercase; }
 
-.admin-tabla th { background-color: #f8f8f8; text-transform: uppercase; font-size: 0.8rem; }
+.btn-negro { background: #000; color: #fff; padding: 10px 20px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; }
+.btn-eliminar { background: var(--danger); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; }
 
-/* --- 7. BOTONES GENERALES --- */
-.btn-negro {
-    background: var(--primary); color: #fff; padding: 12px 25px;
-    border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
+/* --- 7. MODAL Y VARIOS --- */
+.modal-zoom {
+    display: none; position: fixed; z-index: 9999; inset: 0;
+    background: rgba(0,0,0,0.9); align-items: center; justify-content: center;
+}
+.modal-contenido { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+.whatsapp-float {
+    position: fixed; width: 60px; height: 60px; bottom: 20px; right: 20px;
+    background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    z-index: 1000; box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
 }
 
-.btn-eliminar {
-    background-color: var(--danger); color: white;
-    padding: 6px 12px; border-radius: 4px; font-size: 0.85rem;
+/* --- 8. RESPONSIVE --- */
+@media (max-width: 768px) {
+    .grid-productos { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .slider-container { height: 280px; }
+    .nombre { font-size: 26px; }
+    .admin-tabla { display: block; overflow-x: auto; } /* Tabla scrolleable en celu */
 }
 
-.btn-logout { color: #fff; border: 1px solid #fff; padding: 8px 15px; border-radius: 4px; }
 
-/* --- 8. FOOTER --- */
-.footer {
-    background: #f9f9f9; padding: 40px 20px; margin-top: 50px;
-    border-top: 1px solid var(--border); text-align: center;
-}
+/* --- 10. ADMINISTRACIÓN DE BANNERS --- */
 
-.instagram-btn {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-    color: white; padding: 12px 25px; border-radius: 30px; font-weight: bold;
-}
-
-/* Contenedor del Banner */
-.slider-container {
-    width: 100%;
-    height: 500px; 
-    overflow: hidden;
-    position: relative;
-    margin-bottom: 40px;
-}
-
-.slide {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; /* Tira el texto a la derecha */
-    background-size: cover;
-    background-position: center;
-}
-
-/* La caja de texto blanca sobre la foto */
-.slide-text-container {
-    margin-right: 7%;
-    background: rgba(255, 255, 255, 0.85); /* Blanco con transparencia */
-    padding: 40px;
-    border-radius: 30px;
-    max-width: 450px;
-    text-align: center;
-    box-shadow: var(--shadow);
-}
-
-.slide-text-container h2 {
-    font-size: 2.5rem;
-    color: var(--primary-logo);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-}
-
-.slide-text-container p {
-    font-size: 1.1rem;
-    color: #555;
-    margin-bottom: 20px;
-}
-
-.btn-promo {
-    display: inline-block;
-    background: #000;
-    color: #fff;
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-weight: bold;
-}
-
-/* Mejora el aspecto de los campos en el panel de admin */
-.form-seccion form {
+/* Contenedor específico para el formulario de banners */
+.form-banner {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Espacio entre cuadritos */
+    gap: 15px;
 }
 
-.form-seccion textarea {
+.form-banner label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: var(--primary-logo);
+    margin-bottom: -10px;
+}
+
+.form-banner input[type="text"],
+.form-banner textarea,
+.form-banner select {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-family: inherit;
-    resize: vertical;
+    font-size: 1rem;
+    background-color: #fff;
 }
 
-.slider-container {
-    position: relative;
-    height: 550px;
+/* Estilo para la tabla de banners cargados */
+.tabla-banners-admin {
     width: 100%;
-    overflow: hidden;
-}
-
-.slide {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0;
-    transition: opacity 1s ease-in-out; /* Efecto de desvanecido */
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    background-size: cover;
-    background-position: center;
-}
-
-.slide.active {
-    opacity: 1;
-    z-index: 1;
-}
-
-.admin-tabla img {
-    max-width: 120px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-}
-
-.productos {
-    display: grid;
-    /* Esto es lo más importante: obliga a crear columnas de máximo 280px */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 25px;
-    padding: 40px 5%;
-    max-width: 1400px;
-    margin: 0 auto;
-    align-items: start;
-}
-
-/* LA TARJETA DEL PRODUCTO */
-.card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Para que todas midan lo mismo */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-   
-}
-/* LA IMAGEN DENTRO DE LA TARJETA */
-.card img {
-    width: 100%;
-    height: 220px; /* Altura fija para que no se deforme */
-    object-fit: contain; /* Cambié a contain para que veas el producto entero sin cortes */
-    background-color: #f9f9f9;
+    margin-top: 20px;
     border-radius: 10px;
-    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
 }
 
-
-/* Contenedor del + y - */
-.cantidad-control {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin: 10px 0;
+.preview-banner-admin {
+    width: 120px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
 }
 
-.btn-qty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background-color: #f0f0f0;
-    color: #333;
-    border-radius: 50%; /* Los hace redondos */
+/* Badge para indicar si tiene link o no */
+.badge-link {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
     font-weight: bold;
-    font-size: 18px;
-    transition: 0.2s;
 }
 
-.btn-qty:hover {
-    background-color: var(--primary);
-    color: white;
+/* Responsive para el formulario de admin */
+@media (max-width: 768px) {
+    .form-seccion {
+        padding: 15px;
+    }
+    
+    .btn-negro {
+        width: 100%; /* Botón de agregar a pantalla completa en celu */
+    }
+    
+    .tabla-banners-admin td {
+        font-size: 0.85rem;
+        padding: 10px 5px;
+    }
 }
 
-.qty-numero {
-    font-weight: 800;
-    font-size: 1.1rem;
-    min-width: 20px;
-    text-align: center;
-}
+/* --- 11. BOTONES DE ACCIÓN EN CARRITO --- */
 
-.btn-quitar {
-    color: var(--danger);
-    font-size: 0.85rem;
-    text-decoration: underline;
-    margin-top: 10px;
-    display: inline-block;
-}
-
-/* Contenedor de los botones de abajo */
+/* Contenedor para centrar los botones */
 .acciones-carrito {
     display: flex;
     justify-content: space-between;
     align-items: center;
     max-width: 600px;
-    margin: 30px auto;
-    padding: 0 15px;
+    margin: 20px auto;
+    gap: 15px;
+    padding: 0 10px;
 }
 
-/* Estilo general para ambos botones */
+/* Estilo general para ambos */
 .btn-seguir, .btn-vaciar {
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.3s;
-    font-size: 0.9rem;
+    flex: 1; /* Para que midan lo mismo */
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
 }
 
 /* Botón Seguir Comprando (Negro/Elegante) */
 .btn-seguir {
-    background-color: #222;
+    background-color: var(--primary); /* El negro que definimos arriba */
     color: white;
-    border: 1px solid #222;
 }
 
 .btn-seguir:hover {
-    background-color: transparent;
-    color: #222;
-}
-
-/* Botón Vaciar Carrito (Gris/Rojo suave) */
-.btn-vaciar {
-    background-color: #f8f9fa;
-    color: #dc3545; /* Rojo para indicar que borra */
-    border: 1px solid #dc3545;
-}
-
-.btn-vaciar:hover {
-    background-color: #dc3545;
-    color: white;
-}
-
-/* Estilo para el botón de WhatsApp (El más importante) */
-.finalizar-compra-contenedor {
-    text-align: center;
-    margin-top: 20px;
-    padding-bottom: 50px;
-}
-
-.btn-whatsapp {
-    display: inline-block;
-    background-color: #25d366; /* Verde WhatsApp */
-    color: white;
-    padding: 18px 35px;
-    border-radius: 50px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    text-decoration: none;
-    box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
-    transition: 0.3s;
-}
-
-.btn-whatsapp:hover {
-    transform: scale(1.05);
-    background-color: #128c7e;
-}
-
-
-* Imagen miniatura */
-.zoom-img {
-    cursor: zoom-in;
-}
-
-/* Modal fondo */
-/* Modal fondo - CORREGIDO */
-.modal-zoom {
-    display: none;        /* Se mantiene oculto al inicio */
-    position: fixed;
-    z-index: 9999;
-    inset: 0;
-    background-color: rgba(0,0,0,0.9);
-    
-    /* Estas 3 líneas centran la foto cuando el modal se activa */
-    align-items: center;
-    justify-content: center;
-    display: none;        /* Asegúrate de que esta sea la última línea de display */
-}
-
-/* Imagen ampliada */
-.modal-contenido {
-    max-width: 90vw;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border-radius: 12px;
-    animation: zoomIn 0.25s ease;
-}
-
-/* Animación suave */
-@keyframes zoomIn {
-    from { transform: scale(0.9); opacity: 0 }
-    to { transform: scale(1); opacity: 1 }
-}
-
-/* Botón cerrar */
-.cerrar-zoom {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    color: #fff;
-    font-size: 35px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10000;
-}
-
-
-/* ================= BANNER / SLIDER LIMPIO ================= */
-
-.slider-container {
-    position: relative;
-    width: 100%;
-    height: 400px;
-    overflow: hidden;
-}
-
-.slide {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.slide.active {
-    opacity: 1;
-    z-index: 1;
-}
-
-/* Overlay oscuro SUAVE para legibilidad */
-.slide::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-}
-
-/* TEXTO DIRECTO SOBRE IMAGEN */
-.slide-text-container {
-    position: relative;
-    z-index: 2;
-    max-width: 90%;
-    text-align: center;
-    color: white;
-    background: none !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-}
-
-/* TÍTULO */
-.slide-text-container h2 {
-    font-size: 2.3rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    color: white;
-}
-
-/* DESCRIPCIÓN */
-.slide-text-container p {
-    font-size: 1.1rem;
-    margin-bottom: 18px;
-    color: white;
-    opacity: 0.95;
-}
-
-/* BOTÓN */
-.btn-promo {
-    display: inline-block;
-    background: #000;
-    color: #fff;
-    padding: 14px 30px;
-    border-radius: 30px;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 14px;
-    transition: 0.3s;
-}
-
-.btn-promo:hover {
-    background: #222;
+    background-color: #333;
     transform: translateY(-2px);
 }
 
-/* ================= MOBILE ================= */
+/* Botón Vaciar Carrito (Gris con borde rojo) */
+.btn-vaciar {
+    background-color: #f8f9fa;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+.btn-vaciar:hover {
+    background-color: var(--danger);
+    color: white;
+}
+
+/* Ajuste para celulares */
 @media (max-width: 480px) {
-    .slider-container {
-        height: 230px;
+    .acciones-carrito {
+        flex-direction: column; /* Uno arriba del otro en el celu */
     }
-
-    .slide-text-container h2 {
-        font-size: 1.4rem;
-    }
-
-    .slide-text-container p {
-        font-size: 0.9rem;
-    }
-}
-
-
-/* ===== BUSCADOR RESPONSIVE ===== */
-.buscador {
-    display: flex;
-    gap: 10px;
-    max-width: 100%;
-    margin: 20px auto;
-}
-
-/* INPUT */
-.buscador input {
-    flex: 1;
-    padding: 12px 14px;
-    font-size: 16px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-}
-
-/* BOTÓN */
-.buscador button {
-    padding: 12px 18px;
-    font-size: 16px;
-    border-radius: 25px;
-    border: none;
-    background: #000;
-    color: #fff;
-    cursor: pointer;
-}
-
-/* ===== AJUSTES SOLO PARA CELULAR ===== */
-@media (max-width: 480px) {
-    .buscador {
-        flex-direction: column; /* uno debajo del otro */
-        padding: 0 12px;
-    }
-
-    .buscador input,
-    .buscador button {
+    .btn-seguir, .btn-vaciar {
         width: 100%;
     }
-
-    .buscador button {
-        text-align: center;
-    }
 }
 
-.resumen-compra {
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 520px;
-    margin: 30px auto;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
+/* --- MEJORA FORMULARIO BANNERS ADMIN --- */
 
-.resumen-compra h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-}
-
-.resumen-item {
+/* Contenedor del formulario */
+.form-seccion form {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 0.95rem;
+    flex-direction: column; /* Pone un campo debajo del otro */
+    gap: 15px;
+    max-width: 600px; /* Para que no sea tan ancho en PC */
 }
 
-.resumen-compra hr {
-    border: none;
-    border-top: 1px dashed #ddd;
-    margin: 15px 0;
-}
-
-.resumen-total {
+/* Estilo para los grupos de inputs */
+.input-group {
     display: flex;
-    justify-content: space-between;
-    font-size: 1.3rem;
-    font-weight: 900;
-    color: #27ae60;
-}
-
-CSS
-
-/* AJUSTES PARA EL PANEL ADMIN */
-
-/* Contenedor de botones en la tabla para que no se encimen */
-.acciones-celda {
-    display: flex;
-    flex-direction: column; /* Uno arriba del otro en pantallas chicas */
+    flex-direction: column;
     gap: 5px;
-    align-items: center;
+    text-align: left;
 }
 
-@media (min-width: 768px) {
-    .acciones-celda {
-        flex-direction: row; /* Uno al lado del otro en PC */
-        justify-content: center;
-    }
-}
-
-/* Modal de edición más compacto */
-.modal-contenido-scroll {
-    background: white;
-    width: 95%;
-    max-width: 450px;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 12px;
-    max-height: 90vh; /* Que no supere el alto de la pantalla */
-    overflow-y: auto; /* Si es muy largo, permite hacer scroll adentro del modal */
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-}
-
-/* Achicamos un poco los inputs del modal */
-.modal-contenido-scroll label {
-    font-size: 14px;
-    margin-top: 8px;
-    display: block;
+.input-group label {
     font-weight: bold;
+    font-size: 0.9rem;
+    color: #333;
 }
 
-.modal-contenido-scroll input, 
-.modal-contenido-scroll select {
-    margin-bottom: 5px;
-    padding: 8px;
+/* Estilo para los cuadros de texto */
+.form-seccion input[type="text"],
+.form-seccion textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box; /* Evita que se salgan del borde */
 }
-.form-seccion {
+
+/* Botón de subir banner */
+.btn-subir-banner {
+    background-color: #000;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.btn-subir-banner:hover {
+    background-color: #333;
+}
+
+.btn-quitar {
+    color: var(--danger); /* El rojo que definimos arriba */
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: none;
+    border: 1px solid var(--danger);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.btn-quitar:hover {
+    background-color: var(--danger);
+    color: white;
+}
+
+/* Ajuste para que en el item del carrito quede alineado */
+.item-detalles {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+/* --- 13. BUSCADOR Y FILTROS POR CATEGORÍA --- */
+
+/* Contenedor del Buscador */
+.buscador {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 0 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.buscador form {
+    display: flex;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.buscador input {
+    flex: 1;
+    padding: 15px 25px;
+    border: 2px solid var(--primary);
+    border-right: none;
+    border-radius: 30px 0 0 30px;
+    outline: none;
+    font-size: 1rem;
+}
+
+.buscador button {
+    padding: 15px 30px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 0 30px 30px 0;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.buscador button:hover {
+    background: #333;
+}
+
+/* Barra de Filtros (Categorías) */
+.categorias {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding: 10px 15px 30px;
+    flex-wrap: wrap; /* Para que en celu se acomoden solos */
+}
+
+.categorias a {
+    padding: 10px 22px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.categorias a:hover {
+    background: var(--success);
+    color: white;
+    border-color: var(--success);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+}
+
+/* Ajustes para Celular */
+@media (max-width: 480px) {
+    .buscador input {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .buscador button {
+        padding: 12px 20px;
+    }
+
+    .categorias a {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+/* --- 2. HEADER ESTILO ONRENDER --- */
+.header {
+    display: flex;
+    flex-direction: column; /* Apila todo al centro */
+    align-items: center;
+    padding: 20px 0;
     background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    height: auto; /* IMPORTANTE: Que crezca según el contenido */
-    overflow: visible; /* Que no corte nada */
+    border-bottom: 1px solid #eee;
+    width: 100%;
 }
 
-/* Ajustes para Celular (Header) */
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column; /* Apila los elementos uno arriba del otro */
-        padding: 15px 10px;
-        text-align: center;
-        gap: 15px; /* Les da aire para que no se peguen */
-    }
-
-    .header-left {
-        flex-direction: column; /* Logo arriba, nombre abajo */
-        align-items: center;
-        gap: 10px;
-    }
-
-    .logo-img {
-        width: 80px; /* Un poquito más grande para que luzca */
-        height: auto;
-    }
-
-    .nombre {
-        font-size: 24px; /* Un poco más chico para que no ocupe tanto */
-        letter-spacing: 2px;
-    }
-
-    .header-right {
-        width: 100%; /* El carrito ocupa todo el ancho para poder centrarse */
-        display: flex;
-        justify-content: center;
-    }
-
-    .carrito-btn {
-        width: fit-content; /* El botón se ajusta a su texto y queda centrado */
-    }
+.header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
-@media (max-width: 768px) {
-    .slider-container {
-        height: 300px; /* Le damos una altura fija más cómoda para el celu */
-    }
-    .slide {
-        background-position: center; /* Asegura que se vea el centro de tu flyer */
-    }
+.logo-img {
+    width: 120px; /* Tamaño justo para que no sea gigante */
+    height: auto;
+    margin-bottom: 10px;
 }
 
+.nombre {
+    font-size: 42px; /* Bien grande como pediste */
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #000;
+    margin: 10px 0;
+}
 
-.whatsapp-float {
+/* El Carrito ahora va debajo del nombre en celulares o a la derecha en PC */
+.header-right {
+    margin-top: 10px;
+}
+
+.carrito-btn {
+    background: #000;
+    color: #fff;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.carrito-btn:hover {
+    transform: scale(1.05);
+}
+
+.contador {
+    background: #fff;
+    color: #000;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* --- BOTÓN FLOTANTE CARRITO --- */
+.carrito-float {
     position: fixed;
     width: 60px;
     height: 60px;
     bottom: 20px;
-    right: 20px;
-    background-color: #25d366;
+    left: 20px; /* Del lado opuesto a WhatsApp */
+    background-color: var(--primary); /* Negro elegante */
     color: #FFF;
     border-radius: 50px;
     text-align: center;
-    font-size: 30px;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    z-index: 10000; /* Para que esté por encima de todo */
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    z-index: 10000;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s;
+    transition: transform 0.3s, background-color 0.3s;
+    text-decoration: none;
 }
 
-.whatsapp-float img {
-    width: 35px;
-    height: 35px;
+.icono-carrito {
+    font-size: 28px;
 }
 
-.whatsapp-float:hover {
-    transform: scale(1.1); /* Se agranda un poquito al pasar el mouse */
-    background-color: #128c7e;
+.contador-float {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--success); /* Verde como el de arriba */
+    color: white;
+    font-size: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--primary);
+    font-weight: bold;
 }
 
-/* Ajuste para que en celular no tape los botones de abajo */
+.carrito-float:hover {
+    transform: scale(1.1);
+    background-color: #333;
+}
+
+/* Ajuste para celulares */
 @media (max-width: 768px) {
-    .whatsapp-float {
+    .carrito-float {
         width: 50px;
         height: 50px;
         bottom: 15px;
-        right: 15px;
+        left: 15px;
     }
-    .whatsapp-float img {
-        width: 30px;
-        height: 30px;
+    .icono-carrito {
+        font-size: 22px;
     }
-}
-/* Estilos para las categorías */
-.categoria-bloque {
-    margin-bottom: 50px;
-    padding: 10px;
 }
 
-.titulo-categoria {
-    background: #2c3e50;
-    color: white;
-    padding: 12px 25px;
-    border-radius: 50px; /* Bordes redondeados tipo Tienda Nube */
-    display: inline-block;
-    margin-bottom: 25px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+/* --- VENTANA MODAL DE EDICIÓN (ADMIN) --- */
+
+/* El fondo oscuro detrás de la ventana */
+.modal-edicion {
+    display: none; /* Se activa por JS */
+    position: fixed;
+    z-index: 10001;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px); /* Efecto de desenfoque al fondo */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-.grid-productos {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+/* --- VENTANA DE EDICIÓN (MODAL) --- */
+.modal-zoom {
+    display: none; 
+    position: fixed; 
+    z-index: 99999; /* Por encima de todo */
+    inset: 0; 
+    background-color: rgba(0,0,0,0.7); /* Fondo oscuro */
+    backdrop-filter: blur(4px); /* Efecto de desenfoque */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.btn-comprar {
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
+
+.modal-contenido-scroll {
+    background: #ffffff;
+    width: 90%;
+    max-width: 480px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-contenido-scroll h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--primary);
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.modal-contenido-scroll label {
+    display: block;
+    margin-top: 15px;
     font-weight: bold;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.modal-contenido-scroll input, 
+.modal-contenido-scroll select {
     width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Evita que se salga del borde */
+}
+
+.modal-contenido-scroll input:focus {
+    border-color: var(--success);
+    outline: none;
+    box-shadow: 0 0 5px rgba(37, 211, 102, 0.2);
+}
+
+/* --- DISEÑO DE FORMULARIO DE BANNERS --- */
+.form-banner-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.form-banner-admin input[type="text"],
+.form-banner-admin input[type="number"],
+.form-banner-admin textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #fafafa;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.form-banner-admin input:focus, 
+.form-banner-admin textarea:focus {
+    border-color: var(--primary-logo);
+    outline: none;
+    background-color: #fff;
+}
+
+.form-banner-admin label {
+    font-weight: 700;
+    color: #444;
+    margin-bottom: -10px; /* Para que quede pegadito al input */
+    font-size: 0.9rem;
+}
+
+.form-banner-admin .btn-subir-completo {
+    background-color: var(--primary);
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
     transition: background 0.3s;
 }
 
-.btn-comprar:hover {
-    background-color: #219150;
+.form-banner-admin .btn-subir-completo:hover {
+    background-color: #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Para que la tabla de banners activos no deforme las fotos */
+.admin-tabla img {
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    object-fit: cover;
+}
+
+/* --- ESTILO REFORZADO PARA EL PANEL DE BANNERS --- */
+.form-banner-guille {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    max-width: 650px !important;
+    margin: 20px auto !important;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.form-banner-guille input, 
+.form-banner-guille textarea {
+    width: 100% !important;
+    padding: 12px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    display: block !important;
+}
+
+.btn-banner-pro {
+    background: #000 !important;
+    color: #fff !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    border: none !important;
 }

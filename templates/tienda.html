@@ -18,21 +18,20 @@
 
 <body>
 
-    <header class="header">
-        <div class="header-left">
-            <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo" class="logo-img">
-            <span class="nombre">BAZAR GUILLE</span>
-        </div>
-        <div class="header-right">
-            <a href="/carrito" class="carrito-btn">
-                🛒 Carrito
-                {% if carrito_total > 0 %}
-                    <span class="contador">{{ carrito_total }}</span>
-                {% endif %}
-            </a>
-        </div>
-    </header>
-
+<header class="header">
+    <div class="header-left">
+        <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo" class="logo-img">
+        <span class="nombre">BAZAR GUILLE</span>
+    </div>
+    <div class="header-right">
+        <a href="/carrito" class="carrito-btn">
+            🛒 Carrito
+            {% if carrito_total > 0 %}
+                <span class="contador">{{ carrito_total }}</span>
+            {% endif %}
+        </a>
+    </div>
+</header>
 {% if banners %}
 <section class="slider-container">
     {% for b in banners %}
@@ -75,22 +74,39 @@
     </div>
 
 <div class="contenedor-categorias" id="productos">
-    
-    {# Agrupamos por categoría según tu JSON #}
     {% for categoria, items in productos | groupby('categoria') %}
         <section class="categoria-bloque">
             <h2 class="titulo-categoria">{{ categoria | upper if categoria else 'VARIOS' }}</h2>
             <div class="grid-productos">
                 {% for p in items %}
                     <div class="card" id="prod-{{ p.id }}">
-                        <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
-                             alt="{{ p.nombre }}" 
-                             onclick="abrirModal(this.src)">
+                        <div class="contenedor-foto-principal">
+                            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                                 id="main-{{ p.id }}" 
+                                 class="foto-principal"
+                                 onclick="abrirModal(this.src)" 
+                                 title="Click para ampliar">
+                        </div>
                         
+                        <div class="galeria-miniaturas">
+                            {# Foto principal como miniatura #}
+                            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                                 onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
+                                 class="mini-foto">
+                            
+                            {# Fotos extras si existen #}
+                            {% if p.imagenes_extras %}
+                                {% for foto in p.imagenes_extras %}
+                                    <img src="{{ url_for('static', filename='uploads/' + foto) }}" 
+                                         onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
+                                         class="mini-foto">
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
                         <div class="card-content">
                             <h3>{{ p.nombre }}</h3>
                             <p class="precio">{{ p.precio | pesos }}</p>
-                            
                             <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
                                 <input type="hidden" name="id" value="{{ p.id }}">
                                 <button type="submit" class="btn-comprar">🛒 Añadir al Carrito</button>
@@ -101,8 +117,7 @@
             </div>
         </section>
     {% endfor %}
-</div>
-
+    
     <div id="modalZoom" class="modal-zoom" onclick="cerrarModal()">
         <span class="cerrar-zoom">&times;</span>
         <img class="modal-contenido" id="imgAmpliada">
@@ -165,6 +180,12 @@
    target="_blank">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
 </a>
-
+ 
+<a href="/carrito" class="carrito-float">
+    <span class="icono-carrito">🛒</span>
+    {% if carrito_total > 0 %}
+        <span class="contador-float">{{ carrito_total }}</span>
+    {% endif %}
+</a>
 </body>
 </html>

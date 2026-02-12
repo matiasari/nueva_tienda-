@@ -17,19 +17,17 @@
     <main class="admin-container">
         
 <div class="form-seccion">
-    <h2>Actualizar Banner Principal</h2>
-    <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data">
+    <h2 style="text-align: center;">📸 Actualizar Banner Principal</h2>
+    <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data" class="form-banner-guille">
         
-        <input type="text" name="titulo" placeholder="Título (Opcional)">
+        <input type="text" name="titulo" placeholder="Título del Banner">
+        <textarea name="descripcion" placeholder="Descripción corta" rows="2"></textarea>
+        <input type="number" name="producto_id" placeholder="ID del Producto para el link">
         
-        <textarea name="descripcion" placeholder="Descripción (Opcional)" rows="2"></textarea>
-        
-        <input type="number" name="producto_id" placeholder="ID Producto (Opcional)">
-        
-        <label>Imagen del Banner (Obligatoria):</label>
+        <label style="font-weight: bold; font-size: 14px;">Imagen (1920x600):</label>
         <input type="file" name="imagen" accept="image/*" required>
         
-        <button type="submit" class="btn-negro">Subir Banner</button>
+        <button type="submit" class="btn-banner-pro">🚀 Subir y Publicar Banner</button>
     </form>
 </div>
         
@@ -76,14 +74,40 @@
                     {% endfor %}
                 </select>
                 <input type="number" name="stock" placeholder="Stock" required>
-                <input type="file" name="imagen" accept="image/*" required>
+                <div class="input-group">
+    <label>Fotos del Producto (Seleccioná una o varias):</label>
+    <input type="file" name="imagenes_extras" multiple class="input-admin">
+    <small>La primera imagen será la que se vea en la tienda principal.</small>
+</div>
                 <button type="submit" class="btn-negro">Guardar Producto</button>
             </form>
         </div>
 
         <hr>
+<div class="form-seccion">
+    <h2>📊 Carga Masiva por Excel</h2>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+        <a href="{{ url_for('descargar_plantilla') }}" class="btn-seguir" style="text-decoration: none; padding: 10px 20px; background: #3498db !important;">
+            📥 Descargar Plantilla Excel
+        </a>
+    </div>
 
+    <form action="{{ url_for('importar_excel') }}" method="POST" enctype="multipart/form-data" class="form-banner-guille">
+        <label>Seleccioná tu archivo Excel completado:</label>
+        <input type="file" name="archivo_excel" accept=".xlsx, .xls" required>
+        <button type="submit" class="btn-banner-pro" style="background: #27ae60 !important;">
+            🚀 Subir y Cargar Artículos
+        </button>
+        <small style="display: block; margin-top: 10px; color: #666;">
+            * Descargá la plantilla, completala sin cambiar los nombres de las columnas y subila acá.
+        </small>
+    </form>
+</div>
+
+        
         <div class="form-seccion">
+
             <h2>Listado de Productos</h2>
             
             <div style="margin-bottom: 20px;">
