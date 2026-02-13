@@ -463,5 +463,14 @@
             "4951049_2.png",
             "4951049_1.png"
         ]
+    },
+    {
+        "id": 65,
+        "nombre": "SET VAJILLA PORC 16 PCS",
+        "precio": 70000.0,
+        "categoria": "Cocina",
+        "stock": 2,
+        "imagen": "4962613.jpg",
+        "imagenes_extras": []
     }
 ]
