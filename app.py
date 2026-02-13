@@ -139,6 +139,7 @@ def agregar_producto():
 def editar_producto():
     p_id = request.form.get('id')
     productos = cargar_datos(PRODUCTOS_JSON)
+    
     for p in productos:
         if str(p['id']) == str(p_id):
             p['nombre'] = request.form.get('nombre')
@@ -146,21 +147,26 @@ def editar_producto():
             p['categoria'] = request.form.get('categoria')
             p['stock'] = int(request.form.get('stock'))
             
-            # Cargar más fotos en edición
-            nuevas_fotos = request.files.getlist('fotos_extras')
-            for foto in nuevas_fotos:
-                if foto.filename != '':
+            # --- ACÁ ESTÁ EL CAMBIO IMPORTANTE ---
+            # 1. Obtenemos el nuevo orden que mandaste desde el admin (Drag & Drop)
+            fotos_ordenadas = request.form.getlist('orden_fotos[]')
+            
+            # 2. Procesamos si subiste fotos nuevas desde el botón "Añadir más fotos"
+            fotos_nuevas = request.files.getlist('fotos_extras')
+            for foto in fotos_nuevas:
+                if foto and foto.filename != '':
                     fname = secure_filename(foto.filename)
                     foto.save(os.path.join(app.config['UPLOAD_FOLDER'], fname))
-                    if 'imagenes_extras' not in p: p['imagenes_extras'] = []
-                    p['imagenes_extras'].append(fname)
+                    # Las agregamos al final de la lista actual
+                    fotos_ordenadas.append(fname)
             
-            if 'imagen' in request.files and request.files['imagen'].filename != '':
-                archivo = request.files['imagen']
-                filename = secure_filename(archivo.filename)
-                archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                p['imagen'] = filename
+            # 3. Actualizamos el producto con el orden final
+            if fotos_ordenadas:
+                p['imagen'] = fotos_ordenadas[0]  # La primera es la principal
+                p['imagenes_extras'] = fotos_ordenadas[1:]  # El resto a la galería
+            # -------------------------------------
             break
+            
     guardar_datos(PRODUCTOS_JSON, productos)
     return redirect(url_for('admin'))
 

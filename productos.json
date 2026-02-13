@@ -460,8 +460,7 @@
         "imagen": "4951049_1.png",
         "imagenes_extras": [
             "4951049_3.png",
-            "4951049_2.png",
-            "4951049_1.png"
+            "4951049_2.png"
         ]
     },
     {
@@ -471,6 +470,27 @@
         "categoria": "Cocina",
         "stock": 2,
         "imagen": "4962613.jpg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 66,
+        "nombre": "Mochila Pechera Cruzada Impermeable Fashion",
+        "precio": 18000.0,
+        "categoria": "Otros",
+        "stock": 3,
+        "imagen": "imagen_2026-02-13_130401295.png",
+        "imagenes_extras": [
+            "fashion.png",
+            "imagen_2026-02-13_130825912.png"
+        ]
+    },
+    {
+        "id": 67,
+        "nombre": "Mochila Gris Liso Poliéster Antirrobo USB Notebook",
+        "precio": 16000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "imagen_2026-02-13_131433087.png",
         "imagenes_extras": []
     }
 ]
