@@ -284,22 +284,6 @@
         "imagen": "Auriculares_Inalambricos_Y30_Bluetooth_5.0_Tws_Tactiles_Color_Negro.png"
     },
     {
-        "id": 42,
-        "nombre": "AURICULARES X15",
-        "precio": 12000.0,
-        "categoria": "Electrónica",
-        "stock": 2,
-        "imagen": "Auriculares_Gamer_In-ear_Fan_Pro_X15_Bluetooth_5.0_TWS_Microfono_Negro_LED.png"
-    },
-    {
-        "id": 43,
-        "nombre": "SMARTBAND UNI-B6",
-        "precio": 10000.0,
-        "categoria": "Electrónica",
-        "stock": 1,
-        "imagen": "Smartband_UNI-B6_negro.png"
-    },
-    {
         "id": 44,
         "nombre": "SMARTWACH D20",
         "precio": 12000.0,
@@ -366,10 +350,11 @@
     {
         "id": 53,
         "nombre": "PARLANTE BLUETOOTH  V1",
-        "precio": 24000.0,
+        "precio": 19000.0,
         "categoria": "Electrónica",
         "stock": 1,
-        "imagen": "imagen_2026-02-12_091854912.png"
+        "imagen": "imagen_2026-02-12_091854912.png",
+        "imagenes_extras": []
     },
     {
         "id": 54,
@@ -377,7 +362,10 @@
         "precio": 18000.0,
         "categoria": "Decoración",
         "stock": 1,
-        "imagen": "imagen_2026-02-12_092018240.png"
+        "imagen": "imagen_2026-02-12_092018240.png",
+        "imagenes_extras": [
+            "4246.png"
+        ]
     },
     {
         "id": 55,
@@ -449,7 +437,10 @@
         "precio": 25000.0,
         "categoria": "Otros",
         "stock": 1,
-        "imagen": "imagen_2026-02-12_093504796.png"
+        "imagen": "WhatsApp_Image_2026-02-18_at_14.24.08.jpeg",
+        "imagenes_extras": [
+            "4207.png"
+        ]
     },
     {
         "id": 64,
@@ -490,7 +481,403 @@
         "precio": 16000.0,
         "categoria": "Otros",
         "stock": 1,
-        "imagen": "imagen_2026-02-13_131433087.png",
+        "imagen": "4210A.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 68,
+        "nombre": "INTERCOMUNICADORES CASCO  BLUETOOTH PARA MOTO ",
+        "precio": 30000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4200.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 69,
+        "nombre": "LINTERNA PICANA RECARGABLE P55 NEGRO NEGRO",
+        "precio": 15000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4201.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 70,
+        "nombre": "CHOP VASO 1/2 L HASTA EL FONDO PRINCESA",
+        "precio": 15000.0,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "4203.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 71,
+        "nombre": "SMARWATCH A58PLUS",
+        "precio": 25000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4204.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 72,
+        "nombre": "MOPA CON BALDE CENTRIFUGADO",
+        "precio": 20000.0,
+        "categoria": "Baño",
+        "stock": 1,
+        "imagen": "4205.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 73,
+        "nombre": "DEPILADOR BELLO FACIAL RECARGABLE USB",
+        "precio": 7000.0,
+        "categoria": "Electrónica",
+        "stock": 4,
+        "imagen": "4206.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 74,
+        "nombre": "AURICULARES INALAMBRICOS T12 ",
+        "precio": 20000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4208.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 75,
+        "nombre": "AURICULARES M25",
+        "precio": 12000.0,
+        "categoria": "Electrónica",
+        "stock": 4,
+        "imagen": "4209.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 76,
+        "nombre": "PAVA ELECTRICA DE VIDRIO TOKYO 2L",
+        "precio": 25000.0,
+        "categoria": "Cocina",
+        "stock": 3,
+        "imagen": "4211.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 77,
+        "nombre": "PAVA TOKYO ROSA 2L",
+        "precio": 20000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4212R.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 78,
+        "nombre": "PAVA TOKYO CELESTE 2L",
+        "precio": 20000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4212C.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 79,
+        "nombre": "PAVA TOKYO ROJO 2L",
+        "precio": 20000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4212RO.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 80,
+        "nombre": "PAVA TOKYO 2L CON CORTE",
+        "precio": 20000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4213.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 81,
+        "nombre": "MOCHILA ESTILO MORRAL ANTI ROBO",
+        "precio": 17000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4215.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 82,
+        "nombre": "PARLANTE MUSIC SPEAKER",
+        "precio": 6500.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4216.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 83,
+        "nombre": "MOCHILA JUST AZUL",
+        "precio": 10000.0,
+        "categoria": "Otros",
+        "stock": 2,
+        "imagen": "4222.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 84,
+        "nombre": "MOCHILA JUST ROSA",
+        "precio": 10000.0,
+        "categoria": "Otros",
+        "stock": 2,
+        "imagen": "4223.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 85,
+        "nombre": "MOCHILA JUST ROJA",
+        "precio": 10000.0,
+        "categoria": "Otros",
+        "stock": 2,
+        "imagen": "4224.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 86,
+        "nombre": "MOCHILA JUST VERDE",
+        "precio": 10000.0,
+        "categoria": "Otros",
+        "stock": 2,
+        "imagen": "4225.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 87,
+        "nombre": "PELUCHE PINGUINO ELEFANTE",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4226E.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 88,
+        "nombre": "PELUCHE PINGUINO UNICORNIO",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4226U.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 89,
+        "nombre": "PELUCHE PINGUINO PANDA",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4226P.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 90,
+        "nombre": "PELUCHE UNICORNIO ROSA",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4227.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 91,
+        "nombre": "PELUCHE PERRO 4228R",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4228R.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 92,
+        "nombre": "PELUCHE PERRO -4228B",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4228B.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 93,
+        "nombre": "PELUCHE PERRO -4228M",
+        "precio": 12000.0,
+        "categoria": "Otros",
+        "stock": 1,
+        "imagen": "4228M.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 94,
+        "nombre": "TAZA CELESTE CON TAPA PORCELANA",
+        "precio": 14000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4962771.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 95,
+        "nombre": "TAZA PORCELANA BLANCA CON TAPA DE BAMBU + CUCHARA",
+        "precio": 18000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4962785.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 96,
+        "nombre": "TAZA ROSA DE PORCELANA CON TAPA Y CUCHARA",
+        "precio": 18000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4230.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 97,
+        "nombre": "TAZA DE PORCELANA PERRITOS 350 ML",
+        "precio": 5000.0,
+        "categoria": "Cocina",
+        "stock": 4,
+        "imagen": "4963527.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 98,
+        "nombre": "TAZA PORCELANA GATITOS 350 ML",
+        "precio": 5000.0,
+        "categoria": "Cocina",
+        "stock": 4,
+        "imagen": "4963515.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 99,
+        "nombre": "SMARTWACH Z69 ULTRA S8 NARANJA",
+        "precio": 24000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4233N.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 100,
+        "nombre": "SMARTWACH FD68",
+        "precio": 12000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4239.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 101,
+        "nombre": "SMARTWACH FD68 ROSA",
+        "precio": 12000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4239R.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 102,
+        "nombre": "SECADOR DE PELO FUCSIA",
+        "precio": 18000.0,
+        "categoria": "Baño",
+        "stock": 1,
+        "imagen": "4240.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 103,
+        "nombre": "AURICULARES I12 VERDE",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4241V.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 104,
+        "nombre": "AURICULARES I12 AMARILLO",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "default.jpg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 105,
+        "nombre": "AURICULARES I12 ROSA",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4241RO.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 106,
+        "nombre": "SMARTWACH ZL02 PRO ROSA",
+        "precio": 30000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "4242.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 107,
+        "nombre": "MINI ASPIRADORA DE ESCRITORIO",
+        "precio": 35000.0,
+        "categoria": "Electrónica",
+        "stock": 2,
+        "imagen": "4243.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 108,
+        "nombre": "HUMIFICADOR SATURNO",
+        "precio": 25000.0,
+        "categoria": "Decoración",
+        "stock": 2,
+        "imagen": "4244.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 109,
+        "nombre": "LAMPARA MEDUSA 12\"",
+        "precio": 40000.0,
+        "categoria": "Decoración",
+        "stock": 1,
+        "imagen": "4245.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 110,
+        "nombre": "MATE LISTO ACERO 1L",
+        "precio": 9500.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4247.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 111,
+        "nombre": "VASO DE VIDRIO CON SORBETE",
+        "precio": 5000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4334940.jpeg",
         "imagenes_extras": []
     }
 ]

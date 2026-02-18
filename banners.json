@@ -1,23 +1,16 @@
 [
     {
-        "id": 1,
-        "titulo": "TAZA VASO DOBLE VIDRIO FLORAL 350 mL ROSA",
-        "descripcion": "NUEVO INGRESO $8000",
-        "imagen": "WhatsApp Image 2026-02-05 at 08.17.04 (1) (1) (2).jpeg",
-        "link": "/?q=47"
-    },
-    {
-        "id": 2,
-        "titulo": "TAZA VASO DOBLE VIDRIO FLORAL 350 mL ",
-        "descripcion": "NUEVO INGRESO $8000",
-        "imagen": "Gemini_Generated_Image_igzvfxigzvfxigzv (1).png",
-        "link": "/?q=46"
-    },
-    {
-        "id": 4,
+        "id": 5,
         "titulo": "",
         "descripcion": "",
-        "imagen": "ADMINISTRACION (1).jpg",
+        "imagen": "ChatGPT_Image_18_feb_2026_15_05_42.png",
+        "link": ""
+    },
+    {
+        "id": 6,
+        "titulo": "",
+        "descripcion": "",
+        "imagen": "Gemini_Generated_Image_nwkhponwkhponwkh_1.png",
         "link": ""
     }
 ]
