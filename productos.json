@@ -879,5 +879,23 @@
         "stock": 1,
         "imagen": "4334940.jpeg",
         "imagenes_extras": []
+    },
+    {
+        "id": 112,
+        "nombre": "460ML VASO VIDRIO C/SORBETE TAPA BAMBOO",
+        "precio": 6000.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4966109.jpg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 113,
+        "nombre": "450ML VASO VIDRIO SURT TAPA BAMBOO",
+        "precio": 7500.0,
+        "categoria": "Cocina",
+        "stock": 1,
+        "imagen": "4965344.jpg",
+        "imagenes_extras": []
     }
 ]
