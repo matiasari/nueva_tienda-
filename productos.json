@@ -611,7 +611,7 @@
         "id": 83,
         "nombre": "MOCHILA JUST AZUL",
         "precio": 10000.0,
-        "categoria": "Otros",
+        "categoria": "Escolar",
         "stock": 2,
         "imagen": "4222.png",
         "imagenes_extras": []
@@ -620,7 +620,7 @@
         "id": 84,
         "nombre": "MOCHILA JUST ROSA",
         "precio": 10000.0,
-        "categoria": "Otros",
+        "categoria": "Escolar",
         "stock": 2,
         "imagen": "4223.png",
         "imagenes_extras": []
@@ -629,7 +629,7 @@
         "id": 85,
         "nombre": "MOCHILA JUST ROJA",
         "precio": 10000.0,
-        "categoria": "Otros",
+        "categoria": "Escolar",
         "stock": 2,
         "imagen": "4224.png",
         "imagenes_extras": []
@@ -638,18 +638,9 @@
         "id": 86,
         "nombre": "MOCHILA JUST VERDE",
         "precio": 10000.0,
-        "categoria": "Otros",
+        "categoria": "Escolar",
         "stock": 2,
         "imagen": "4225.png",
-        "imagenes_extras": []
-    },
-    {
-        "id": 87,
-        "nombre": "PELUCHE PINGUINO ELEFANTE",
-        "precio": 12000.0,
-        "categoria": "Otros",
-        "stock": 1,
-        "imagen": "4226E.png",
         "imagenes_extras": []
     },
     {
@@ -677,33 +668,6 @@
         "categoria": "Otros",
         "stock": 1,
         "imagen": "4227.jpeg",
-        "imagenes_extras": []
-    },
-    {
-        "id": 91,
-        "nombre": "PELUCHE PERRO 4228R",
-        "precio": 12000.0,
-        "categoria": "Otros",
-        "stock": 1,
-        "imagen": "4228R.jpeg",
-        "imagenes_extras": []
-    },
-    {
-        "id": 92,
-        "nombre": "PELUCHE PERRO -4228B",
-        "precio": 12000.0,
-        "categoria": "Otros",
-        "stock": 1,
-        "imagen": "4228B.jpeg",
-        "imagenes_extras": []
-    },
-    {
-        "id": 93,
-        "nombre": "PELUCHE PERRO -4228M",
-        "precio": 12000.0,
-        "categoria": "Otros",
-        "stock": 1,
-        "imagen": "4228M.jpeg",
         "imagenes_extras": []
     },
     {
@@ -866,6 +830,101 @@
         "categoria": "Baño",
         "stock": 1,
         "imagen": "WhatsApp_Image_2026-02-20_at_15.38.08.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 115,
+        "nombre": "VENTILADOR DE DOBLE PULVERIZACIÓN CON HUMIDIFICADOR",
+        "precio": 28000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "humificador1.png",
+        "imagenes_extras": [
+            "humificador.png",
+            "humificadorespecificaciones.png"
+        ]
+    },
+    {
+        "id": 116,
+        "nombre": "HUMIDIFICADOR ROCKET OSITO ROSA",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 3,
+        "imagen": "WhatsApp_Image_2026-02-22_at_08.36.15.jpeg",
+        "imagenes_extras": [
+            "humificador_osito.png"
+        ]
+    },
+    {
+        "id": 117,
+        "nombre": "ALTAVOZ INALAMBRICO PORTATIL M18",
+        "precio": 15000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-20_at_21.44.41.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 118,
+        "nombre": "ALTAVOZ INALAMBRICO PORTATIL S86",
+        "precio": 25000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-20_at_21.44.401.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 119,
+        "nombre": "ALTAVOZ INALAMBRICO PORTATIL M20",
+        "precio": 18000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-20_at_21.44.40.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 120,
+        "nombre": "ALTAVOZ INALAMBRICO PORTATIL ET-212",
+        "precio": 35000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "WhatsApp_Image_2026-02-20_at_21.44.39.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 121,
+        "nombre": "AURICULAR M88 PLUS",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "AURICULARM88.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 122,
+        "nombre": "AURICULAR INALAMBRICO M90 MAX",
+        "precio": 11000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "AURICULARM90.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 123,
+        "nombre": "ESPEJO CCON LED PARA MAQUILLAJE MAKEUP MIRROR BLANCO",
+        "precio": 10000.0,
+        "categoria": "Baño",
+        "stock": 2,
+        "imagen": "ESPEJOLED.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 124,
+        "nombre": "MOCHILA UNICORNIO PELUCHE DISEÑOS VARIOS",
+        "precio": 10000.0,
+        "categoria": "Escolar",
+        "stock": 1,
+        "imagen": "MOCHILAUNICORNIO.png",
         "imagenes_extras": []
     }
 ]
