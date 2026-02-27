@@ -172,14 +172,6 @@
         "imagen": "4916367.jpg"
     },
     {
-        "id": 27,
-        "nombre": "CUBRE ALIMENTOS METAL SURT 28CM ",
-        "precio": 3500.0,
-        "categoria": "Cocina",
-        "stock": 2,
-        "imagen": "4917900.jpg"
-    },
-    {
         "id": 28,
         "nombre": "FILTRO DE AGUA P/CANILLA 9CM ",
         "precio": 2600.0,
@@ -228,30 +220,6 @@
         "imagen": "4952126.jpg"
     },
     {
-        "id": 34,
-        "nombre": "16CM SETX50 PAPEL RESPUESTO P/AIRFRYER",
-        "precio": 3000.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "4961443.jpg"
-    },
-    {
-        "id": 35,
-        "nombre": "20CM SETX50 PAPEL REPUESTO P/AIRFYER",
-        "precio": 3500.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "4961458.jpg"
-    },
-    {
-        "id": 36,
-        "nombre": "16CM SETX50 PAPEL REPUESTO P/AIRFRYER CUAD",
-        "precio": 3000.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "4961462.jpg"
-    },
-    {
         "id": 37,
         "nombre": "400ML VASO VIDRIO C/SORBETE SURT",
         "precio": 6000.0,
@@ -292,22 +260,6 @@
         "imagen": "Reloj_Inteligente_D20_Pro_Monitor_Cardiaco_Deportivo_Negro_IP67.png"
     },
     {
-        "id": 46,
-        "nombre": "TAZA DE VIDRIO FLORAL 350 mL",
-        "precio": 8000.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "Gemini_Generated_Image_igzvfxigzvfxigzv.png"
-    },
-    {
-        "id": 47,
-        "nombre": "TAZA VASO DOBLE VIDRIO FLORAL 350 mL ROSA ",
-        "precio": 8000.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "WhatsApp_Image_2026-02-05_at_08.17.04.jpeg"
-    },
-    {
         "id": 48,
         "nombre": "SETX3 TAZA SURT 230ML ",
         "precio": 8000.0,
@@ -332,29 +284,12 @@
         "imagen": "4619406.jpg"
     },
     {
-        "id": 51,
-        "nombre": "SMARTWACH Z69 ULTRA S8",
-        "precio": 24000.0,
-        "categoria": "Electrónica",
-        "stock": 1,
-        "imagen": "imagen_2026-02-12_091648591.png"
-    },
-    {
         "id": 52,
         "nombre": "PARLANTE RGB TIPO AIR Z6",
         "precio": 24000.0,
         "categoria": "Electrónica",
         "stock": 1,
         "imagen": "imagen_2026-02-12_091757760.png"
-    },
-    {
-        "id": 53,
-        "nombre": "PARLANTE BLUETOOTH  V1",
-        "precio": 19000.0,
-        "categoria": "Electrónica",
-        "stock": 1,
-        "imagen": "imagen_2026-02-12_091854912.png",
-        "imagenes_extras": []
     },
     {
         "id": 54,
@@ -374,14 +309,6 @@
         "categoria": "Electrónica",
         "stock": 1,
         "imagen": "imagen_2026-02-12_092319379.png"
-    },
-    {
-        "id": 56,
-        "nombre": "AURICULAR BLUETOOHT SUONO P47 Rojo",
-        "precio": 10000.0,
-        "categoria": "Electrónica",
-        "stock": 1,
-        "imagen": "WhatsApp_Image_2026-02-09_at_15.40.43.jpeg"
     },
     {
         "id": 57,
@@ -743,15 +670,6 @@
         "imagenes_extras": []
     },
     {
-        "id": 99,
-        "nombre": "SMARTWACH Z69 ULTRA S8 NARANJA",
-        "precio": 24000.0,
-        "categoria": "Electrónica",
-        "stock": 1,
-        "imagen": "4233N.png",
-        "imagenes_extras": []
-    },
-    {
         "id": 100,
         "nombre": "SMARTWACH FD68",
         "precio": 12000.0,
@@ -824,15 +742,6 @@
         "imagenes_extras": []
     },
     {
-        "id": 108,
-        "nombre": "HUMIFICADOR SATURNO",
-        "precio": 25000.0,
-        "categoria": "Decoración",
-        "stock": 2,
-        "imagen": "4244.png",
-        "imagenes_extras": []
-    },
-    {
         "id": 109,
         "nombre": "LAMPARA MEDUSA 12\"",
         "precio": 40000.0,
@@ -842,30 +751,111 @@
         "imagenes_extras": []
     },
     {
-        "id": 112,
-        "nombre": "460ML VASO VIDRIO C/SORBETE TAPA BAMBOO",
-        "precio": 6000.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "4966109.jpg",
-        "imagenes_extras": []
-    },
-    {
-        "id": 113,
-        "nombre": "450ML VASO VIDRIO SOLO TRANSPARENTE TAPA BAMBOO",
-        "precio": 7500.0,
-        "categoria": "Cocina",
-        "stock": 1,
-        "imagen": "4965344.jpg",
-        "imagenes_extras": []
-    },
-    {
         "id": 114,
         "nombre": "SET DE BAÑO PORC NEGRO 3PCS",
         "precio": 15000.0,
         "categoria": "Baño",
         "stock": 1,
         "imagen": "WhatsApp_Image_2026-02-20_at_15.38.08.jpeg",
+        "imagenes_extras": []
+    },
+    {
+        "id": 115,
+        "nombre": "Auriculares Y-one",
+        "precio": 21000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_093135390.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 116,
+        "nombre": "AURICULARES BLUETOOTH M56 (4 AURICULARES EN 1)",
+        "precio": 40000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_093254670.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 117,
+        "nombre": "M27 Negro Auriculares Bluetooth",
+        "precio": 12000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_093811958.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 118,
+        "nombre": "Auriculares Tws Deportivo In-ear Inalámbrico Mti Pro One Color Blanco",
+        "precio": 20000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_094002414.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 119,
+        "nombre": "AURICULARES BLUETOOTH X7",
+        "precio": 28000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_094113267.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 120,
+        "nombre": "Auriculares X6 Gamer Bluetooth 4.2 500mah Negro",
+        "precio": 27000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_094502098.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 121,
+        "nombre": "Dx21 Bluetooth 5.6 A Wireless Gamer Headphones",
+        "precio": 22000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_094826440.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 122,
+        "nombre": "Audífonos M45 Tws Bluetooth 5.3 Baja Latencia",
+        "precio": 22000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_094927481.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 123,
+        "nombre": "Auriculares Inalámbricos Gamer Kespu Dx26",
+        "precio": 20000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_095057122.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 124,
+        "nombre": "Auriculares Bluetooth Deportivos Recargables Usb",
+        "precio": 10000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_095343593.png",
+        "imagenes_extras": []
+    },
+    {
+        "id": 125,
+        "nombre": "Auriculares Inalámbricos Bluetooth Dx-36",
+        "precio": 18000.0,
+        "categoria": "Electrónica",
+        "stock": 1,
+        "imagen": "imagen_2026-02-27_095423712.png",
         "imagenes_extras": []
     }
 ]
