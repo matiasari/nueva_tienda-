@@ -17,17 +17,14 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # Archivos de datos
 PRODUCTOS_JSON = 'productos.json'
 BANNERS_JSON = 'banners.json'
+CATEGORIAS_JSON = 'categorias.json' # Nuevo archivo para gestionar todo
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
-
-# --- CATEGORÍAS AMPLIADAS ---
-CATEGORIAS_BAZAR = [
-    "Cocina", "Baño", "Decoración", "Electrónica", 
-    "Mates", "Textil", "Vajilla", "Limpieza", "Escolar", "Otros"
-]
 
 # --- PERSISTENCIA ---
 def cargar_datos(archivo):
-    if not os.path.exists(archivo): return []
+    if not os.path.exists(archivo): 
+        if archivo == CATEGORIAS_JSON: return [] # Retorna lista vacía si no existe
+        return []
     with open(archivo, 'r', encoding='utf-8') as f:
         try: return json.load(f)
         except: return []
@@ -70,18 +67,19 @@ def api_actualizar_stock():
 def index():
     productos = cargar_datos(PRODUCTOS_JSON)
     banners = cargar_datos(BANNERS_JSON)
+    categorias = cargar_datos(CATEGORIAS_JSON)
     cat = request.args.get('cat')
     q = request.args.get('q')
     
     prod_mostrar = productos
     if cat and cat != "Todos":
-        prod_mostrar = [p for p in prod_mostrar if p.get('categoria') == cat]
+        prod_mostrar = [p for p in prod_mostrar if p.get('categoria') == cat or p.get('subcategoria') == cat]
     if q:
         q_l = q.lower()
         prod_mostrar = [p for p in prod_mostrar if q_l in p.get('nombre', '').lower() or str(p.get('id')) == q_l]
         
     return render_template('tienda.html', productos=prod_mostrar, banners=banners, 
-                           carrito_total=len(session.get('carrito', [])), categorias=CATEGORIAS_BAZAR)
+                           carrito_total=len(session.get('carrito', [])), categorias=categorias)
 
 # --- ADMINISTRACIÓN ---
 @app.route('/login', methods=['GET', 'POST'])
@@ -103,10 +101,44 @@ def logout():
 @login_requerido
 def admin():
     productos = cargar_datos(PRODUCTOS_JSON)
+    categorias = cargar_datos(CATEGORIAS_JSON)
     for p in productos:
         if 'imagenes_extras' not in p: p['imagenes_extras'] = []
-    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=CATEGORIAS_BAZAR)
+    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias)
 
+# --- GESTIÓN DE CATEGORÍAS ---
+@app.route('/admin/categorias/agregar', methods=['POST'])
+@login_requerido
+def agregar_categoria():
+    categorias = cargar_datos(CATEGORIAS_JSON)
+    nueva = request.form.get('nombre').strip()
+    if nueva and not any(c['nombre'] == nueva for c in categorias):
+        categorias.append({"nombre": nueva, "subcategorias": []})
+        guardar_datos(CATEGORIAS_JSON, categorias)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/subcategorias/agregar', methods=['POST'])
+@login_requerido
+def agregar_subcategoria():
+    categorias = cargar_datos(CATEGORIAS_JSON)
+    padre = request.form.get('padre')
+    nueva_sub = request.form.get('nombre_sub').strip()
+    for c in categorias:
+        if c['nombre'] == padre:
+            if nueva_sub not in c['subcategorias']:
+                c['subcategorias'].append(nueva_sub)
+            break
+    guardar_datos(CATEGORIAS_JSON, categorias)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/categorias/eliminar/<nombre>')
+@login_requerido
+def eliminar_categoria(nombre):
+    categorias = [c for c in cargar_datos(CATEGORIAS_JSON) if c['nombre'] != nombre]
+    guardar_datos(CATEGORIAS_JSON, categorias)
+    return redirect(url_for('admin'))
+
+# --- PRODUCTOS ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -124,6 +156,7 @@ def agregar_producto():
         "nombre": request.form.get('nombre', '').upper(),
         "precio": float(request.form.get('precio') or 0),
         "categoria": request.form.get('categoria'),
+        "subcategoria": request.form.get('subcategoria'),
         "stock": int(request.form.get('stock') or 0),
         "imagen": nombres[0] if nombres else "default.jpg",
         "imagenes_extras": nombres[1:] if len(nombres) > 1 else []
@@ -142,6 +175,7 @@ def editar_producto():
             p['nombre'] = request.form.get('nombre', '').upper()
             p['precio'] = float(request.form.get('precio') or 0)
             p['categoria'] = request.form.get('categoria')
+            p['subcategoria'] = request.form.get('subcategoria')
             p['stock'] = int(request.form.get('stock') or 0)
             
             orden = request.form.getlist('orden_fotos[]')

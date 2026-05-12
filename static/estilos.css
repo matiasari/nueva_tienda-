@@ -915,3 +915,66 @@ a { text-decoration: none; }
     font-weight: 800;
 }
 
+* Contenedor principal de categorías */
+.categorias-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+/* Botones con forma de "Chip" */
+.cat-chip {
+    padding: 10px 20px;
+    background: #f4f4f4;
+    border-radius: 30px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.cat-chip.activo, .cat-chip:hover {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+}
+
+/* Menú Desplegable */
+.dropdown-cat {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.15);
+    z-index: 1000;
+    border-radius: 10px;
+    margin-top: 8px;
+    border: 1px solid #eee;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+}
+
+.dropdown-content a:hover {
+    background-color: #f8f9fa;
+    color: #3498db;
+}
+
+/* Mostrar al pasar el mouse */
+.dropdown-cat:hover .dropdown-content {
+    display: block;
+}

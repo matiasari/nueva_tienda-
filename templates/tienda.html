@@ -58,12 +58,24 @@
     </form>
 </div>
 
-<div class="categorias">
-    <a href="/">Todos</a>
-    <a href="/?cat=Cocina">Cocina</a>
-    <a href="/?cat=Baño">Baño</a>
-    <a href="/?cat=Decoración">Decoración</a>
-    <a href="/?cat=Electrónica">Electrónica</a>
+<div class="categorias-nav">
+    <a href="/" class="cat-chip {% if not request.args.get('cat') %}activo{% endif %}">Todos</a>
+    
+    {% for cat in categorias %}
+    <div class="dropdown-cat">
+        <a href="/?cat={{ cat.nombre }}" class="cat-chip {% if request.args.get('cat') == cat.nombre %}activo{% endif %}">
+            {{ cat.nombre }}
+        </a>
+        
+        {% if cat.subcategorias %}
+        <div class="dropdown-content">
+            {% for sub in cat.subcategorias %}
+                <a href="/?cat={{ sub }}">{{ sub }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
 </div>
 
 <div class="contenedor-categorias" id="productos">

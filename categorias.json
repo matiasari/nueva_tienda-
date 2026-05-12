@@ -1,0 +1,76 @@
+[
+    {
+        "nombre": "Cocina",
+        "subcategorias": [
+            "Mates",
+            "Tazas",
+            "Cubiertos",
+            "Utilitarios",
+            "vasos"
+        ]
+    },
+    {
+        "nombre": "Electronica",
+        "subcategorias": [
+            "Parlantes",
+            "Smartwach",
+            "Pavas",
+            "Auriculares"
+        ]
+    },
+    {
+        "nombre": "Vuelta al cole",
+        "subcategorias": [
+            "Mochilas"
+        ]
+    },
+    {
+        "nombre": "Equipaje",
+        "subcategorias": [
+            "Mochilas"
+        ]
+    },
+    {
+        "nombre": "Porcelana",
+        "subcategorias": [
+            "Tazas",
+            "Set de Vajilla"
+        ]
+    },
+    {
+        "nombre": "Vidrio",
+        "subcategorias": [
+            "Tazas doble fondo",
+            "vasos",
+            "Botella/Jarras/Dispenser"
+        ]
+    },
+    {
+        "nombre": "Decoracion",
+        "subcategorias": [
+            "Petit muebles",
+            "Portavelas",
+            "Cuadros"
+        ]
+    },
+    {
+        "nombre": "Iluminacion",
+        "subcategorias": [
+            "Lamparas",
+            "Linternas"
+        ]
+    },
+    {
+        "nombre": "Baño",
+        "subcategorias": [
+            "Dispenser",
+            "Portarollos",
+            "set de baño",
+            "Accesorios"
+        ]
+    },
+    {
+        "nombre": "PETIT MUEBLES",
+        "subcategorias": []
+    }
+]
