@@ -978,3 +978,75 @@ a { text-decoration: none; }
 .dropdown-cat:hover .dropdown-content {
     display: block;
 }
+
+/* Contenedor principal: los centra y permite que bajen de línea si son muchos */
+.categorias-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px auto;
+    padding: 0 10px;
+    max-width: 1200px;
+}
+
+/* El "Chip" o botón principal */
+.cat-chip {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #ffffff;
+    color: #333;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.cat-chip.activo, .cat-chip:hover {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+    transform: translateY(-2px); /* Un pequeño saltito al pasar el mouse */
+}
+
+/* Lógica del menú desplegable (Dropdown) */
+.dropdown-cat {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.15);
+    z-index: 1000;
+    border-radius: 12px;
+    margin-top: 8px;
+    border: 1px solid #eee;
+    padding: 5px 0;
+}
+
+/* Los links de las subcategorías */
+.dropdown-content a {
+    color: #444;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+    background-color: #f8f9fa;
+    color: #3498db;
+}
+
+/* Mostrar el menú al pasar el mouse */
+.dropdown-cat:hover .dropdown-content {
+    display: block;
+}

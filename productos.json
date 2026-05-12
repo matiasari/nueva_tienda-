@@ -1,5 +1,5 @@
 [
-<<<<<<< HEAD
+
     {
         "id": 6,
         "nombre": " DISPENSER JABON VIDRIO FUME 300ML",
@@ -830,8 +830,8 @@
         "stock": 1,
         "imagen": "imagen_2026-05-12_134946190.png",
         "imagenes_extras": []
-    }
-=======
+    },
+
     { "id": 6, "nombre": " DISPENSER JABON VIDRIO FUME 300ML", "precio": 4000.0, "stock": 5, "categoria": "Baño", "imagen": "4290588.png" },
     { "id": 7, "nombre": "TAZA ROSA VIEJO 400 ml ", "precio": 5000.0, "stock": 1, "categoria": "Cocina", "imagen": "WhatsApp_Image_2026-01-20_at_20.38.26.jpeg" },
     { "id": 8, "nombre": "COMPOTERA VIDRIO RAYADO SETX6 260ML ", "precio": 15000.0, "stock": 4, "categoria": "Cocina", "imagen": "WhatsApp_Image_2026-01-22_at_10.31.04.jpeg" },
@@ -935,5 +935,5 @@
     { "id": 133, "nombre": "AURICULAR INALAMBRICO M90 MAX", "precio": 11000.0, "stock": 1, "categoria": "Electrónica", "imagen": "AURICULARM90.png" },
     { "id": 134, "nombre": "ESPEJO CCON LED PARA MAQUILLAJE MAKEUP MIRROR BLANCO", "precio": 10000.0, "stock": 2, "categoria": "Baño", "imagen": "ESPEJOLED.png" },
     { "id": 135, "nombre": "MOCHILA UNICORNIO PELUCHE DISEÑOS VARIOS", "precio": 10000.0, "stock": 1, "categoria": "Escolar", "imagen": "MOCHILAUNICORNIO.png" }
->>>>>>> 00dde408fea30984b87b24294feb3077428af1fc
+
 ]

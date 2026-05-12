@@ -46,12 +46,19 @@
                 {% for c in categorias %}
                 <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative;">
                     <a href="{{ url_for('eliminar_categoria', nombre=c.nombre) }}" 
-                       style="position: absolute; top: 5px; right: 10px; color: #e74c3c; text-decoration: none; font-weight: bold;"
-                       onclick="return confirm('¿Borrar categoría y todas sus subcategorías?')">×</a>
+                       style="position: absolute; top: 5px; right: 10px; color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 18px;"
+                       onclick="return confirm('¿Borrar categoría completa y todas sus subcategorías?')">×</a>
+                    
                     <strong style="color: #3498db; font-size: 16px;">{{ c.nombre }}</strong>
-                    <ul style="margin: 8px 0 0 0; padding-left: 15px; font-size: 13px; color: #555;">
+                    
+                    <ul style="margin: 8px 0 0 0; padding-left: 0; font-size: 13px; color: #555; list-style: none;">
                         {% for sub in c.subcategorias %}
-                            <li>{{ sub }}</li>
+                            <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; padding-bottom: 2px;">
+                                <span>• {{ sub }}</span>
+                                <a href="{{ url_for('eliminar_subcategoria', padre=c.nombre, nombre_sub=sub) }}" 
+                                   style="color: #ff4757; text-decoration: none; font-weight: bold; padding: 0 5px;"
+                                   onclick="return confirm('¿Eliminar subcategoría: {{ sub }}?')">×</a>
+                            </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -162,7 +169,7 @@
                             {% endfor %}
                         </select>
                         <select name="subcategoria" id="edit-sub" class="input-admin-edit" style="flex: 1;">
-                            </select>
+                        </select>
                     </div>
 
                     <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;">
@@ -184,7 +191,6 @@
         const categoriasData = JSON.parse('{{ categorias | tojson | safe }}');
         let fotosActuales = [];
 
-        // LÓGICA DE CATEGORÍAS DINÁMICAS
         function actualizarSubcats(catNombre, targetSelectId, subSeleccionada = "") {
             const selectSub = document.getElementById(targetSelectId);
             selectSub.innerHTML = '<option value="">Sin subcategoría</option>';
@@ -201,7 +207,6 @@
             }
         }
 
-        // BUSCADOR PRO
         document.getElementById('buscadorAdmin').addEventListener('keyup', function() {
             let filtro = this.value.toLowerCase();
             document.querySelectorAll('.fila-producto').forEach(fila => {
@@ -210,21 +215,17 @@
             });
         });
 
-        // MODAL Y FOTOS
         function abrirEditar(id, nombre, precio, categoria, subcategoria, stock, imgPrincipal, extrasJson) {
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-nombre').value = nombre;
             document.getElementById('edit-precio').value = precio;
             document.getElementById('edit-stock').value = stock;
             document.getElementById('edit-categoria').value = categoria;
-            
             actualizarSubcats(categoria, 'edit-sub', subcategoria);
-
             try {
                 const extras = JSON.parse(extrasJson);
                 fotosActuales = [imgPrincipal, ...extras].filter(f => f && f !== '');
             } catch (e) { fotosActuales = [imgPrincipal]; }
-
             renderizarFotosEdit();
             document.getElementById('modalEditar').style.display = 'block';
         }
@@ -255,30 +256,6 @@
         }
 
         function cerrarEditar() { document.getElementById('modalEditar').style.display = 'none'; }
-
-        // LÓGICA DRAG & DROP
-        document.getElementById('contenedor-fotos-edit').addEventListener('dragover', e => {
-            e.preventDefault();
-            const container = e.currentTarget;
-            const draggable = document.querySelector('.dragging');
-            const afterElement = getDragAfterElement(container, e.clientX);
-            if (afterElement == null) {
-                container.appendChild(draggable);
-            } else {
-                container.insertBefore(draggable, afterElement);
-            }
-        });
-
-        function getDragAfterElement(container, x) {
-            const draggableElements = [...container.querySelectorAll('.foto-edit-item:not(.dragging)')];
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = x - box.left - box.width / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else { return closest; }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
     </script>
 
     <style>

@@ -8,7 +8,7 @@ import io
 
 app = Flask(__name__)
 
-# --- CONFIGURACIÓN DE SESIÓN ---
+# --- CONFIGURACIÓN ---
 app.secret_key = 'bazar_guille_key_secret_2026'
 app.config['SESSION_COOKIE_NAME'] = 'bazar_guille_session'
 app.config['SESSION_PERMANENT'] = True
@@ -17,14 +17,12 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # Archivos de datos
 PRODUCTOS_JSON = 'productos.json'
 BANNERS_JSON = 'banners.json'
-CATEGORIAS_JSON = 'categorias.json' # Nuevo archivo para gestionar todo
+CATEGORIAS_JSON = 'categorias.json'
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 
 # --- PERSISTENCIA ---
 def cargar_datos(archivo):
-    if not os.path.exists(archivo): 
-        if archivo == CATEGORIAS_JSON: return [] # Retorna lista vacía si no existe
-        return []
+    if not os.path.exists(archivo): return []
     with open(archivo, 'r', encoding='utf-8') as f:
         try: return json.load(f)
         except: return []
@@ -51,17 +49,6 @@ def formato_pesos(valor):
     try: return f"${int(float(valor)):,}".replace(",", ".")
     except: return "$0"
 
-# --- API DE SINCRONIZACIÓN ---
-@app.route('/api/actualizar_stock', methods=['POST'])
-def api_actualizar_stock():
-    if request.headers.get('X-API-KEY') != API_KEY_SINCRO:
-        return jsonify({"status": "error", "message": "No autorizado"}), 401
-    datos = request.get_json()
-    if datos:
-        guardar_datos(PRODUCTOS_JSON, datos)
-        return jsonify({"status": "success"}), 200
-    return jsonify({"status": "error"}), 400
-
 # --- RUTAS PÚBLICAS ---
 @app.route('/')
 def index():
@@ -71,9 +58,19 @@ def index():
     cat = request.args.get('cat')
     q = request.args.get('q')
     
+    # --- PARCHE DE SEGURIDAD PARA GROUPBY ---
+    # Si un producto no tiene categoría, le ponemos 'VARIOS' para que no tire error
+    for p in productos:
+        if not p.get('categoria') or p.get('categoria') == "None":
+            p['categoria'] = "VARIOS"
+        if 'subcategoria' not in p:
+            p['subcategoria'] = ""
+
     prod_mostrar = productos
     if cat and cat != "Todos":
+        # Filtra si coincide con categoría principal O subcategoría
         prod_mostrar = [p for p in prod_mostrar if p.get('categoria') == cat or p.get('subcategoria') == cat]
+    
     if q:
         q_l = q.lower()
         prod_mostrar = [p for p in prod_mostrar if q_l in p.get('nombre', '').lower() or str(p.get('id')) == q_l]
@@ -138,7 +135,7 @@ def eliminar_categoria(nombre):
     guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
-# --- PRODUCTOS ---
+# --- PRODUCTOS (ABM) ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -211,9 +208,14 @@ def importar_excel():
         nuevo_id = max([p['id'] for p in productos], default=0) + 1
         for _, row in df.iterrows():
             productos.append({
-                "id": nuevo_id, "nombre": str(row['Nombre']).upper(), "precio": float(row['Precio']),
-                "categoria": str(row['Categoría']), "stock": int(row.get('Stock', 0)),
-                "imagen": "default.jpg", "imagenes_extras": []
+                "id": nuevo_id, 
+                "nombre": str(row['Nombre']).upper(), 
+                "precio": float(row['Precio']),
+                "categoria": str(row['Categoría']), 
+                "subcategoria": str(row.get('Subcategoría', '')),
+                "stock": int(row.get('Stock', 0)),
+                "imagen": "default.jpg", 
+                "imagenes_extras": []
             })
             nuevo_id += 1
         guardar_datos(PRODUCTOS_JSON, productos)
@@ -222,12 +224,14 @@ def importar_excel():
 @app.route('/admin/descargar_plantilla')
 @login_requerido
 def descargar_plantilla():
-    df = pd.DataFrame(columns=['Nombre', 'Precio', 'Categoría', 'Stock'])
-    df.loc[0] = ['Ejemplo', 1500.0, 'Cocina', 10]
+    df = pd.DataFrame(columns=['Nombre', 'Precio', 'Categoría', 'Subcategoría', 'Stock'])
+    df.loc[0] = ['EJEMPLO PRODUCTO', 5000.0, 'COCINA', 'MATES', 10]
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer: df.to_excel(writer, index=False)
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False)
     output.seek(0)
-    return send_file(output, mimetype='application/vnd.ms-excel', as_attachment=True, download_name='plantilla.xlsx')
+    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                     as_attachment=True, download_name='plantilla_bazar.xlsx')
 
 # --- CARRITO ---
 @app.route('/agregar_al_carrito', methods=['POST'])
@@ -253,10 +257,9 @@ def mostrar_carrito():
             items.append(it)
     
     envio = session.get('envio', 0)
-    total_f = total + envio
     msj = f"Hola Bazar Guille! Pedido:\n" + "\n".join([f"- {i['nombre']} x{i['cantidad']}" for i in items])
     link_wa = f"https://wa.me/5491149899616?text={msj.replace(' ', '%20')}"
-    return render_template('carrito.html', carrito=items, total=total, envio=envio, total_final=total_f, link_whatsapp=link_wa)
+    return render_template('carrito.html', carrito=items, total=total, envio=envio, total_final=total+envio, link_whatsapp=link_wa)
 
 # --- BANNERS ---
 @app.route('/admin/banner/agregar', methods=['POST'])
@@ -282,6 +285,19 @@ def agregar_banner():
 def eliminar_banner(id):
     banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
     guardar_datos(BANNERS_JSON, banners)
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/subcategorias/eliminar/<padre>/<nombre_sub>')
+@login_requerido
+def eliminar_subcategoria(padre, nombre_sub):
+    categorias = cargar_datos(CATEGORIAS_JSON)
+    for c in categorias:
+        if c['nombre'] == padre:
+            if nombre_sub in c['subcategorias']:
+                c['subcategorias'].remove(nombre_sub)
+            break
+    guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':
