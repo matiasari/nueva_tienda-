@@ -19,6 +19,7 @@
 
     <main class="admin-container">
         
+        <!-- SECCIÓN: CATEGORÍAS -->
         <div class="form-seccion" style="background: #f0f4f8; border: 2px solid #3498db; border-radius: 12px;">
             <h2 style="text-align: center; color: #2c3e50;">📂 Gestión de Categorías y Subcategorías</h2>
             
@@ -68,6 +69,59 @@
 
         <hr>
 
+        <!-- 🔴 NUEVA SECCIÓN AGREGADA: GESTIÓN DE BANNERS -->
+        <div class="form-seccion" style="background: #fff3e0; border: 2px solid #ff9800; border-radius: 12px; padding: 20px;">
+            <h2 style="text-align: center; color: #e65100; margin-top: 0;">🖼️ Gestión de Banners Rotativos</h2>
+            
+            <!-- Formulario para agregar Banner -->
+            <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Título del Banner:</label>
+                    <input type="text" name="titulo" placeholder="Ej: ¡Ofertas de la Semana!" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Descripción Corta:</label>
+                    <input type="text" name="descripcion" placeholder="Ej: Hasta 15% OFF en Electrónica" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">ID Producto Vinculado (Opcional):</label>
+                    <input type="number" name="producto_id" placeholder="Ej: 39" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Imagen del Banner:</label>
+                    <input type="file" name="imagen" accept="image/*" required style="font-size: 12px; margin-top: 5px;">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <button type="submit" class="btn-negro" style="width: 100%; padding: 12px; background: #ff9800; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px;">📤 Subir e Instalar Banner</button>
+                </div>
+            </form>
+
+            <!-- Lista de Banners Actuales -->
+            <h3 style="color: #e65100; margin-top: 20px; border-bottom: 1px solid #ffe0b2; padding-bottom: 5px;">Banners Activos en la Web:</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 10px;">
+                {% if banners %}
+                    {% for b in banners %}
+                    <div style="background: white; border: 1px solid #ffe0b2; padding: 10px; border-radius: 8px; display: flex; gap: 10px; align-items: center; position: relative;">
+                        <img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="80" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        <div style="flex: 1; font-size: 13px; overflow: hidden;">
+                            <strong style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.titulo or 'Sin título' }}</strong>
+                            <span style="color: #666; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.descripcion or '' }}</span>
+                            <small style="color: #ff9800; display: block;">Enlace: {{ b.link }}</small>
+                        </div>
+                        <a href="{{ url_for('eliminar_banner', id=b.id) }}" 
+                           style="background: #ff4757; color: white; text-decoration: none; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;"
+                           onclick="return confirm('¿Seguro que querés eliminar este banner?')">×</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #888; font-size: 14px; grid-column: 1 / -1; text-align: center; margin: 10px 0;">No hay banners cargados actualmente.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- SECCIÓN: PRODUCTOS -->
         <div class="form-seccion">
             <h2>📦 Añadir Nuevo Producto</h2>
             <form action="{{ url_for('agregar_producto') }}" method="POST" enctype="multipart/form-data">
@@ -140,6 +194,7 @@
             </table>
         </div>
 
+        <!-- MODAL EDITAR -->
         <div id="modalEditar" class="modal-zoom" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 20000;">
             <div style="background: white; padding: 30px; border-radius: 12px; max-width: 650px; margin: 20px auto; max-height: 90vh; overflow-y: auto;">
                 <h3 style="margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 10px;">✏️ Editar Artículo</h3>
@@ -242,8 +297,7 @@
                     <button type="button" class="btn-del-foto" onclick="quitarFoto(${index})">×</button>
                     <input type="hidden" name="orden_fotos[]" value="${foto}">
                 `;
-                item.addEventListener('dragstart', () => item.classList.add('dragging'));
-                item.addEventListener('dragend', () => item.classList.remove('dragging'));
+                item.draggable = true;
                 container.appendChild(item);
             });
         }
@@ -261,10 +315,9 @@
     <style>
         .input-admin-edit { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
         .grid-fotos-edit-sortable { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; min-height: 90px; padding: 10px; border: 1px dashed #3498db; border-radius: 8px; background: #fff; }
-        .foto-edit-item { position: relative; width: 80px; height: 80px; cursor: grab; border: 2px solid #fff; border-radius: 5px; overflow: visible; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .foto-edit-item { position: relative; width: 80px; height: 80px; border: 2px solid #fff; border-radius: 5px; overflow: visible; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .foto-edit-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
         .btn-del-foto { position: absolute; top: -8px; right: -8px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        .dragging { opacity: 0.4; transform: scale(0.9); }
     </style>
 </body>
 </html>
