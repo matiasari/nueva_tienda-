@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_file
+from flask_sqlalchemy import SQLAlchemy  # 🔴 AGREGADO
 from werkzeug.utils import secure_filename
 from functools import wraps
 import io
@@ -14,13 +15,45 @@ app.config['SESSION_COOKIE_NAME'] = 'bazar_guille_session'
 app.config['SESSION_PERMANENT'] = True
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# Archivos de datos
-PRODUCTOS_JSON = 'productos.json'
+# 🔴 CONFIGURACIÓN DE POSTGRESQL EN RENDER
+URL_RENDER = "postgresql://guille_admin:7nHE9WVezwoXS0RsDUiMrNkogSSX3FAW@dpg-d8sjeme7r5hc73fjftrg-a.oregon-postgres.render.com/bazarguille_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = URL_RENDER
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Archivos de datos restantes (Banners y Categorías siguen en JSON por ahora)
 BANNERS_JSON = 'banners.json'
 CATEGORIAS_JSON = 'categorias.json'
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 
-# --- PERSISTENCIA ---
+# --- MODELO DE LA BASE DE DATOS ---
+class Articulo(db.Model):
+    __tablename__ = 'articulos'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(250), nullable=False)
+    precio = db.Column(db.Float, nullable=False)
+    categoria = db.Column(db.String(100), nullable=True)
+    subcategoria = db.Column(db.String(100), nullable=True, default="")
+    stock = db.Column(db.Integer, default=0)
+    imagen = db.Column(db.String(500), nullable=True)
+    imagenes_extras = db.Column(db.Text, nullable=True, default="") # Guardado como texto separado por comas
+
+    # Helper para transformar el objeto de la BD a un diccionario común tipo JSON
+    def to_dict(self):
+        img_ex = self.imagenes_extras.split(',') if self.imagenes_extras else []
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "precio": self.precio,
+            "categoria": self.categoria if self.categoria else "VARIOS",
+            "subcategoria": self.subcategoria if self.subcategoria else "",
+            "stock": self.stock,
+            "imagen": self.imagen if self.imagen else "default.jpg",
+            "imagenes_extras": img_ex
+        }
+
+# --- PERSISTENCIA RESTANTE (Banners y Categorías) ---
 def cargar_datos(archivo):
     if not os.path.exists(archivo): return []
     with open(archivo, 'r', encoding='utf-8') as f:
@@ -52,23 +85,17 @@ def formato_pesos(valor):
 # --- RUTAS PÚBLICAS ---
 @app.route('/')
 def index():
-    productos = cargar_datos(PRODUCTOS_JSON)
+    # 🔴 CAMBIADO: Traemos de la base de datos y convertimos a diccionario
+    articulos_db = Articulo.query.all()
+    productos = [a.to_dict() for a in articulos_db]
+    
     banners = cargar_datos(BANNERS_JSON)
     categorias = cargar_datos(CATEGORIAS_JSON)
     cat = request.args.get('cat')
     q = request.args.get('q')
-    
-    # --- PARCHE DE SEGURIDAD PARA GROUPBY ---
-    # Si un producto no tiene categoría, le ponemos 'VARIOS' para que no tire error
-    for p in productos:
-        if not p.get('categoria') or p.get('categoria') == "None":
-            p['categoria'] = "VARIOS"
-        if 'subcategoria' not in p:
-            p['subcategoria'] = ""
 
     prod_mostrar = productos
     if cat and cat != "Todos":
-        # Filtra si coincide con categoría principal O subcategoría
         prod_mostrar = [p for p in prod_mostrar if p.get('categoria') == cat or p.get('subcategoria') == cat]
     
     if q:
@@ -97,10 +124,11 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-    productos = cargar_datos(PRODUCTOS_JSON)
+    # 🔴 CAMBIADO: Traemos desde PostgreSQL
+    articulos_db = Articulo.query.order_by(Articulo.id.desc()).all()
+    productos = [a.to_dict() for a in articulos_db]
+    
     categorias = cargar_datos(CATEGORIAS_JSON)
-    for p in productos:
-        if 'imagenes_extras' not in p: p['imagenes_extras'] = []
     return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias)
 
 # --- GESTIÓN DE CATEGORÍAS ---
@@ -139,7 +167,6 @@ def eliminar_categoria(nombre):
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
-    productos = cargar_datos(PRODUCTOS_JSON)
     fotos = request.files.getlist('imagenes_extras')
     nombres = []
     for img in fotos:
@@ -148,53 +175,65 @@ def agregar_producto():
             img.save(os.path.join(app.config['UPLOAD_FOLDER'], fn))
             nombres.append(fn)
 
-    nuevo = {
-        "id": max([p['id'] for p in productos], default=0) + 1,
-        "nombre": request.form.get('nombre', '').upper(),
-        "precio": float(request.form.get('precio') or 0),
-        "categoria": request.form.get('categoria'),
-        "subcategoria": request.form.get('subcategoria'),
-        "stock": int(request.form.get('stock') or 0),
-        "imagen": nombres[0] if nombres else "default.jpg",
-        "imagenes_extras": nombres[1:] if len(nombres) > 1 else []
-    }
-    productos.append(nuevo)
-    guardar_datos(PRODUCTOS_JSON, productos)
+    # 🔴 CAMBIADO: Buscamos el ID máximo en la base de datos
+    max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
+    nuevo_id = max_id + 1
+
+    img_extras_str = ",".join(nombres[1:]) if len(nombres) > 1 else ""
+
+    # 🔴 CAMBIADO: Guardamos en PostgreSQL
+    nuevo_articulo = Articulo(
+        id=nuevo_id,
+        nombre=request.form.get('nombre', '').upper(),
+        precio=float(request.form.get('precio') or 0),
+        categoria=request.form.get('categoria'),
+        subcategoria=request.form.get('subcategoria'),
+        stock=int(request.form.get('stock') or 0),
+        imagen=nombres[0] if nombres else "default.jpg",
+        imagenes_extras=img_extras_str
+    )
+    db.session.add(nuevo_articulo)
+    db.session.commit()
     return redirect(url_for('admin'))
 
 @app.route('/admin/producto/editar', methods=['POST'])
 @login_requerido
 def editar_producto():
-    p_id = request.form.get('id')
-    productos = cargar_datos(PRODUCTOS_JSON)
-    for p in productos:
-        if str(p['id']) == str(p_id):
-            p['nombre'] = request.form.get('nombre', '').upper()
-            p['precio'] = float(request.form.get('precio') or 0)
-            p['categoria'] = request.form.get('categoria')
-            p['subcategoria'] = request.form.get('subcategoria')
-            p['stock'] = int(request.form.get('stock') or 0)
+    p_id = int(request.form.get('id'))
+    # 🔴 CAMBIADO: Buscamos el artículo en PostgreSQL
+    articulo = Articulo.query.get(p_id)
+    
+    if articulo:
+        articulo.nombre = request.form.get('nombre', '').upper()
+        articulo.precio = float(request.form.get('precio') or 0)
+        articulo.categoria = request.form.get('categoria')
+        articulo.subcategoria = request.form.get('subcategoria')
+        articulo.stock = int(request.form.get('stock') or 0)
+        
+        orden = request.form.getlist('orden_fotos[]')
+        nuevas = request.files.getlist('fotos_extras')
+        for f in nuevas:
+            if f.filename != '':
+                fn = secure_filename(f.filename)
+                f.save(os.path.join(app.config['UPLOAD_FOLDER'], fn))
+                orden.append(fn)
+        
+        if orden:
+            articulo.imagen = orden[0]
+            articulo.imagenes_extras = ",".join(orden[1:]) if len(orden) > 1 else ""
             
-            orden = request.form.getlist('orden_fotos[]')
-            nuevas = request.files.getlist('fotos_extras')
-            for f in nuevas:
-                if f.filename != '':
-                    fn = secure_filename(f.filename)
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], fn))
-                    orden.append(fn)
-            
-            if orden:
-                p['imagen'] = orden[0]
-                p['imagenes_extras'] = orden[1:]
-            break
-    guardar_datos(PRODUCTOS_JSON, productos)
+        db.session.commit() # Guardar cambios en la BD
+        
     return redirect(url_for('admin'))
 
 @app.route('/admin/producto/eliminar/<int:id>')
 @login_requerido
 def eliminar_producto(id):
-    productos = [p for p in cargar_datos(PRODUCTOS_JSON) if p['id'] != id]
-    guardar_datos(PRODUCTOS_JSON, productos)
+    # 🔴 CAMBIADO: Eliminar de PostgreSQL
+    articulo = Articulo.query.get(id)
+    if articulo:
+        db.session.delete(articulo)
+        db.session.commit()
     return redirect(url_for('admin'))
 
 # --- EXCEL ---
@@ -204,21 +243,26 @@ def importar_excel():
     file = request.files.get('archivo_excel')
     if file and file.filename != '':
         df = pd.read_excel(file)
-        productos = cargar_datos(PRODUCTOS_JSON)
-        nuevo_id = max([p['id'] for p in productos], default=0) + 1
+        
+        max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
+        nuevo_id = max_id + 1
+        
         for _, row in df.iterrows():
-            productos.append({
-                "id": nuevo_id, 
-                "nombre": str(row['Nombre']).upper(), 
-                "precio": float(row['Precio']),
-                "categoria": str(row['Categoría']), 
-                "subcategoria": str(row.get('Subcategoría', '')),
-                "stock": int(row.get('Stock', 0)),
-                "imagen": "default.jpg", 
-                "imagenes_extras": []
-            })
+            # 🔴 CAMBIADO: Guardamos cada fila directo en la BD
+            nuevo_art = Articulo(
+                id=nuevo_id,
+                nombre=str(row['Nombre']).upper(),
+                precio=float(row['Precio']),
+                categoria=str(row['Categoría']),
+                subcategoria=str(row.get('Subcategoría', '')),
+                stock=int(row.get('Stock', 0)),
+                imagen="default.jpg",
+                imagenes_extras=""
+            )
+            db.session.add(nuevo_art)
             nuevo_id += 1
-        guardar_datos(PRODUCTOS_JSON, productos)
+            
+        db.session.commit()
     return redirect(url_for('admin'))
 
 @app.route('/admin/descargar_plantilla')
@@ -245,7 +289,11 @@ def agregar_al_carrito():
 @app.route('/carrito')
 def mostrar_carrito():
     ids = session.get('carrito', [])
-    todos = cargar_datos(PRODUCTOS_JSON)
+    
+    # 🔴 CAMBIADO: Traemos todos de la base de datos
+    articulos_db = Articulo.query.all()
+    todos = [a.to_dict() for a in articulos_db]
+    
     items = []
     total = 0
     for p_id in set(ids):
@@ -286,7 +334,6 @@ def eliminar_banner(id):
     banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
     guardar_datos(BANNERS_JSON, banners)
     return redirect(url_for('admin'))
-
 
 @app.route('/admin/subcategorias/eliminar/<padre>/<nombre_sub>')
 @login_requerido
