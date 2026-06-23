@@ -27,6 +27,12 @@ db = SQLAlchemy(app)
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
+# --- FILTROS JINJA Y FUNCIONES AUXILIARES (Puestas arriba para evitar NameError) ---
+@app.template_filter('pesos')
+def formato_pesos(valor):
+    try: return f"${int(float(valor)):,}".replace(",", ".")
+    except: return "$0"
+
 # --- MODELOS DE LA BASE DE DATOS (POSTGRESQL PERMANENTE) ---
 
 class Articulo(db.Model):
@@ -81,7 +87,7 @@ class Pedido(db.Model):
     total = db.Column(db.Float, nullable=False)
     envio = db.Column(db.Float, default=0.0)
     zona = db.Column(db.String(100), default="Retiro en local")
-    estado = db.Column(db.String(50), default="PENDIENTE") # PENDIENTE, HECHO, CANCELADO
+    estado = db.Column(db.String(50), default="PENDIENTE") 
     detalles = db.relationship('DetallePedido', backref='pedido', lazy=True, cascade="all, delete-orphan")
 
 class DetallePedido(db.Model):
@@ -99,7 +105,6 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 # --- INICIALIZACIÓN Y MIGRACIÓN AUTOMÁTICA ---
 with app.app_context():
-    # 🔐 Seguro para producción: db.drop_all() eliminado para cuidar tus datos
     db.create_all()
     if Categoria.query.count() == 0:
         categorias_json = [
@@ -128,11 +133,6 @@ def login_requerido(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
-
-@app.template_filter('pesos')
-def formato_pesos(valor):
-    try: return f"${int(float(valor)):,}".replace(",", ".")
-    except: return "$0"
 
 # --- RUTAS PÚBLICAS ---
 @app.route('/')
@@ -221,7 +221,7 @@ def finalizar_pedido():
         db.session.add(detalle)
     db.session.commit()
 
-    # Armamos el mensaje para WhatsApp incluyendo el # de Pedido
+    # Armamos el mensaje para WhatsApp
     msj = f"Hola Bazar Guille! Pedido #{nuevo_pedido.id}\n"
     msj += f"Metodo: {zona}\n--------------------\n"
     for i in items:
