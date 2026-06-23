@@ -27,7 +27,7 @@ db = SQLAlchemy(app)
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
-# --- FILTROS JINJA Y FUNCIONES AUXILIARES (Puestas arriba para evitar NameError) ---
+# --- FILTROS JINJA Y FUNCIONES AUXILIARES ---
 @app.template_filter('pesos')
 def formato_pesos(valor):
     try: return f"${int(float(valor)):,}".replace(",", ".")
@@ -151,7 +151,8 @@ def index():
         q_l = q.lower()
         prod_mostrar = [p for p in prod_mostrar if q_l in p.get('nombre', '').lower() or str(p.get('id')) == q_l]
         
-    return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias)
+    # 🔴 FIX: Se pasan tanto 'categorias' como 'categories' para evitar error 500 en tienda.html
+    return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
 
 # --- ADMINISTRACIÓN ---
 @app.route('/login', methods=['GET', 'POST'])
