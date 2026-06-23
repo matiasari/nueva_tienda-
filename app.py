@@ -52,7 +52,6 @@ class Articulo(db.Model):
             "imagenes_extras": img_ex
         }
 
-# 🔴 NUEVO: Tabla permanente para Banners en PostgreSQL
 class Banner(db.Model):
     __tablename__ = 'banners'
     id = db.Column(db.Integer, primary_key=True)
@@ -70,12 +69,11 @@ class Banner(db.Model):
             "link": self.link
         }
 
-# 🔴 NUEVO: Tabla permanente para Categorías en PostgreSQL
 class Categoria(db.Model):
     __tablename__ = 'categorias'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), unique=True, nullable=False)
-    subcategorias_text = db.Column(db.Text, default="") # Guardado como texto separado por comas
+    subcategorias_text = db.Column(db.Text, default="") 
 
     def to_dict(self):
         subs = [s.strip() for s in self.subcategorias_text.split(',') if s.strip()] if self.subcategorias_text else []
@@ -87,9 +85,31 @@ class Categoria(db.Model):
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# 🔴 NUEVO: Asegura que las tablas se creen en Render de forma permanente
+# 🔴 ASEGURA CREACIÓN DE TABLAS Y INYECTA TU JSON AUTOMÁTICAMENTE
 with app.app_context():
     db.create_all()
+    
+    if Categoria.query.count() == 0:
+        categorias_json = [
+            {"nombre": "COCINA", "subcategorias": ["MATES", "TAZAS", "CUBIERTOS", "UTILITARIOS", "VASOS"]},
+            {"nombre": "ELECTRONICA", "subcategorias": ["PARLANTES", "SMARTWACH", "PAVAS", "AURICULARES"]},
+            {"nombre": "VUELTA AL COLE", "subcategorias": ["MOCHILAS"]},
+            {"nombre": "EQUIPAJE", "subcategorias": ["MOCHILAS"]},
+            {"nombre": "PORCELANA", "subcategorias": ["TAZAS", "SET DE VAJILLA"]},
+            {"nombre": "VIDRIO", "subcategorias": ["TAZAS DOBLE FONDO", "VASOS", "BOTELLA/JARRAS/DISPENSER"]},
+            {"nombre": "DECORACION", "subcategorias": ["PORTAVELAS", "CUADROS"]},
+            {"nombre": "ILUMINACION", "subcategorias": ["LAMPARAS", "LINTERNAS"]},
+            {"nombre": "BAÑO", "subcategorias": ["DISPENSER", "PORTAROLLOS", "SET DE BAÑO", "ACCESORIOS"]},
+            {"nombre": "PETIT MUEBLES", "subcategorias": []}
+        ]
+        
+        for cat_data in categorias_json:
+            subs_str = ",".join(cat_data["subcategorias"])
+            nueva_cat = Categoria(nombre=cat_data["nombre"], subcategorias_text=subs_str)
+            db.session.add(nueva_cat)
+        
+        db.session.commit()
+        print("¡Categorías del JSON migradas a PostgreSQL con éxito!")
 
 # --- SEGURIDAD ---
 def login_requerido(f):
@@ -112,7 +132,6 @@ def index():
     articulos_db = Articulo.query.all()
     productos = [a.to_dict() for a in articulos_db]
     
-    # 🔴 CAMBIADO: Traemos desde PostgreSQL
     banners_db = Banner.query.all()
     banners = [b.to_dict() for b in banners_db]
     
@@ -155,7 +174,6 @@ def admin():
     articulos_db = Articulo.query.order_by(Articulo.id.desc()).all()
     productos = [a.to_dict() for a in articulos_db]
     
-    # 🔴 CAMBIADO: Traemos desde PostgreSQL permanente
     banners_db = Banner.query.all()
     banners = [b.to_dict() for b in banners_db]
     
@@ -164,7 +182,7 @@ def admin():
     
     return render_template('admin.html', productos=productos, banners=banners, categorias=categorias)
 
-# --- GESTIÓN DE CATEGORÍAS (MODIFICADO A BD PERMANENTE) ---
+# --- GESTIÓN DE CATEGORÍAS ---
 @app.route('/admin/categorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_categoria():
@@ -213,7 +231,7 @@ def eliminar_subcategoria(padre, nombre_sub):
             db.session.commit()
     return redirect(url_for('admin'))
 
-# --- PRODUCTOS (ABM CON CONEXIÓN EN NUBE IMGBB) ---
+# --- PRODUCTOS (ABM CON CONEXIÓN EN NUBE IMGBB + PARACAÍDAS ANTI ERROR 500) ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -368,7 +386,7 @@ def mostrar_carrito():
     link_wa = f"https://wa.me/5491149899616?text={msj.replace(' ', '%20')}"
     return render_template('carrito.html', carrito=items, total=total, envio=envio, total_final=total+envio, link_whatsapp=link_wa)
 
-# --- BANNERS (ABM MODIFICADO PARA POSTGRESQL + IMGBB PERMANENTE) ---
+# --- BANNERS ---
 @app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
 def agregar_banner():
@@ -383,7 +401,6 @@ def agregar_banner():
             if res_data.get("success"):
                 url_banner = res_data["data"]["url"]
                 
-                # 🔴 CAMBIADO: Guardamos directo en PostgreSQL
                 nuevo_banner = Banner(
                     titulo=request.form.get('titulo'),
                     descripcion=request.form.get('descripcion'),
@@ -399,7 +416,6 @@ def agregar_banner():
 @app.route('/admin/banner/eliminar/<int:id>')
 @login_requerido
 def eliminar_banner(id):
-    # 🔴 CAMBIADO: Eliminamos de PostgreSQL
     banner = Banner.query.get(id)
     if banner:
         db.session.delete(banner)
