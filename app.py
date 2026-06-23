@@ -91,7 +91,7 @@ class DetallePedido(db.Model):
     articulo_id = db.Column(db.Integer, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
     precio = db.Column(db.Float, nullable=False)
-    cantidad = db.Column(db.Integer, nullable=False) # Corregido definitivo sin alias raros
+    cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -99,6 +99,7 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 # --- INICIALIZACIÓN Y MIGRACIÓN AUTOMÁTICA ---
 with app.app_context():
+    # 🔐 Seguro para producción: db.drop_all() eliminado para cuidar tus datos
     db.create_all()
     if Categoria.query.count() == 0:
         categorias_json = [
