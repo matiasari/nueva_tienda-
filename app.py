@@ -178,7 +178,7 @@ def admin():
     categorias = [c.to_dict() for c in Categoria.query.all()]
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     
-    # 🔴 FIX DEFINITIVO: Enviamos tanto 'categorias' como 'categories' para que admin.html no tire Error 500
+    # ✨ FIX EXPLICITO: Se mandan tanto 'categorias' como 'categories' para blindar el HTML
     return render_template('admin.html', productos=productos, banners=banners, categorias=categorias, categories=categorias, pedidos=pedidos)
 
 # --- PROCESAR PEDIDO Y ENVIAR WHATSAPP ---

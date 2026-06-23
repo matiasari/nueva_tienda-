@@ -11,7 +11,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  function gtag()){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-6Y3MN0GKBN');
 </script>
@@ -27,7 +27,7 @@
         {% for item in carrito %}
         <div class="item-carrito">
             {% if item.imagen %}
-                {% if item.imagen.startswith('http') %}
+                {% if item.imagen.startswith('http://') or item.imagen.startswith('https://') %}
                     <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
                 {% else %}
                     <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}" alt="{{ item.nombre }}">
@@ -113,7 +113,7 @@
 
     <div class="finalizar-compra-contenedor">
         <form action="/finalizar_pedido" method="POST">
-            <button type="submit" class="btn-whatsapp" style="width:100%; border:none; font-size:16px; cursor:pointer; padding:15px; display:block; text-align:center;">
+            <button type="submit" class="btn-whatsapp" style="width:100%; border:none; font-size:16px; cursor:pointer; padding:15px; display:block; text-align:center; font-weight:bold;">
                 Confirmar pedido por WhatsApp
             </button>
         </form>

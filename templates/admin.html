@@ -99,7 +99,7 @@
                     <label>🌿 Nueva Subcategoría:</label>
                     <select name="padre" required>
                         <option value="">Seleccionar Categoría Padre...</option>
-                        {% for c in categorias %}
+                        {% for c in categories %}
                             <option value="{{ c.nombre }}">{{ c.nombre }}</option>
                         {% endfor %}
                     </select>
@@ -109,7 +109,7 @@
             </div>
 
             <div style="margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-                {% for c in categorias %}
+                {% for c in categories %}
                 <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative;">
                     <a href="{{ url_for('eliminar_categoria', nombre=c.nombre) }}" 
                        style="position: absolute; top: 5px; right: 10px; color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 18px;"
@@ -121,7 +121,7 @@
                         {% for sub in c.subcategorias %}
                             <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; padding-bottom: 2px;">
                                 <span>• {{ sub }}</span>
-                                <a href="{{ url_for('eliminar_subcategoria', padre=c.nombre, nombre_sub=sub) }}" 
+                                <a href="{{ url_for('eliminar_subcategoria', padre=c.nombre, name_sub=sub) }}" 
                                    style="color: #ff4757; text-decoration: none; font-weight: bold; padding: 0 5px;"
                                    onclick="return confirm('¿Eliminar subcategoría: {{ sub }}?')">×</a>
                             </li>
