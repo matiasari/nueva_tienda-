@@ -144,6 +144,7 @@ def index():
     
     cat = request.args.get('cat')
     q = request.args.get('q')
+    
     prod_mostrar = productos
     if cat and cat != "Todos":
         prod_mostrar = [p for p in prod_mostrar if p.get('categoria') == cat or p.get('subcategoria') == cat]
@@ -176,7 +177,9 @@ def admin():
     banners = [b.to_dict() for b in Banner.query.all()]
     categorias = [c.to_dict() for c in Categoria.query.all()]
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
-    return render_template('admin.html', productos=productos, banners=banners, categorias=categorias, pedidos=pedidos)
+    
+    # 🔴 FIX DEFINITIVO: Enviamos tanto 'categorias' como 'categories' para que admin.html no tire Error 500
+    return render_template('admin.html', productos=productos, banners=banners, categorias=categorias, categories=categorias, pedidos=pedidos)
 
 # --- PROCESAR PEDIDO Y ENVIAR WHATSAPP ---
 @app.route('/finalizar_pedido', methods=['POST'])
