@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from functools import wraps
 import io
-import requests  # 🔴 AGREGADO para conectar con ImgBB
+import requests
 
 app = Flask(__name__)
 
