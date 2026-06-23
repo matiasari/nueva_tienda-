@@ -151,7 +151,6 @@ def index():
         q_l = q.lower()
         prod_mostrar = [p for p in prod_mostrar if q_l in p.get('nombre', '').lower() or str(p.get('id')) == q_l]
         
-    # 🔴 FIX: Se pasan tanto 'categorias' como 'categories' para evitar error 500 en tienda.html
     return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
 
 # --- ADMINISTRACIÓN ---
