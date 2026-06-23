@@ -7,14 +7,6 @@
     <title>Mi Carrito - Bazar Guille</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ range(1, 999) | random }}">
 </head>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag()){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-6Y3MN0GKBN');
-</script>
 <body>
 
 <div class="carrito-header">
@@ -48,7 +40,6 @@
 
     <div class="opciones-entrega">
         <h3>🚚 Método de Entrega</h3>
-        
         <div class="entrega-toggle">
             <label class="opcion">
                 <input type="radio" name="metodo" value="acordar" {% if zona == 'No seleccionada' or zona == 'Retiro en local' %}checked{% endif %} onclick="toggleEnvio(false)">
@@ -74,37 +65,33 @@
         </div>
     </div>
 
-{% if envio > 0 %}
-<div class="resultado-envio">
-    <p>📍 Zona seleccionada: <strong>{{ zona }}</strong></p>
-    <p>📦 Costo de envío: <strong>{{ envio | pesos }}</strong></p>
-</div>
-{% endif %}
-
-    <div class="resumen-compra">
-    <h3>🧾 Resumen de tu compra</h3>
-
-    {% for item in carrito %}
-    <div class="resumen-item">
-        <span>{{ item.nombre }} x{{ item.cantidad }}</span>
-        <strong>{{ (item.precio * item.cantidad) | pesos }}</strong>
-    </div>
-    {% endfor %}
-
     {% if envio > 0 %}
-    <div class="resumen-item">
-        <span>Envío</span>
-        <strong>{{ envio | pesos }}</strong>
+    <div class="resultado-envio">
+        <p>📍 Zona seleccionada: <strong>{{ zona }}</strong></p>
+        <p>📦 Costo de envío: <strong>{{ envio | pesos }}</strong></p>
     </div>
     {% endif %}
 
-    <hr>
-
-    <div class="resumen-total">
-        <span>Total Final</span>
-        <strong>{{ total_final | pesos if envio > 0 else total | pesos }}</strong>
+    <div class="resumen-compra">
+        <h3>🧾 Resumen de tu compra</h3>
+        {% for item in carrito %}
+        <div class="resumen-item">
+            <span>{{ item.nombre }} x{{ item.cantidad }}</span>
+            <strong>{{ (item.precio * item.cantidad) | pesos }}</strong>
+        </div>
+        {% endfor %}
+        {% if envio > 0 %}
+        <div class="resumen-item">
+            <span>Envío</span>
+            <strong>{{ envio | pesos }}</strong>
+        </div>
+        {% endif %}
+        <hr>
+        <div class="resumen-total">
+            <span>Total Final</span>
+            <strong>{{ total_final | pesos if envio > 0 else total | pesos }}</strong>
+        </div>
     </div>
-</div>
 
     <div class="acciones-carrito">
         <a href="/" class="btn-seguir">← Seguir comprando</a>
@@ -113,12 +100,11 @@
 
     <div class="finalizar-compra-contenedor">
         <form action="/finalizar_pedido" method="POST">
-            <button type="submit" class="btn-whatsapp" style="width:100%; border:none; font-size:16px; cursor:pointer; padding:15px; display:block; text-align:center; font-weight:bold;">
+            <button type="submit" class="btn-whatsapp" style="width:100%; border:none; font-size:16px; cursor:pointer; padding:15px; font-weight:bold;">
                 Confirmar pedido por WhatsApp
             </button>
         </form>
     </div>
-
 {% else %}
     <div style="text-align: center; margin-top: 50px;">
         <p>Tu carrito está vacío ☹️</p>
@@ -130,21 +116,14 @@
 function toggleEnvio(mostrar) {
     const div = document.getElementById('calculador-envio');
     div.style.display = mostrar ? 'block' : 'none';
-    
     if (!mostrar) {
         const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/calcular_envio';
+        form.method = 'POST'; form.action = '/calcular_envio';
         const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'zona';
-        input.value = 'Retiro en local';
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
+        input.type = 'hidden'; input.name = 'zona'; input.value = 'Retiro en local';
+        form.appendChild(input); document.body.appendChild(form); form.submit();
     }
 }
 </script>
-    
 </body>
 </html>

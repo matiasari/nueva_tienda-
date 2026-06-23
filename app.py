@@ -24,16 +24,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+CATEGORIAS_JSON = 'categorias.json'
+BANNERS_JSON = 'banners.json'
+API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
-# --- FILTROS JINJA ---
-@app.template_filter('pesos')
-def formato_pesos(valor):
-    try: return f"${int(float(valor)):,}".replace(",", ".")
-    except: return "$0"
-
-# --- MODELOS DE LA BASE DE DATOS (POSTGRESQL PERMANENTE) ---
-
+# --- MODELOS DE LA BASE DE DATOS ---
 class Articulo(db.Model):
     __tablename__ = 'articulos'
     id = db.Column(db.Integer, primary_key=True)
@@ -58,27 +54,6 @@ class Articulo(db.Model):
             "imagenes_extras": img_ex
         }
 
-class Banner(db.Model):
-    __tablename__ = 'banners'
-    id = db.Column(db.Integer, primary_key=True)
-    titulo = db.Column(db.String(250), nullable=True)
-    descripcion = db.Column(db.String(500), nullable=True)
-    imagen = db.Column(db.String(500), nullable=False)
-    link = db.Column(db.String(250), nullable=True)
-
-    def to_dict(self):
-        return {"id": self.id, "titulo": self.titulo, "descripcion": self.descripcion, "imagen": self.imagen, "link": self.link}
-
-class Categoria(db.Model):
-    __tablename__ = 'categorias'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), unique=True, nullable=False)
-    subcategorias_text = db.Column(db.Text, default="") 
-
-    def to_dict(self):
-        subs = [s.strip() for s in self.subcategorias_text.split(',') if s.strip()] if self.subcategorias_text else []
-        return {"nombre": self.nombre, "subcategorias": subs}
-
 class Pedido(db.Model):
     __tablename__ = 'pedidos'
     id = db.Column(db.Integer, primary_key=True)
@@ -99,30 +74,22 @@ class DetallePedido(db.Model):
     cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
 
+# --- ARCHIVOS JSON ---
+def cargar_datos(archivo):
+    if not os.path.exists(archivo): return []
+    with open(archivo, 'r', encoding='utf-8') as f:
+        try: return json.load(f)
+        except: return []
+
+def guardar_datos(archivo, datos):
+    with open(archivo, 'w', encoding='utf-8') as f:
+        json.dump(datos, f, indent=4, ensure_ascii=False)
+
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# --- INICIALIZACIÓN DE BASE DE DATOS Y CATEGORÍAS EN POSTGRES ---
 with app.app_context():
     db.create_all()
-    if Categoria.query.count() == 0:
-        categorias_json = [
-            {"nombre": "COCINA", "subcategorias": ["MATES", "TAZAS", "CUBIERTOS", "UTILITARIOS", "VASOS"]},
-            {"nombre": "ELECTRONICA", "subcategorias": ["PARLANTES", "SMARTWACH", "PAVAS", "AURICULARES"]},
-            {"nombre": "VUELTA AL COLE", "subcategorias": ["MOCHILAS"]},
-            {"nombre": "EQUIPAJE", "subcategorias": ["MOCHILAS"]},
-            {"nombre": "PORCELANA", "subcategorias": ["TAZAS", "SET DE VAJILLA"]},
-            {"nombre": "VIDRIO", "subcategorias": ["TAZAS DOBLE FONDO", "VASOS", "BOTELLA/JARRAS/DISPENSER"]},
-            {"nombre": "DECORACION", "subcategorias": ["PORTAVELAS", "CUADROS"]},
-            {"nombre": "ILUMINACION", "subcategorias": ["LAMPARAS", "LINTERNAS"]},
-            {"nombre": "BAÑO", "subcategorias": ["DISPENSER", "PORTAROLLOS", "SET DE BAÑO", "ACCESORIOS"]},
-            {"nombre": "PETIT MUEBLES", "subcategorias": []}
-        ]
-        for cat_data in categorias_json:
-            subs_str = ",".join(cat_data["subcategorias"])
-            nueva_cat = Categoria(nombre=cat_data["nombre"], subcategorias_text=subs_str)
-            db.session.add(nueva_cat)
-        db.session.commit()
 
 # --- SEGURIDAD ---
 def login_requerido(f):
@@ -133,13 +100,18 @@ def login_requerido(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.template_filter('pesos')
+def formato_pesos(valor):
+    try: return f"${int(float(valor)):,}".replace(",", ".")
+    except: return "$0"
+
 # --- RUTAS PÚBLICAS ---
 @app.route('/')
 def index():
     articulos_db = Articulo.query.all()
     productos = [a.to_dict() for a in articulos_db]
-    banners = [b.to_dict() for b in Banner.query.all()]
-    categorias = [c.to_dict() for c in Categoria.query.all()]
+    banners = cargar_datos(BANNERS_JSON)
+    categorias = cargar_datos(CATEGORIAS_JSON)
     
     cat = request.args.get('cat')
     q = request.args.get('q')
@@ -153,7 +125,7 @@ def index():
         
     return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
 
-# --- ADMINISTRACIÓN PANEL ---
+# --- ADMINISTRACIÓN ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -173,21 +145,17 @@ def logout():
 @login_requerido
 def admin():
     productos = [a.to_dict() for a in Articulo.query.order_by(Articulo.id.desc()).all()]
-    banners = [b.to_dict() for b in Banner.query.all()]
-    categorias = [c.to_dict() for c in Categoria.query.all()]
+    categorias = cargar_datos(CATEGORIAS_JSON)
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
-    return render_template('admin.html', productos=productos, banners=banners, categorias=categorias, categories=categorias, pedidos=pedidos)
+    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias, categories=categorias, pedidos=pedidos)
 
-# --- PROCESAR PEDIDO Y ENVIAR WHATSAPP ---
+# --- PEDIDOS ---
 @app.route('/finalizar_pedido', methods=['POST'])
 def finalizar_pedido():
     ids = session.get('carrito', [])
-    if not ids:
-        return redirect(url_for('index'))
+    if not ids: return redirect(url_for('index'))
     
-    articulos_db = Articulo.query.all()
-    todos = [a.to_dict() for a in articulos_db]
-    
+    todos = [a.to_dict() for a in Articulo.query.all()]
     items = []
     total = 0
     for p_id in set(ids):
@@ -195,8 +163,7 @@ def finalizar_pedido():
         if p:
             cant = ids.count(p_id)
             total += p['precio'] * cant
-            it = p.copy()
-            it['cantidad'] = cant
+            it = p.copy(); it['cantidad'] = cant
             items.append(it)
             
     envio = session.get('envio', 0)
@@ -209,30 +176,20 @@ def finalizar_pedido():
 
     for i in items:
         detalle = DetallePedido(
-            pedido_id=nuevo_pedido.id,
-            articulo_id=i['id'],
-            nombre=i['nombre'],
-            precio=i['precio'],
-            cantidad=i['cantidad'],
-            imagen=i['imagen']
+            pedido_id=nuevo_pedido.id, articulo_id=i['id'], nombre=i['nombre'],
+            precio=i['precio'], cantidad=i['cantidad'], imagen=i['imagen']
         )
         db.session.add(detalle)
     db.session.commit()
 
-    msj = f"Hola Bazar Guille! Pedido #{nuevo_pedido.id}\n"
-    msj += f"Metodo: {zona}\n--------------------\n"
+    msj = f"Hola Bazar Guille! Pedido #{nuevo_pedido.id}\nMetodo: {zona}\n--------------------\n"
     for i in items:
         msj += f"- {i['nombre']} x{i['cantidad']} ({formato_pesos(i['precio'] * i['cantidad'])})\n"
-    if envio > 0:
-        msj += f"Envio: {formato_pesos(envio)}\n"
+    if envio > 0: msj += f"Envio: {formato_pesos(envio)}\n"
     msj += f"--------------------\nTotal Final: {formato_pesos(total_final)}"
     
-    session['carrito'] = []
-    session['envio'] = 0
-    session['zona'] = 'No seleccionada'
-    
-    link_wa = f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}"
-    return redirect(link_wa)
+    session['carrito'] = []; session['envio'] = 0; session['zona'] = 'No seleccionada'
+    return redirect(f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}")
 
 @app.route('/admin/pedido/hecho/<int:id>')
 @login_requerido
@@ -241,8 +198,7 @@ def pedido_hecho(id):
     if pedido and pedido.estado == "PENDIENTE":
         for detalle in pedido.detalles:
             articulo = Articulo.query.get(detalle.articulo_id)
-            if articulo:
-                articulo.stock = max(0, articulo.stock - detalle.cantidad)
+            if articulo: articulo.stock = max(0, articulo.stock - detalle.cantidad)
         pedido.estado = "HECHO"
         db.session.commit()
     return redirect(url_for('admin'))
@@ -256,53 +212,49 @@ def pedido_cancelar(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# --- CATEGORÍAS ABM ---
+# --- ABM CATEGORÍAS ---
 @app.route('/admin/categorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_categoria():
+    categorias = cargar_datos(CATEGORIAS_JSON)
     nueva = request.form.get('nombre').strip().upper()
-    if nueva:
-        if not Categoria.query.filter_by(nombre=nueva).first():
-            db.session.add(Categoria(nombre=nueva, subcategorias_text=""))
-            db.session.commit()
+    if nueva and not any(c['nombre'] == nueva for c in categorias):
+        categorias.append({"nombre": nueva, "subcategorias": []})
+        guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
 @app.route('/admin/subcategorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_subcategoria():
+    categorias = cargar_datos(CATEGORIAS_JSON)
     padre = request.form.get('padre')
     nueva_sub = request.form.get('nombre_sub').strip().upper()
-    cat = Categoria.query.filter_by(nombre=padre).first()
-    if cat and nueva_sub:
-        subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()] if cat.subcategorias_text else []
-        if nueva_sub not in subs:
-            subs.append(nueva_sub)
-            cat.subcategorias_text = ",".join(subs)
-            db.session.commit()
+    for c in categorias:
+        if c['nombre'] == padre and nueva_sub not in c['subcategorias']:
+            c['subcategorias'].append(nueva_sub)
+            break
+    guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
 @app.route('/admin/categorias/eliminar/<nombre>')
 @login_requerido
 def eliminar_categoria(nombre):
-    cat = Categoria.query.filter_by(nombre=nombre).first()
-    if cat:
-        db.session.delete(cat)
-        db.session.commit()
+    categorias = [c for c in cargar_datos(CATEGORIAS_JSON) if c['nombre'] != nombre]
+    guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
 @app.route('/admin/subcategorias/eliminar/<padre>/<nombre_sub>')
 @login_requerido
 def eliminar_subcategoria(padre, nombre_sub):
-    cat = Categoria.query.filter_by(nombre=padre).first()
-    if cat:
-        subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()] if cat.subcategorias_text else []
-        if nombre_sub in subs:
-            subs.remove(nombre_sub)
-            cat.subcategorias_text = ",".join(subs)
-            db.session.commit()
+    categorias = cargar_datos(CATEGORIAS_JSON)
+    for c in categorias:
+        if c['nombre'] == padre and nombre_sub in c['subcategorias']:
+            c['subcategorias'].remove(nombre_sub)
+            break
+    guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
-# --- PRODUCTOS ABM ---
+# --- ABM PRODUCTOS ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -310,22 +262,16 @@ def agregar_producto():
     urls_subidas = []
     for img in fotos:
         if img and img.filename != '':
-            img_bytes = img.read()
-            payload = {"key": IMGBBB_API_KEY}
-            files = {"image": (img.filename, img_bytes)}
             try:
-                response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
-                res_data = response.json()
-                if res_data.get("success"): urls_subidas.append(res_data["data"]["url"])
-            except Exception as e: print(f"Error al subir a ImgBB: {e}")
+                res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (img.filename, img.read())})
+                if res.json().get("success"): urls_subidas.append(res.json()["data"]["url"])
+            except: pass
     max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
-    nuevo_id = max_id + 1
-    img_extras_str = ",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else ""
-    imagen_portada = urls_subidas[0] if urls_subidas else "default.jpg"
     nuevo_articulo = Articulo(
-        id=nuevo_id, nombre=request.form.get('nombre', '').upper(), precio=float(request.form.get('precio') or 0),
+        id=max_id + 1, nombre=request.form.get('nombre', '').upper(), precio=float(request.form.get('precio') or 0),
         categoria=request.form.get('categoria'), subcategoria=request.form.get('subcategoria'),
-        stock=int(request.form.get('stock') or 0), imagen=imagen_portada, imagenes_extras=img_extras_str
+        stock=int(request.form.get('stock') or 0), imagen=urls_subidas[0] if urls_subidas else "default.jpg",
+        imagenes_extras=",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else ""
     )
     db.session.add(nuevo_articulo)
     db.session.commit()
@@ -346,14 +292,10 @@ def editar_producto():
         nuevas = request.files.getlist('fotos_extras')
         for f in nuevas:
             if f.filename != '':
-                img_bytes = f.read()
-                payload = {"key": IMGBBB_API_KEY}
-                files = {"image": (f.filename, img_bytes)}
                 try:
-                    response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
-                    res_data = response.json()
-                    if res_data.get("success"): orden.append(res_data["data"]["url"])
-                except Exception as e: print(f"Error en edicion ImgBB: {e}")
+                    res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
+                    if res.json().get("success"): orden.append(res.json()["data"]["url"])
+                except: pass
         if orden:
             articulo.imagen = orden[0]
             articulo.imagenes_extras = ",".join(orden[1:]) if len(orden) > 1 else ""
@@ -378,12 +320,10 @@ def importar_excel():
         max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
         nuevo_id = max_id + 1
         for _, row in df.iterrows():
-            cat_val = str(row['Categoría']).upper() if pd.notna(row['Categoría']) else 'VARIOS'
-            sub_val = str(row.get('Subcategoría', '')).upper() if pd.notna(row.get('Subcategoría', '')) else ''
             nuevo_art = Articulo(
-                id=nuevo_id, nombre=str(row['Nombre']).upper() if pd.notna(row['Nombre']) else 'SIN NOMBRE', precio=float(row['Precio'] or 0),
-                categoria=cat_val, subcategoria=sub_val,
-                stock=int(row.get('Stock', 0) if pd.notna(row.get('Stock')) else 0), imagen="default.jpg", imagenes_extras=""
+                id=nuevo_id, nombre=str(row['Nombre']).upper(), precio=float(row['Precio']),
+                categoria=str(row['Categoría']).upper(), subcategoria=str(row.get('Subcategoría', '')).upper(),
+                stock=int(row.get('Stock', 0)), imagen="default.jpg", imagenes_extras=""
             )
             db.session.add(nuevo_art)
             nuevo_id += 1
@@ -394,34 +334,26 @@ def importar_excel():
 @app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
 def agregar_banner():
+    banners = cargar_datos(BANNERS_JSON)
     f = request.files.get('imagen')
     if f and f.filename != '':
-        img_bytes = f.read()
-        payload = {"key": IMGBBB_API_KEY}
-        files = {"image": (f.filename, img_bytes)}
         try:
-            response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
-            res_data = response.json()
-            if res_data.get("success"):
-                url_banner = res_data["data"]["url"]
-                nuevo_banner = Banner(
-                    titulo=request.form.get('titulo'),
-                    descripcion=request.form.get('descripcion'),
-                    imagen=url_banner,
-                    link=f"/?q={request.form.get('producto_id')}"
-                )
-                db.session.add(nuevo_banner)
-                db.session.commit()
-        except Exception as e: print(f"Error al subir banner: {e}")
+            res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
+            if res.json().get("success"):
+                banners.append({
+                    "id": max([b['id'] for b in banners], default=0) + 1,
+                    "titulo": request.form.get('titulo'), "descripcion": request.form.get('descripcion'),
+                    "imagen": res.json()["data"]["url"], "link": f"/?q={request.form.get('producto_id')}"
+                })
+                guardar_datos(BANNERS_JSON, banners)
+        except: pass
     return redirect(url_for('admin'))
 
 @app.route('/admin/banner/eliminar/<int:id>')
 @login_requerido
 def eliminar_banner(id):
-    banner = Banner.query.get(id)
-    if banner:
-        db.session.delete(banner)
-        db.session.commit()
+    banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
+    guardar_datos(BANNERS_JSON, banners)
     return redirect(url_for('admin'))
 
 # --- CARRITO LOGICA ---
@@ -429,32 +361,26 @@ def eliminar_banner(id):
 def agregar_al_carrito():
     carrito = session.get('carrito', [])
     carrito.append(str(request.form.get('id')))
-    session['carrito'] = carrito
-    session.modified = True
+    session['carrito'] = carrito; session.modified = True
     return redirect(url_for('index'))
 
 @app.route('/aumentar/<id>')
 def aumentar_carrito(id):
     carrito = session.get('carrito', [])
     carrito.append(str(id))
-    session['carrito'] = carrito
-    session.modified = True
+    session['carrito'] = carrito; session.modified = True
     return redirect(url_for('mostrar_carrito'))
 
 @app.route('/disminuir/<id>')
 def disminuir_carrito(id):
     carrito = session.get('carrito', [])
-    if str(id) in carrito:
-        carrito.remove(str(id))
-    session['carrito'] = carrito
-    session.modified = True
+    if str(id) in carrito: carrito.remove(str(id))
+    session['carrito'] = carrito; session.modified = True
     return redirect(url_for('mostrar_carrito'))
 
 @app.route('/carrito/eliminar/<id>')
 def eliminar_carrito(id):
-    carrito = session.get('carrito', [])
-    session['carrito'] = [x for x in carrito if x != str(id)]
-    session.modified = True
+    session['carrito'] = [x for x in session.get('carrito', []) if x != str(id)]; session.modified = True
     return redirect(url_for('mostrar_carrito'))
 
 @app.route('/carrito/vaciar')
