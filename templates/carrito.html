@@ -13,7 +13,6 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-6Y3MN0GKBN');
 </script>
 <body>
@@ -28,7 +27,11 @@
         {% for item in carrito %}
         <div class="item-carrito">
             {% if item.imagen %}
-                <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}" alt="{{ item.nombre }}">
+                {% if item.imagen.startswith('http') %}
+                    <img src="{{ item.imagen }}" alt="{{ item.nombre }}">
+                {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.imagen) }}" alt="{{ item.nombre }}">
+                {% endif %}
             {% endif %}
             <div class="info">
                 <h3>{{ item.nombre }}</h3>
@@ -53,7 +56,7 @@
             </label>
             <label class="opcion">
                 <input type="radio" name="metodo" value="envio" {% if envio > 0 %}checked{% endif %} onclick="toggleEnvio(true)">
-                <span>📦 Envió a domicilio</span>
+                <span>📦 Envío a domicilio</span>
             </label>
         </div>
 
@@ -69,6 +72,8 @@
                 <button type="submit">Calcular Costo</button>
             </form>
         </div>
+    </div>
+
 {% if envio > 0 %}
 <div class="resultado-envio">
     <p>📍 Zona seleccionada: <strong>{{ zona }}</strong></p>
@@ -107,9 +112,11 @@
     </div>
 
     <div class="finalizar-compra-contenedor">
-        <a href="{{ link_whatsapp }}" target="_blank" class="btn-whatsapp">
-            Confirmar pedido por WhatsApp
-        </a>
+        <form action="/finalizar_pedido" method="POST">
+            <button type="submit" class="btn-whatsapp" style="width:100%; border:none; font-size:16px; cursor:pointer; padding:15px; display:block; text-align:center;">
+                Confirmar pedido por WhatsApp
+            </button>
+        </form>
     </div>
 
 {% else %}
@@ -125,7 +132,6 @@ function toggleEnvio(mostrar) {
     div.style.display = mostrar ? 'block' : 'none';
     
     if (!mostrar) {
-        // Si elige retirar/acordar, mandamos al servidor que el envío es $0
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/calcular_envio';
