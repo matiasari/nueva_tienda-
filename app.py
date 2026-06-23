@@ -24,10 +24,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
-# --- FILTROS JINJA Y FUNCIONES AUXILIARES ---
+# --- FILTROS JINJA ---
 @app.template_filter('pesos')
 def formato_pesos(valor):
     try: return f"${int(float(valor)):,}".replace(",", ".")
@@ -103,7 +102,7 @@ class DetallePedido(db.Model):
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# --- INICIALIZACIÓN Y MIGRACIÓN AUTOMÁTICA ---
+# --- INICIALIZACIÓN DE BASE DE DATOS Y CATEGORÍAS EN POSTGRES ---
 with app.app_context():
     db.create_all()
     if Categoria.query.count() == 0:
@@ -154,7 +153,7 @@ def index():
         
     return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
 
-# --- ADMINISTRACIÓN ---
+# --- ADMINISTRACIÓN PANEL ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -177,8 +176,6 @@ def admin():
     banners = [b.to_dict() for b in Banner.query.all()]
     categorias = [c.to_dict() for c in Categoria.query.all()]
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
-    
-    # ✨ FIX EXPLICITO: Se mandan tanto 'categorias' como 'categories' para blindar el HTML
     return render_template('admin.html', productos=productos, banners=banners, categorias=categorias, categories=categorias, pedidos=pedidos)
 
 # --- PROCESAR PEDIDO Y ENVIAR WHATSAPP ---
@@ -206,12 +203,10 @@ def finalizar_pedido():
     zona = session.get('zona', 'Retiro en local')
     total_final = total + envio
 
-    # Guardar Pedido principal
     nuevo_pedido = Pedido(total=total_final, envio=envio, zona=zona, estado="PENDIENTE")
     db.session.add(nuevo_pedido)
     db.session.commit()
 
-    # Guardar detalles del pedido
     for i in items:
         detalle = DetallePedido(
             pedido_id=nuevo_pedido.id,
@@ -224,7 +219,6 @@ def finalizar_pedido():
         db.session.add(detalle)
     db.session.commit()
 
-    # Armamos el mensaje para WhatsApp
     msj = f"Hola Bazar Guille! Pedido #{nuevo_pedido.id}\n"
     msj += f"Metodo: {zona}\n--------------------\n"
     for i in items:
@@ -233,7 +227,6 @@ def finalizar_pedido():
         msj += f"Envio: {formato_pesos(envio)}\n"
     msj += f"--------------------\nTotal Final: {formato_pesos(total_final)}"
     
-    # Vaciamos el carrito del cliente
     session['carrito'] = []
     session['envio'] = 0
     session['zona'] = 'No seleccionada'
@@ -241,7 +234,6 @@ def finalizar_pedido():
     link_wa = f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}"
     return redirect(link_wa)
 
-# --- ACCIONES DE PEDIDOS (CAMBIO DE ESTADO Y STOCK) ---
 @app.route('/admin/pedido/hecho/<int:id>')
 @login_requerido
 def pedido_hecho(id):
@@ -264,7 +256,7 @@ def pedido_cancelar(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# --- CONFIGURACIÓN DE ABM ADICIONAL ---
+# --- CATEGORÍAS ABM ---
 @app.route('/admin/categorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_categoria():
@@ -310,6 +302,7 @@ def eliminar_subcategoria(padre, nombre_sub):
             db.session.commit()
     return redirect(url_for('admin'))
 
+# --- PRODUCTOS ABM ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -397,16 +390,41 @@ def importar_excel():
         db.session.commit()
     return redirect(url_for('admin'))
 
-@app.route('/admin/descargar_plantilla')
+# --- BANNERS ABM ---
+@app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
-def descargar_plantilla():
-    df = pd.DataFrame(columns=['Nombre', 'Precio', 'Categoría', 'Subcategoría', 'Stock'])
-    df.loc[0] = ['EJEMPLO PRODUCTO', 5000.0, 'COCINA', 'MATES', 10]
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer: df.to_excel(writer, index=False)
-    output.seek(0)
-    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='plantilla_bazar.xlsx')
+def agregar_banner():
+    f = request.files.get('imagen')
+    if f and f.filename != '':
+        img_bytes = f.read()
+        payload = {"key": IMGBBB_API_KEY}
+        files = {"image": (f.filename, img_bytes)}
+        try:
+            response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
+            res_data = response.json()
+            if res_data.get("success"):
+                url_banner = res_data["data"]["url"]
+                nuevo_banner = Banner(
+                    titulo=request.form.get('titulo'),
+                    descripcion=request.form.get('descripcion'),
+                    imagen=url_banner,
+                    link=f"/?q={request.form.get('producto_id')}"
+                )
+                db.session.add(nuevo_banner)
+                db.session.commit()
+        except Exception as e: print(f"Error al subir banner: {e}")
+    return redirect(url_for('admin'))
 
+@app.route('/admin/banner/eliminar/<int:id>')
+@login_requerido
+def eliminar_banner(id):
+    banner = Banner.query.get(id)
+    if banner:
+        db.session.delete(banner)
+        db.session.commit()
+    return redirect(url_for('admin'))
+
+# --- CARRITO LOGICA ---
 @app.route('/agregar_al_carrito', methods=['POST'])
 def agregar_al_carrito():
     carrito = session.get('carrito', [])
