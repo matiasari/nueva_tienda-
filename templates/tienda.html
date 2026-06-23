@@ -36,7 +36,9 @@
 {% if banners %}
 <section class="slider-container">
     {% for b in banners %}
-    <div class="slide {% if loop.first %}active{% endif %}" style="background-image: url('{{ url_for('static', filename='uploads/' + b.imagen) }}');">
+    <!-- 🔴 CORREGIDO: Lógica inteligente para renderizar Banners desde ImgBB o Local -->
+    <div class="slide {% if loop.first %}active{% endif %}" 
+         style="background-image: url('{% if b.imagen and b.imagen.startswith('http') %}{{ b.imagen }}{% else %}{{ url_for('static', filename='uploads/' + b.imagen) }}{% endif %}');">
         {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
         <div class="slide-text-container">
             {% if b.titulo %}<h2>{{ b.titulo }}</h2>{% endif %}
@@ -86,7 +88,8 @@
                 {% for p in items %}
                     <div class="card" id="prod-{{ p.id }}">
                         <div class="contenedor-foto-principal">
-                            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                            <!-- 🔴 CORREGIDO: Lógica inteligente para la foto de portada de la tarjeta -->
+                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
                                  id="main-{{ p.id }}" 
                                  class="foto-principal"
                                  onclick="abrirModal(this.src)" 
@@ -95,13 +98,15 @@
                         </div>
                         
                         <div class="galeria-miniaturas">
-                            <img src="{{ url_for('static', filename='uploads/' + p.imagen) }}" 
+                            <!-- 🔴 CORREGIDO: Miniatura de la foto principal -->
+                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
                                  onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
                                  class="mini-foto">
                             
                             {% if p.imagenes_extras %}
                                 {% for foto in p.imagenes_extras %}
-                                    <img src="{{ url_for('static', filename='uploads/' + foto) }}" 
+                                    <!-- 🔴 CORREGIDO: Lógica para las miniaturas secundarias -->
+                                    <img src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + foto) }}{% endif %}" 
                                          onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
                                          class="mini-foto">
                                 {% endfor %}
@@ -157,44 +162,44 @@
         setInterval(nextSlide, 5000);
     }
 
-  let fotosProductoActual = [];
-let indiceFotoActual = 0;
+    let fotosProductoActual = [];
+    let indiceFotoActual = 0;
 
-function abrirModal(imgSrc) {
-    const modal = document.getElementById('modalZoom');
-    const modalImg = document.getElementById('imgAmpliada');
-    
-    // Buscamos todas las fotos del producto donde hiciste clic
-    // Esto detecta automáticamente la principal y las miniaturas de esa Card
-    const card = event.target.closest('.card');
-    const todasLasFotos = card.querySelectorAll('img');
-    
-    fotosProductoActual = Array.from(todasLasFotos).map(img => img.src);
-    indiceFotoActual = fotosProductoActual.indexOf(imgSrc);
+    function abrirModal(imgSrc) {
+        const modal = document.getElementById('modalZoom');
+        const modalImg = document.getElementById('imgAmpliada');
+        
+        const card = event.target.closest('.card');
+        const todasLasFotos = card.querySelectorAll('.galeria-miniaturas img');
+        
+        // Agarramos las fuentes exactas de las miniaturas para el carrusel de zoom
+        fotosProductoActual = Array.from(todasLasFotos).map(img => img.src);
+        indiceFotoActual = fotosProductoActual.indexOf(imgSrc);
 
-    modalImg.src = fotosProductoActual[indiceFotoActual];
-    modal.style.display = 'flex';
-}
+        // Si se clickea la principal y no mapea directo al index, forzamos la asignación
+        if(indiceFotoActual === -1) indiceFotoActual = 0;
 
-function cambiarFoto(direccion) {
-    indiceFotoActual += direccion;
-
-    if (indiceFotoActual >= fotosProductoActual.length) {
-        indiceFotoActual = 0; // Vuelve a la primera
-    } else if (indiceFotoActual < 0) {
-        indiceFotoActual = fotosProductoActual.length - 1; // Va a la última
+        modalImg.src = fotosProductoActual[indiceFotoActual];
+        modal.style.display = 'flex';
     }
 
-    document.getElementById('imgAmpliada').src = fotosProductoActual[indiceFotoActual];
-}
+    function cambiarFoto(direccion) {
+        indiceFotoActual += direccion;
 
-function cerrarModal() {
-    const modal = document.getElementById("modalZoom");
-    modal.style.display = "none";
-    // Limpiamos la lista de fotos para que no queden fantasmas
-    fotosProductoActual = [];
-}
+        if (indiceFotoActual >= fotosProductoActual.length) {
+            indiceFotoActual = 0;
+        } else if (indiceFotoActual < 0) {
+            indiceFotoActual = fotosProductoActual.length - 1;
+        }
 
+        document.getElementById('imgAmpliada').src = fotosProductoActual[indiceFotoActual];
+    }
+
+    function cerrarModal() {
+        const modal = document.getElementById("modalZoom");
+        modal.style.display = "none";
+        fotosProductoActual = [];
+    }
 
     // Cerrar con tecla Escape
     document.addEventListener('keydown', function(event) {

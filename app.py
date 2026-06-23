@@ -2,10 +2,11 @@ import os
 import json
 import pandas as pd
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, send_file
-from flask_sqlalchemy import SQLAlchemy  # 🔴 AGREGADO
+from flask_sqlalchemy import SQLAlchemy 
 from werkzeug.utils import secure_filename
 from functools import wraps
 import io
+import requests  # 🔴 AGREGADO para conectar con ImgBB
 
 app = Flask(__name__)
 
@@ -22,10 +23,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Archivos de datos restantes (Banners y Categorías siguen en JSON por ahora)
-BANNERS_JSON = 'banners.json'
+# Archivos de datos restantes (Categorías siguen en JSON por ahora)
 CATEGORIAS_JSON = 'categorias.json'
+BANNERS_JSON = 'banners.json'
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
+
+# API KEY DE IMGBB PARA IMÁGENES PERMANENTES
+IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
 # --- MODELO DE LA BASE DE DATOS ---
 class Articulo(db.Model):
@@ -53,7 +57,7 @@ class Articulo(db.Model):
             "imagenes_extras": img_ex
         }
 
-# --- PERSISTENCIA RESTANTE (Banners y Categorías) ---
+# --- PERSISTENCIA RESTANTE (Categorías y Banners locales) ---
 def cargar_datos(archivo):
     if not os.path.exists(archivo): return []
     with open(archivo, 'r', encoding='utf-8') as f:
@@ -85,7 +89,6 @@ def formato_pesos(valor):
 # --- RUTAS PÚBLICAS ---
 @app.route('/')
 def index():
-    # 🔴 CAMBIADO: Traemos de la base de datos y convertimos a diccionario
     articulos_db = Articulo.query.all()
     productos = [a.to_dict() for a in articulos_db]
     
@@ -124,7 +127,6 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-    # 🔴 CAMBIADO: Traemos desde PostgreSQL
     articulos_db = Articulo.query.order_by(Articulo.id.desc()).all()
     productos = [a.to_dict() for a in articulos_db]
     
@@ -163,25 +165,31 @@ def eliminar_categoria(nombre):
     guardar_datos(CATEGORIAS_JSON, categorias)
     return redirect(url_for('admin'))
 
-# --- PRODUCTOS (ABM) ---
+# --- PRODUCTOS (ABM CON CONEXIÓN EN NUBE IMGBB) ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
     fotos = request.files.getlist('imagenes_extras')
-    nombres = []
+    urls_subidas = []
+    
     for img in fotos:
         if img.filename != '':
-            fn = secure_filename(img.filename)
-            img.save(os.path.join(app.config['UPLOAD_FOLDER'], fn))
-            nombres.append(fn)
+            img_bytes = img.read()
+            payload = {"key": IMGBBB_API_KEY}
+            files = {"image": (img.filename, img_bytes)}
+            try:
+                response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
+                res_data = response.json()
+                if res_data.get("success"):
+                    urls_subidas.append(res_data["data"]["url"])
+            except Exception as e:
+                print(f"Error al subir a ImgBB: {e}")
 
-    # 🔴 CAMBIADO: Buscamos el ID máximo en la base de datos
     max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
     nuevo_id = max_id + 1
 
-    img_extras_str = ",".join(nombres[1:]) if len(nombres) > 1 else ""
+    img_extras_str = ",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else ""
 
-    # 🔴 CAMBIADO: Guardamos en PostgreSQL
     nuevo_articulo = Articulo(
         id=nuevo_id,
         nombre=request.form.get('nombre', '').upper(),
@@ -189,7 +197,7 @@ def agregar_producto():
         categoria=request.form.get('categoria'),
         subcategoria=request.form.get('subcategoria'),
         stock=int(request.form.get('stock') or 0),
-        imagen=nombres[0] if nombres else "default.jpg",
+        imagen=urls_subidas[0] if urls_subidas else "https://via.placeholder.com/300?text=Sin+Foto",
         imagenes_extras=img_extras_str
     )
     db.session.add(nuevo_articulo)
@@ -200,7 +208,6 @@ def agregar_producto():
 @login_requerido
 def editar_producto():
     p_id = int(request.form.get('id'))
-    # 🔴 CAMBIADO: Buscamos el artículo en PostgreSQL
     articulo = Articulo.query.get(p_id)
     
     if articulo:
@@ -212,24 +219,31 @@ def editar_producto():
         
         orden = request.form.getlist('orden_fotos[]')
         nuevas = request.files.getlist('fotos_extras')
+        
         for f in nuevas:
             if f.filename != '':
-                fn = secure_filename(f.filename)
-                f.save(os.path.join(app.config['UPLOAD_FOLDER'], fn))
-                orden.append(fn)
+                img_bytes = f.read()
+                payload = {"key": IMGBBB_API_KEY}
+                files = {"image": (f.filename, img_bytes)}
+                try:
+                    response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
+                    res_data = response.json()
+                    if res_data.get("success"):
+                        orden.append(res_data["data"]["url"])
+                except Exception as e:
+                    print(f"Error en edicion ImgBB: {e}")
         
         if orden:
             articulo.imagen = orden[0]
             articulo.imagenes_extras = ",".join(orden[1:]) if len(orden) > 1 else ""
             
-        db.session.commit() # Guardar cambios en la BD
+        db.session.commit()
         
     return redirect(url_for('admin'))
 
 @app.route('/admin/producto/eliminar/<int:id>')
 @login_requerido
 def eliminar_producto(id):
-    # 🔴 CAMBIADO: Eliminar de PostgreSQL
     articulo = Articulo.query.get(id)
     if articulo:
         db.session.delete(articulo)
@@ -248,7 +262,6 @@ def importar_excel():
         nuevo_id = max_id + 1
         
         for _, row in df.iterrows():
-            # 🔴 CAMBIADO: Guardamos cada fila directo en la BD
             nuevo_art = Articulo(
                 id=nuevo_id,
                 nombre=str(row['Nombre']).upper(),
@@ -283,14 +296,13 @@ def agregar_al_carrito():
     carrito = session.get('carrito', [])
     carrito.append(str(request.form.get('id')))
     session['carrito'] = carrito
+    session['carrito'] = carrito
     session.modified = True
     return redirect(url_for('index'))
 
 @app.route('/carrito')
 def mostrar_carrito():
     ids = session.get('carrito', [])
-    
-    # 🔴 CAMBIADO: Traemos todos de la base de datos
     articulos_db = Articulo.query.all()
     todos = [a.to_dict() for a in articulos_db]
     
@@ -309,23 +321,31 @@ def mostrar_carrito():
     link_wa = f"https://wa.me/5491149899616?text={msj.replace(' ', '%20')}"
     return render_template('carrito.html', carrito=items, total=total, envio=envio, total_final=total+envio, link_whatsapp=link_wa)
 
-# --- BANNERS ---
+# --- BANNERS (ABM MODIFICADO PARA IMGBB) ---
 @app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
 def agregar_banner():
     banners = cargar_datos(BANNERS_JSON)
     f = request.files.get('imagen')
-    if f:
-        fn = secure_filename(f.filename)
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], fn))
-        banners.append({
-            "id": max([b['id'] for b in banners], default=0) + 1,
-            "titulo": request.form.get('titulo'),
-            "descripcion": request.form.get('descripcion'),
-            "imagen": fn,
-            "link": f"/?q={request.form.get('producto_id')}"
-        })
-        guardar_datos(BANNERS_JSON, banners)
+    if f and f.filename != '':
+        img_bytes = f.read()
+        payload = {"key": IMGBBB_API_KEY}
+        files = {"image": (f.filename, img_bytes)}
+        try:
+            response = requests.post("https://api.imgbb.com/1/upload", data=payload, files=files)
+            res_data = response.json()
+            if res_data.get("success"):
+                url_banner = res_data["data"]["url"]
+                banners.append({
+                    "id": max([b['id'] for b in banners], default=0) + 1,
+                    "titulo": request.form.get('titulo'),
+                    "descripcion": request.form.get('descripcion'),
+                    "imagen": url_banner,  # Guarda el enlace completo de ImgBB
+                    "link": f"/?q={request.form.get('producto_id')}"
+                })
+                guardar_datos(BANNERS_JSON, banners)
+        except Exception as e:
+            print(f"Error al subir banner a ImgBB: {e}")
     return redirect(url_for('admin'))
 
 @app.route('/admin/banner/eliminar/<int:id>')

@@ -19,7 +19,6 @@
 
     <main class="admin-container">
         
-        <!-- SECCIÓN: CATEGORÍAS -->
         <div class="form-seccion" style="background: #f0f4f8; border: 2px solid #3498db; border-radius: 12px;">
             <h2 style="text-align: center; color: #2c3e50;">📂 Gestión de Categorías y Subcategorías</h2>
             
@@ -69,11 +68,9 @@
 
         <hr>
 
-        <!-- 🔴 NUEVA SECCIÓN AGREGADA: GESTIÓN DE BANNERS -->
         <div class="form-seccion" style="background: #fff3e0; border: 2px solid #ff9800; border-radius: 12px; padding: 20px;">
             <h2 style="text-align: center; color: #e65100; margin-top: 0;">🖼️ Gestión de Banners Rotativos</h2>
             
-            <!-- Formulario para agregar Banner -->
             <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                 <div>
                     <label style="font-weight: bold; display: block; margin-bottom: 5px;">Título del Banner:</label>
@@ -81,7 +78,7 @@
                 </div>
                 <div>
                     <label style="font-weight: bold; display: block; margin-bottom: 5px;">Descripción Corta:</label>
-                    <input type="text" name="descripcion" placeholder="Ej: Hasta 15% OFF en Electrónica" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="text" name="descripcion" placeholder="Ej: Hasta 15% OFF" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 <div>
                     <label style="font-weight: bold; display: block; margin-bottom: 5px;">ID Producto Vinculado (Opcional):</label>
@@ -96,19 +93,23 @@
                 </div>
             </form>
 
-            <!-- Lista de Banners Actuales -->
             <h3 style="color: #e65100; margin-top: 20px; border-bottom: 1px solid #ffe0b2; padding-bottom: 5px;">Banners Activos en la Web:</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 10px;">
                 {% if banners %}
                     {% for b in banners %}
                     <div style="background: white; border: 1px solid #ffe0b2; padding: 10px; border-radius: 8px; display: flex; gap: 10px; align-items: center; position: relative;">
-                        <img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="80" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        {% if b.imagen and b.imagen.startswith('http') %}
+                            <img src="{{ b.imagen }}" width="80" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="80" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        {% endif %}
+                        
                         <div style="flex: 1; font-size: 13px; overflow: hidden;">
                             <strong style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.titulo or 'Sin título' }}</strong>
                             <span style="color: #666; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.descripcion or '' }}</span>
                             <small style="color: #ff9800; display: block;">Enlace: {{ b.link }}</small>
                         </div>
-                        <a href="{{ url_for('eliminar_banner', id=b.id) }}" 
+                        <a href="{{ url_for('eliminar_banner', id=b['id']) }}" 
                            style="background: #ff4757; color: white; text-decoration: none; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;"
                            onclick="return confirm('¿Seguro que querés eliminar este banner?')">×</a>
                     </div>
@@ -121,7 +122,6 @@
 
         <hr>
 
-        <!-- SECCIÓN: PRODUCTOS -->
         <div class="form-seccion">
             <h2>📦 Añadir Nuevo Producto</h2>
             <form action="{{ url_for('agregar_producto') }}" method="POST" enctype="multipart/form-data">
@@ -144,8 +144,8 @@
                 </div>
 
                 <div style="background: #fdfdfd; padding: 15px; border: 1px dashed #ccc; border-radius: 5px;">
-                    <label style="font-weight: bold;">📸 Fotos del Producto:</label>
-                    <input type="file" name="imagenes_extras" multiple accept="image/*" style="margin-top: 5px;">
+                    <label style="font-weight: bold;">📸 Fotos del Producto (La primera será la portada):</label>
+                    <input type="file" name="imagenes_extras" multiple accept="image/*" style="margin-top: 5px;" required>
                 </div>
                 <button type="submit" class="btn-negro" style="width: 100%; margin-top: 15px; padding: 15px;">🚀 Guardar Producto en la Tienda</button>
             </form>
@@ -174,7 +174,15 @@
                     {% for p in productos %}
                     <tr class="fila-producto">
                         <td class="id-prod">{{ p.id }}</td>
-                        <td><img src="{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;"></td>
+                        
+                        <td>
+                            {% if p.imagen and p.imagen.startswith('http') %}
+                                <img src="{{ p.imagen }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
+                            {% endif %}
+                        </td>
+                        
                         <td class="nombre-prod"><strong>{{ p.nombre }}</strong></td>
                         <td style="font-size: 12px; color: #666;">{{ p.categoria }} > {{ p.subcategoria or '-' }}</td>
                         <td style="color: #27ae60; font-weight: bold;">{{ p.precio | pesos }}</td>
@@ -194,7 +202,6 @@
             </table>
         </div>
 
-        <!-- MODAL EDITAR -->
         <div id="modalEditar" class="modal-zoom" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 20000;">
             <div style="background: white; padding: 30px; border-radius: 12px; max-width: 650px; margin: 20px auto; max-height: 90vh; overflow-y: auto;">
                 <h3 style="margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 10px;">✏️ Editar Artículo</h3>
@@ -228,7 +235,7 @@
                     </div>
 
                     <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;">
-                        <label style="font-weight: bold; color: #2c3e50;">📸 Galería de Fotos (Arrastrá para reordenar):</label>
+                        <label style="font-weight: bold; color: #2c3e50;">📸 Galería de Fotos Actuales:</label>
                         <div id="contenedor-fotos-edit" class="grid-fotos-edit-sortable"></div>
                         <input type="file" name="fotos_extras" multiple accept="image/*" style="margin-top: 10px; font-size: 12px;">
                     </div>
@@ -285,19 +292,22 @@
             document.getElementById('modalEditar').style.display = 'block';
         }
 
+        // 🔴 CORREGIDO: Renderizado dinámico de fotos en el modal de edición para links completos o locales
         function renderizarFotosEdit() {
             const container = document.getElementById('contenedor-fotos-edit');
             container.innerHTML = '';
             fotosActuales.forEach((foto, index) => {
                 const item = document.createElement('div');
                 item.className = 'foto-edit-item';
-                item.draggable = true;
+                
+                // Si la foto ya es un link de ImgBB, la renderizamos directo; si no, de la carpeta estática
+                const srcFinal = foto.startsWith('http') ? foto : `/static/uploads/${foto}`;
+                
                 item.innerHTML = `
-                    <img src="/static/uploads/${foto}">
+                    <img src="${srcFinal}">
                     <button type="button" class="btn-del-foto" onclick="quitarFoto(${index})">×</button>
                     <input type="hidden" name="orden_fotos[]" value="${foto}">
                 `;
-                item.draggable = true;
                 container.appendChild(item);
             });
         }
