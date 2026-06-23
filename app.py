@@ -173,7 +173,7 @@ def agregar_producto():
     urls_subidas = []
     
     for img in fotos:
-        if img.filename != '':
+        if img and img.filename != '':
             img_bytes = img.read()
             payload = {"key": IMGBBB_API_KEY}
             files = {"image": (img.filename, img_bytes)}
@@ -185,10 +185,15 @@ def agregar_producto():
             except Exception as e:
                 print(f"Error al subir a ImgBB: {e}")
 
+    # Buscamos el ID máximo en la base de datos de forma segura
     max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
     nuevo_id = max_id + 1
-
+    
+    # Armamos la cadena de fotos extras de forma segura
     img_extras_str = ",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else ""
+
+    # Evitamos el error 500 si la lista de URLs está vacía
+    imagen_portada = urls_subidas[0] if urls_subidas else "default.jpg"
 
     nuevo_articulo = Articulo(
         id=nuevo_id,
@@ -197,7 +202,7 @@ def agregar_producto():
         categoria=request.form.get('categoria'),
         subcategoria=request.form.get('subcategoria'),
         stock=int(request.form.get('stock') or 0),
-        imagen=urls_subidas[0] if urls_subidas else "https://via.placeholder.com/300?text=Sin+Foto",
+        imagen=imagen_portada,
         imagenes_extras=img_extras_str
     )
     db.session.add(nuevo_articulo)
