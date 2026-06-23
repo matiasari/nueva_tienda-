@@ -48,7 +48,7 @@
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             {% for det in ped.detalles %}
                             <div style="display: flex; align-items: center; gap: 12px; background: #fdfdfd; padding: 6px; border-radius: 5px; border: 1px solid #f0f0f0;">
-                                {% if det.imagen and det.imagen.startswith('http') %}
+                                {% if det.imagen and (det.imagen.startswith('http://') or det.imagen.startswith('https://')) %}
                                     <img src="{{ det.imagen }}" width="45" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
                                 {% else %}
                                     <img src="{{ url_for('static', filename='uploads/' + (det.imagen if det.imagen else 'default.jpg')) }}" width="45" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
@@ -164,7 +164,7 @@
                 {% if banners %}
                     {% for b in banners %}
                     <div style="background: white; border: 1px solid #ffe0b2; padding: 10px; border-radius: 8px; display: flex; gap: 10px; align-items: center; position: relative;">
-                        {% if b.imagen and b.imagen.startswith('http') %}
+                        {% if b.imagen and (b.imagen.startswith('http://') or b.imagen.startswith('https://')) %}
                             <img src="{{ b.imagen }}" width="80" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
                         {% else %}
                             <img src="{{ url_for('static', filename='uploads/' + b.imagen) }}" width="80" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
@@ -175,7 +175,7 @@
                             <span style="color: #666; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b.descripcion or '' }}</span>
                             <small style="color: #ff9800; display: block;">Enlace: {{ b.link }}</small>
                         </div>
-                        <a href="{{ url_for('eliminar_banner', id=b['id']) }}" 
+                        <a href="{{ url_for('eliminar_banner', id=b.id) }}" 
                            style="background: #ff4757; color: white; text-decoration: none; font-weight: bold; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px;"
                            onclick="return confirm('¿Seguro que querés eliminar este banner?')">×</a>
                     </div>
@@ -199,7 +199,7 @@
                 <div style="display: flex; gap: 10px; margin: 10px 0;">
                     <select name="categoria" id="main-cat" onchange="actualizarSubcats(this.value, 'main-sub')" required style="flex: 1; padding: 10px;">
                         <option value="">Seleccionar Categoría...</option>
-                        {% for c in categorias %}
+                        {% for c in categories %}
                             <option value="{{ c.nombre }}">{{ c.nombre }}</option>
                         {% endfor %}
                     </select>
@@ -242,7 +242,7 @@
                         <td class="id-prod">{{ p.id }}</td>
                         
                         <td>
-                            {% if p.imagen and p.imagen.startswith('http') %}
+                            {% if p.imagen and (p.imagen.startswith('http://') or p.imagen.startswith('https://')) %}
                                 <img src="{{ p.imagen }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
                             {% else %}
                                 <img src="{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
@@ -256,7 +256,7 @@
                         <td>
                             <div style="display: flex; gap: 5px;">
                                 <button class="btn-negro" style="padding: 5px 10px; font-size: 12px;" 
-                                    onclick="abrirEditar('{{ p.id }}', '{{ p.nombre }}', '{{ p.precio }}', '{{ p.categoria }}', '{{ p.subcategoria }}', '{{ p.stock }}', '{{ p.imagen }}', '{{ (p.imagenes_extras if p.imagenes_extras is defined else []) | tojson | forceescape }}')">
+                                    onclick="abrirEditar('{{ p.id }}', '{{ p.nombre }}', '{{ p.precio }}', '{{ p.categoria }}', '{{ p.subcategoria }}', '{{ p.stock }}', '{{ p.imagen }}')">
                                  Editar
                                 </button>
                                 <a href="{{ url_for('eliminar_producto', id=p.id) }}" class="btn-eliminar" onclick="return confirm('¿Borrar?')">Eliminar</a>
@@ -292,7 +292,7 @@
                     <label>Categoría y Subcategoría:</label>
                     <div style="display: flex; gap: 10px;">
                         <select name="categoria" id="edit-categoria" class="input-admin-edit" onchange="actualizarSubcats(this.value, 'edit-sub')" style="flex: 1;">
-                            {% for cat in categorias %}
+                            {% for cat in categories %}
                                 <option value="{{ cat.nombre }}">{{ cat.nombre }}</option>
                             {% endfor %}
                         </select>
@@ -316,7 +316,7 @@
     </main>
 
     <script>
-        const categoriasData = JSON.parse('{{ categorias | tojson | safe }}');
+        const categoriasData = JSON.parse('{{ categories | tojson | safe }}');
         let fotosActuales = [];
 
         function actualizarSubcats(catNombre, targetSelectId, subSeleccionada = "") {
@@ -343,17 +343,15 @@
             });
         });
 
-        function abrirEditar(id, nombre, precio, categoria, subcategoria, stock, imgPrincipal, extrasJson) {
+        function abrirEditar(id, nombre, precio, categoria, subcategoria, stock, imgPrincipal) {
             document.getElementById('edit-id').value = id;
             document.getElementById('edit-nombre').value = nombre;
             document.getElementById('edit-precio').value = precio;
             document.getElementById('edit-stock').value = stock;
             document.getElementById('edit-categoria').value = categoria;
             actualizarSubcats(categoria, 'edit-sub', subcategoria);
-            try {
-                const extras = JSON.parse(extrasJson);
-                fotosActuales = [imgPrincipal, ...extras].filter(f => f && f !== '');
-            } catch (e) { fotosActuales = [imgPrincipal]; }
+            
+            fotosActuales = [imgPrincipal].filter(f => f && f !== '');
             renderizarFotosEdit();
             document.getElementById('modalEditar').style.display = 'block';
         }
@@ -364,7 +362,7 @@
             fotosActuales.forEach((foto, index) => {
                 const item = document.createElement('div');
                 item.className = 'foto-edit-item';
-                const srcFinal = foto.startsWith('http') ? foto : `/static/uploads/${foto}`;
+                const srcFinal = (foto.startsWith('http://') || foto.startsWith('https://')) ? foto : `/static/uploads/${foto}`;
                 item.innerHTML = `
                     <img src="${srcFinal}">
                     <button type="button" class="btn-del-foto" onclick="quitarFoto(${index})">×</button>
