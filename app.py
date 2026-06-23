@@ -23,15 +23,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Archivos de datos restantes (Categorías siguen en JSON por ahora)
-CATEGORIAS_JSON = 'categorias.json'
-BANNERS_JSON = 'banners.json'
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
-
-# API KEY DE IMGBB PARA IMÁGENES PERMANENTES
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
-# --- MODELO DE LA BASE DE DATOS ---
+# --- MODELOS DE LA BASE DE DATOS (POSTGRESQL PERMANENTE) ---
+
 class Articulo(db.Model):
     __tablename__ = 'articulos'
     id = db.Column(db.Integer, primary_key=True)
@@ -41,9 +37,8 @@ class Articulo(db.Model):
     subcategoria = db.Column(db.String(100), nullable=True, default="")
     stock = db.Column(db.Integer, default=0)
     imagen = db.Column(db.String(500), nullable=True)
-    imagenes_extras = db.Column(db.Text, nullable=True, default="") # Guardado como texto separado por comas
+    imagenes_extras = db.Column(db.Text, nullable=True, default="") 
 
-    # Helper para transformar el objeto de la BD a un diccionario común tipo JSON
     def to_dict(self):
         img_ex = self.imagenes_extras.split(',') if self.imagenes_extras else []
         return {
@@ -57,19 +52,44 @@ class Articulo(db.Model):
             "imagenes_extras": img_ex
         }
 
-# --- PERSISTENCIA RESTANTE (Categorías y Banners locales) ---
-def cargar_datos(archivo):
-    if not os.path.exists(archivo): return []
-    with open(archivo, 'r', encoding='utf-8') as f:
-        try: return json.load(f)
-        except: return []
+# 🔴 NUEVO: Tabla permanente para Banners en PostgreSQL
+class Banner(db.Model):
+    __tablename__ = 'banners'
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(250), nullable=True)
+    descripcion = db.Column(db.String(500), nullable=True)
+    imagen = db.Column(db.String(500), nullable=False)
+    link = db.Column(db.String(250), nullable=True)
 
-def guardar_datos(archivo, datos):
-    with open(archivo, 'w', encoding='utf-8') as f:
-        json.dump(datos, f, indent=4, ensure_ascii=False)
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "titulo": self.titulo,
+            "descripcion": self.descripcion,
+            "imagen": self.imagen,
+            "link": self.link
+        }
+
+# 🔴 NUEVO: Tabla permanente para Categorías en PostgreSQL
+class Categoria(db.Model):
+    __tablename__ = 'categorias'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), unique=True, nullable=False)
+    subcategorias_text = db.Column(db.Text, default="") # Guardado como texto separado por comas
+
+    def to_dict(self):
+        subs = [s.strip() for s in self.subcategorias_text.split(',') if s.strip()] if self.subcategorias_text else []
+        return {
+            "nombre": self.nombre,
+            "subcategorias": subs
+        }
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
+
+# 🔴 NUEVO: Asegura que las tablas se creen en Render de forma permanente
+with app.app_context():
+    db.create_all()
 
 # --- SEGURIDAD ---
 def login_requerido(f):
@@ -92,8 +112,13 @@ def index():
     articulos_db = Articulo.query.all()
     productos = [a.to_dict() for a in articulos_db]
     
-    banners = cargar_datos(BANNERS_JSON)
-    categorias = cargar_datos(CATEGORIAS_JSON)
+    # 🔴 CAMBIADO: Traemos desde PostgreSQL
+    banners_db = Banner.query.all()
+    banners = [b.to_dict() for b in banners_db]
+    
+    categorias_db = Categoria.query.all()
+    categorias = [c.to_dict() for c in categorias_db]
+    
     cat = request.args.get('cat')
     q = request.args.get('q')
 
@@ -130,39 +155,62 @@ def admin():
     articulos_db = Articulo.query.order_by(Articulo.id.desc()).all()
     productos = [a.to_dict() for a in articulos_db]
     
-    categorias = cargar_datos(CATEGORIAS_JSON)
-    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias)
+    # 🔴 CAMBIADO: Traemos desde PostgreSQL permanente
+    banners_db = Banner.query.all()
+    banners = [b.to_dict() for b in banners_db]
+    
+    categorias_db = Categoria.query.all()
+    categorias = [c.to_dict() for c in categorias_db]
+    
+    return render_template('admin.html', productos=productos, banners=banners, categorias=categorias)
 
-# --- GESTIÓN DE CATEGORÍAS ---
+# --- GESTIÓN DE CATEGORÍAS (MODIFICADO A BD PERMANENTE) ---
 @app.route('/admin/categorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_categoria():
-    categorias = cargar_datos(CATEGORIAS_JSON)
-    nueva = request.form.get('nombre').strip()
-    if nueva and not any(c['nombre'] == nueva for c in categorias):
-        categorias.append({"nombre": nueva, "subcategorias": []})
-        guardar_datos(CATEGORIAS_JSON, categorias)
+    nueva = request.form.get('nombre').strip().upper()
+    if nueva:
+        existe = Categoria.query.filter_by(nombre=nueva).first()
+        if not existe:
+            cat = Categoria(nombre=nueva, subcategorias_text="")
+            db.session.add(cat)
+            db.session.commit()
     return redirect(url_for('admin'))
 
 @app.route('/admin/subcategorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_subcategoria():
-    categorias = cargar_datos(CATEGORIAS_JSON)
     padre = request.form.get('padre')
-    nueva_sub = request.form.get('nombre_sub').strip()
-    for c in categorias:
-        if c['nombre'] == padre:
-            if nueva_sub not in c['subcategorias']:
-                c['subcategorias'].append(nueva_sub)
-            break
-    guardar_datos(CATEGORIAS_JSON, categorias)
+    nueva_sub = request.form.get('nombre_sub').strip().upper()
+    
+    cat = Categoria.query.filter_by(nombre=padre).first()
+    if cat and nueva_sub:
+        subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()] if cat.subcategorias_text else []
+        if nueva_sub not in subs:
+            subs.append(nueva_sub)
+            cat.subcategorias_text = ",".join(subs)
+            db.session.commit()
     return redirect(url_for('admin'))
 
 @app.route('/admin/categorias/eliminar/<nombre>')
 @login_requerido
 def eliminar_categoria(nombre):
-    categorias = [c for c in cargar_datos(CATEGORIAS_JSON) if c['nombre'] != nombre]
-    guardar_datos(CATEGORIAS_JSON, categorias)
+    cat = Categoria.query.filter_by(nombre=nombre).first()
+    if cat:
+        db.session.delete(cat)
+        db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/subcategorias/eliminar/<padre>/<nombre_sub>')
+@login_requerido
+def eliminar_subcategoria(padre, nombre_sub):
+    cat = Categoria.query.filter_by(nombre=padre).first()
+    if cat:
+        subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()] if cat.subcategorias_text else []
+        if nombre_sub in subs:
+            subs.remove(nombre_sub)
+            cat.subcategorias_text = ",".join(subs)
+            db.session.commit()
     return redirect(url_for('admin'))
 
 # --- PRODUCTOS (ABM CON CONEXIÓN EN NUBE IMGBB) ---
@@ -185,14 +233,10 @@ def agregar_producto():
             except Exception as e:
                 print(f"Error al subir a ImgBB: {e}")
 
-    # Buscamos el ID máximo en la base de datos de forma segura
     max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
     nuevo_id = max_id + 1
     
-    # Armamos la cadena de fotos extras de forma segura
     img_extras_str = ",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else ""
-
-    # Evitamos el error 500 si la lista de URLs está vacía
     imagen_portada = urls_subidas[0] if urls_subidas else "default.jpg"
 
     nuevo_articulo = Articulo(
@@ -243,7 +287,6 @@ def editar_producto():
             articulo.imagenes_extras = ",".join(orden[1:]) if len(orden) > 1 else ""
             
         db.session.commit()
-        
     return redirect(url_for('admin'))
 
 @app.route('/admin/producto/eliminar/<int:id>')
@@ -271,8 +314,8 @@ def importar_excel():
                 id=nuevo_id,
                 nombre=str(row['Nombre']).upper(),
                 precio=float(row['Precio']),
-                categoria=str(row['Categoría']),
-                subcategoria=str(row.get('Subcategoría', '')),
+                categoria=str(row['Categoría']).upper(),
+                subcategoria=str(row.get('Subcategoría', '')).upper(),
                 stock=int(row.get('Stock', 0)),
                 imagen="default.jpg",
                 imagenes_extras=""
@@ -301,7 +344,6 @@ def agregar_al_carrito():
     carrito = session.get('carrito', [])
     carrito.append(str(request.form.get('id')))
     session['carrito'] = carrito
-    session['carrito'] = carrito
     session.modified = True
     return redirect(url_for('index'))
 
@@ -326,11 +368,10 @@ def mostrar_carrito():
     link_wa = f"https://wa.me/5491149899616?text={msj.replace(' ', '%20')}"
     return render_template('carrito.html', carrito=items, total=total, envio=envio, total_final=total+envio, link_whatsapp=link_wa)
 
-# --- BANNERS (ABM MODIFICADO PARA IMGBB) ---
+# --- BANNERS (ABM MODIFICADO PARA POSTGRESQL + IMGBB PERMANENTE) ---
 @app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
 def agregar_banner():
-    banners = cargar_datos(BANNERS_JSON)
     f = request.files.get('imagen')
     if f and f.filename != '':
         img_bytes = f.read()
@@ -341,14 +382,16 @@ def agregar_banner():
             res_data = response.json()
             if res_data.get("success"):
                 url_banner = res_data["data"]["url"]
-                banners.append({
-                    "id": max([b['id'] for b in banners], default=0) + 1,
-                    "titulo": request.form.get('titulo'),
-                    "descripcion": request.form.get('descripcion'),
-                    "imagen": url_banner,  # Guarda el enlace completo de ImgBB
-                    "link": f"/?q={request.form.get('producto_id')}"
-                })
-                guardar_datos(BANNERS_JSON, banners)
+                
+                # 🔴 CAMBIADO: Guardamos directo en PostgreSQL
+                nuevo_banner = Banner(
+                    titulo=request.form.get('titulo'),
+                    descripcion=request.form.get('descripcion'),
+                    imagen=url_banner,
+                    link=f"/?q={request.form.get('producto_id')}"
+                )
+                db.session.add(nuevo_banner)
+                db.session.commit()
         except Exception as e:
             print(f"Error al subir banner a ImgBB: {e}")
     return redirect(url_for('admin'))
@@ -356,20 +399,11 @@ def agregar_banner():
 @app.route('/admin/banner/eliminar/<int:id>')
 @login_requerido
 def eliminar_banner(id):
-    banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
-    guardar_datos(BANNERS_JSON, banners)
-    return redirect(url_for('admin'))
-
-@app.route('/admin/subcategorias/eliminar/<padre>/<nombre_sub>')
-@login_requerido
-def eliminar_subcategoria(padre, nombre_sub):
-    categorias = cargar_datos(CATEGORIAS_JSON)
-    for c in categorias:
-        if c['nombre'] == padre:
-            if nombre_sub in c['subcategorias']:
-                c['subcategorias'].remove(nombre_sub)
-            break
-    guardar_datos(CATEGORIAS_JSON, categorias)
+    # 🔴 CAMBIADO: Eliminamos de PostgreSQL
+    banner = Banner.query.get(id)
+    if banner:
+        db.session.delete(banner)
+        db.session.commit()
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':
