@@ -74,7 +74,6 @@ class Categoria(db.Model):
         subs = [s.strip() for s in self.subcategorias_text.split(',') if s.strip()] if self.subcategorias_text else []
         return {"nombre": self.nombre, "subcategorias": subs}
 
-# 🔴 NUEVO: Modelos permanentes de Pedidos
 class Pedido(db.Model):
     __tablename__ = 'pedidos'
     id = db.Column(db.Integer, primary_key=True)
@@ -92,7 +91,7 @@ class DetallePedido(db.Model):
     articulo_id = db.Column(db.Integer, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
     precio = db.Column(db.Float, nullable=False)
-    cantidad = db.Column(db.Integer, nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False) # Corregido definitivo sin alias raros
     imagen = db.Column(db.String(500), nullable=True)
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -175,7 +174,6 @@ def admin():
     productos = [a.to_dict() for a in Articulo.query.order_by(Articulo.id.desc()).all()]
     banners = [b.to_dict() for b in Banner.query.all()]
     categorias = [c.to_dict() for c in Categoria.query.all()]
-    # Traemos los pedidos ordenados por los más nuevos primero
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('admin.html', productos=productos, banners=banners, categorias=categorias, pedidos=pedidos)
 
@@ -207,7 +205,7 @@ def finalizar_pedido():
     # Guardar Pedido principal
     nuevo_pedido = Pedido(total=total_final, envio=envio, zona=zona, estado="PENDIENTE")
     db.session.add(nuevo_pedido)
-    db.session.commit() # Commiteamos para tener el ID autogenerado número de orden
+    db.session.commit()
 
     # Guardar detalles del pedido
     for i in items:
@@ -223,12 +221,12 @@ def finalizar_pedido():
     db.session.commit()
 
     # Armamos el mensaje para WhatsApp incluyendo el # de Pedido
-    msj = f"Olá Bazar Guille! Pedido #{nuevo_pedido.id}\n"
-    msj += f"Método: {zona}\n--------------------\n"
+    msj = f"Hola Bazar Guille! Pedido #{nuevo_pedido.id}\n"
+    msj += f"Metodo: {zona}\n--------------------\n"
     for i in items:
         msj += f"- {i['nombre']} x{i['cantidad']} ({formato_pesos(i['precio'] * i['cantidad'])})\n"
     if envio > 0:
-        msj += f"Envío: {formato_pesos(envio)}\n"
+        msj += f"Envio: {formato_pesos(envio)}\n"
     msj += f"--------------------\nTotal Final: {formato_pesos(total_final)}"
     
     # Vaciamos el carrito del cliente
@@ -245,7 +243,6 @@ def finalizar_pedido():
 def pedido_hecho(id):
     pedido = Pedido.query.get(id)
     if pedido and pedido.estado == "PENDIENTE":
-        # Bajamos el stock solo de los productos de este pedido
         for detalle in pedido.detalles:
             articulo = Articulo.query.get(detalle.articulo_id)
             if articulo:
@@ -263,7 +260,7 @@ def pedido_cancelar(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# --- EL RESTO DE TUS RUTAS SIN CAMBIOS ---
+# --- CONFIGURACIÓN DE ABM ADICIONAL ---
 @app.route('/admin/categorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_categoria():
@@ -384,10 +381,12 @@ def importar_excel():
         max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
         nuevo_id = max_id + 1
         for _, row in df.iterrows():
+            cat_val = str(row['Categoría']).upper() if pd.notna(row['Categoría']) else 'VARIOS'
+            sub_val = str(row.get('Subcategoría', '')).upper() if pd.notna(row.get('Subcategoría', '')) else ''
             nuevo_art = Articulo(
-                id=nuevo_id, nombre=str(row['Nombre']).upper(), precio=float(row['Precio']),
-                categoria=str(row['Categoría']).upper(), subcategoria=str(row.get('Subcategoría', '')).upper(),
-                stock=int(row.get('Stock', 0)), imagen="default.jpg", imagenes_extras=""
+                id=nuevo_id, nombre=str(row['Nombre']).upper() if pd.notna(row['Nombre']) else 'SIN NOMBRE', precio=float(row['Precio'] or 0),
+                categoria=cat_val, subcategoria=sub_val,
+                stock=int(row.get('Stock', 0) if pd.notna(row.get('Stock')) else 0), imagen="default.jpg", imagenes_extras=""
             )
             db.session.add(nuevo_art)
             nuevo_id += 1
