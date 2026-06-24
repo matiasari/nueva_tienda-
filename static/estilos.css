@@ -1050,3 +1050,18 @@ a { text-decoration: none; }
 .dropdown-cat:hover .dropdown-content {
     display: block;
 }
+
+header, .tienda-header {
+    background-color: #111111; /* Negro mate premium que combina con las fotos de abajo */
+    padding: 35px 20px;
+    text-align: center;
+    border-bottom: 2px solid #222222;
+}
+
+/* Cambiamos las letras de BAZAR GUILLE a blanco para que resalten */
+header h1, .tienda-header h1, header h2, .tienda-header h2 {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    font-weight: 800;
+    letter-spacing: 2px;
+}
