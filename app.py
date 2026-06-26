@@ -81,7 +81,6 @@ class DetallePedido(db.Model):
     articulo_id = db.Column(db.Integer, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
     precio = db.Column(db.Float, nullable=False)
-    text = db.Column(db.String(250), nullable=True)
     cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
 
