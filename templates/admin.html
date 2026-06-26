@@ -19,9 +19,9 @@
 
     <main class="admin-container">
 
+        <!-- 📥 GESTIÓN DE PEDIDOS -->
         <div class="form-seccion" style="background: #e8f8f5; border: 2px solid #1abc9c; border-radius: 12px; padding: 20px;">
             <h2 style="text-align: center; color: #16a085; margin-top: 0;">📥 Gestión de Pedidos Entrantes</h2>
-            
             <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
                 {% if pedidos %}
                     {% for ped in pedidos %}
@@ -31,9 +31,7 @@
                                 <span style="background: #16a085; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 14px;">PEDIDO #{{ ped.id }}</span>
                                 <small style="color: #666; margin-left: 10px;">{{ ped.fecha.strftime('%d/%m/%Y %H:%M') }}</small>
                             </div>
-                            <div>
-                                <span style="font-weight: bold; font-size: 14px; color: #2c3e50;">Método: {{ ped.zona }}</span>
-                            </div>
+                            <div><span style="font-weight: bold; font-size: 14px; color: #2c3e50;">Método: {{ ped.zona }}</span></div>
                             <div>
                                 {% if ped.estado == 'PENDIENTE' %}
                                     <span style="background: #f1c40f; color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: bold;">⏳ PENDIENTE</span>
@@ -48,25 +46,15 @@
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             {% for det in ped.detalles %}
                             <div style="display: flex; align-items: center; gap: 12px; background: #fdfdfd; padding: 6px; border-radius: 5px; border: 1px solid #f0f0f0;">
-                                {% if det.imagen and (det.imagen.startswith('http://') or det.imagen.startswith('https://')) %}
-                                    <img src="{{ det.imagen }}" width="45" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
-                                {% else %}
-                                    <img src="{{ url_for('static', filename='uploads/' + (det.imagen if det.imagen else 'default.jpg')) }}" width="45" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
-                                {% endif %}
-                                <div style="flex: 1; font-size: 13px;">
-                                    <strong>{{ det.nombre }}</strong> <span style="color: #666;">(ID: {{ det.articulo_id }})</span>
-                                </div>
-                                <div style="font-size: 13px; font-weight: bold; color: #2c3e50;">
-                                    x{{ det.cantidad }} — {{ (det.precio * det.cantidad) | pesos }}
-                                </div>
+                                <img src="{{ det.imagen if det.imagen and det.imagen.startswith('http') else url_for('static', filename='uploads/' + (det.imagen if det.imagen else 'default.jpg')) }}" width="45" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                                <div style="flex: 1; font-size: 13px;"><strong>{{ det.nombre }}</strong></div>
+                                <div style="font-size: 13px; font-weight: bold;">x{{ det.cantidad }} — {{ (det.precio * det.cantidad) | pesos }}</div>
                             </div>
                             {% endfor %}
                         </div>
 
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 8px; border-top: 1px solid #eee;">
-                            <div style="font-size: 15px;">
-                                Total Pedido: <strong style="color: #27ae60; font-size: 17px;">{{ ped.total | pesos }}</strong>
-                            </div>
+                            <div style="font-size: 15px;">Total Pedido: <strong style="color: #27ae60; font-size: 17px;">{{ ped.total | pesos }}</strong></div>
                             {% if ped.estado == 'PENDIENTE' %}
                             <div style="display: flex; gap: 10px;">
                                 <a href="/admin/pedido/hecho/{{ ped.id }}" class="btn-banner-pro" style="background: #2ecc71 !important; padding: 6px 15px; font-size: 13px; text-decoration: none; border-radius: 4px; color: white;">✔ Hecho</a>
@@ -84,6 +72,7 @@
 
         <hr>
         
+        <!-- 📂 CATEGORÍAS Y SUBCATEGORÍAS -->
         <div class="form-seccion" style="background: #f0f4f8; border: 2px solid #3498db; border-radius: 12px; padding: 20px;">
             <h2>📂 Gestión de Categorías y Subcategorías</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
@@ -106,16 +95,17 @@
                 </form>
             </div>
 
+            <!-- Listado Visual de Subcategorías -->
             <div style="margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;">
                 {% for c in categories %}
                 <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative;">
-                    <a href="{{ url_for('eliminar_categoria', nombre=c.nombre) }}" style="position: absolute; top: 5px; right: 10px; color: #e74c3c; font-weight: bold; text-decoration: none;">×</a>
+                    <a href="{{ url_for('eliminar_categoria', nombre=c.nombre) }}" style="position: absolute; top: 5px; right: 10px; color: #e74c3c; font-weight: bold; text-decoration: none;" onclick="return confirm('¿Borrar categoría completa?')">×</a>
                     <strong style="color: #3498db;">{{ c.nombre }}</strong>
                     <ul style="margin: 8px 0 0 0; padding-left: 0; font-size: 13px; list-style: none;">
                         {% for sub in c.subcategorias %}
                             <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px solid #f9f9f9; padding-bottom: 2px;">
                                 <span>• {{ sub }}</span>
-                                <a href="{{ url_for('eliminar_subcategoria', padre=c.nombre, nombre_sub=sub) }}" style="color: #ff4757; text-decoration: none; font-weight: bold; padding: 0 5px;">×</a>
+                                <a href="{{ url_for('eliminar_subcategoria', padre=c.nombre, nombre_sub=sub) }}" style="color: #ff4757; text-decoration: none; font-weight: bold; padding: 0 5px;" onclick="return confirm('¿Eliminar subcategoría?')">×</a>
                             </li>
                         {% endfor %}
                     </ul>
@@ -126,6 +116,7 @@
 
         <hr>
 
+        <!-- 🖼️ BANNERS -->
         <div class="form-seccion" style="background: #fff3e0; border: 2px solid #ff9800; border-radius: 12px; padding: 20px;">
             <h2>🖼️ Gestión de Banners Rotativos</h2>
             <form action="{{ url_for('agregar_banner') }}" method="POST" enctype="multipart/form-data" style="display: grid; gap: 15px;">
@@ -139,6 +130,7 @@
 
         <hr>
 
+        <!-- 📦 AÑADIR PRODUCTO -->
         <div class="form-seccion">
             <h2>📦 Añadir Nuevo Producto</h2>
             <form action="{{ url_for('agregar_producto') }}" method="POST" enctype="multipart/form-data">
@@ -161,6 +153,7 @@
 
         <hr>
 
+        <!-- 🔍 INVENTARIO -->
         <div class="form-seccion">
             <h2>🔍 Inventario Actual</h2>
             <input type="text" id="buscadorAdmin" placeholder="Buscar..." style="padding: 15px; width: 100%; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px;">
@@ -173,19 +166,15 @@
                     <tr class="fila-producto">
                         <td>{{ p.id }}</td>
                         <td>
-                            {% if p.imagen and (p.imagen.startswith('http://') or p.imagen.startswith('https://')) %}
-                                <img src="{{ p.imagen }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
-                            {% else %}
-                                <img src="{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
-                            {% endif %}
+                            <img src="{{ p.imagen if p.imagen.startswith('http') else url_for('static', filename='uploads/' + p.imagen) }}" width="50" style="border-radius: 5px; height: 50px; object-fit: cover;">
                         </td>
                         <td><strong>{{ p.nombre }}</strong></td>
-                        <td>{{ p.categoria }}</td>
+                        <td>{{ p.categoria }} > {{ p.subcategoria or '-' }}</td>
                         <td style="color: #27ae60; font-weight: bold;">{{ p.precio | pesos }}</td>
                         <td>{{ p.stock }} u.</td>
                         <td>
                             <button class="btn-negro" style="padding: 5px 10px;" onclick="abrirEditar('{{ p.id }}', '{{ p.nombre }}', '{{ p.precio }}', '{{ p.categoria }}', '{{ p.subcategoria }}', '{{ p.stock }}', '{{ p.imagen }}')">Editar</button>
-                            <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-eliminar" onclick="return confirm('¿Seguro que querés borrar este producto?')">Eliminar</a>
+                            <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-eliminar" onclick="return confirm('¿Borrar producto?')">Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -193,6 +182,7 @@
             </table>
         </div>
 
+        <!-- MODAL EDITAR -->
         <div id="modalEditar" class="modal-zoom" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 20000;">
             <div style="background: white; padding: 30px; border-radius: 12px; max-width: 650px; margin: 20px auto; max-height: 90vh; overflow-y: auto;">
                 <h3>✏️ Editar Artículo</h3>
@@ -217,7 +207,6 @@
     </main>
 
     <script>
-        // ✨ CORREGIDO: Eliminada la traducción deformada por 'categoriasData' pura
         const categoriasData = JSON.parse('{{ categories | tojson | safe }}');
         let fotosActuales = [];
 
