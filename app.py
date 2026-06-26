@@ -28,7 +28,7 @@ BANNERS_JSON = 'banners.json'
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
-# --- MODELOS DE LA BASE DE DATOS (POSTGRESQL PERMANENTE) ---
+# --- MODELOS DE LA BASE DE DATOS ---
 
 class Articulo(db.Model):
     __tablename__ = 'articulos'
@@ -54,12 +54,11 @@ class Articulo(db.Model):
             "imagenes_extras": img_ex
         }
 
-# 🔒 MODELO DE CATEGORÍAS EN BASE DE DATOS (Blindado contra git push)
 class Categoria(db.Model):
     __tablename__ = 'categorias'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), unique=True, nullable=False)
-    subcategorias_text = db.Column(db.Text, default="") # Se guardan separadas por coma
+    subcategorias_text = db.Column(db.Text, default="")
 
     def to_dict(self):
         subs = [s.strip() for s in self.subcategorias_text.split(',') if s.strip()] if self.subcategorias_text else []
@@ -82,10 +81,10 @@ class DetallePedido(db.Model):
     articulo_id = db.Column(db.Integer, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
     precio = db.Column(db.Float, nullable=False)
+    text = db.Column(db.String(250), nullable=True)
     cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
 
-# --- PERSISTENCIA RESTANTE ---
 def cargar_datos(archivo):
     if not os.path.exists(archivo): return []
     with open(archivo, 'r', encoding='utf-8') as f:
@@ -96,32 +95,9 @@ def guardar_datos(archivo, datos):
     with open(archivo, 'w', encoding='utf-8') as f:
         json.dump(datos, f, indent=4, ensure_ascii=False)
 
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
-
-# --- INICIALIZACIÓN MIGRACIÓN DE CATEGORÍAS A POSTGRES ---
 with app.app_context():
     db.create_all()
-    # Si la base de datos está vacía, cargamos tus categorías iniciales de una
-    if Categoria.query.count() == 0:
-        precarga = [
-            {"nombre": "COCINA", "subcategorias": ["MATES", "TAZAS", "CUBIERTOS", "UTILITARIOS", "VASOS"]},
-            {"nombre": "ELECTRONICA", "subcategorias": ["PARLANTES", "SMARTWACH", "PAVAS", "AURICULARES"]},
-            {"nombre": "VUELTA AL COLE", "subcategorias": ["MOCHILAS"]},
-            {"nombre": "EQUIPAJE", "subcategorias": ["MOCHILAS"]},
-            {"nombre": "PORCELANA", "subcategorias": ["TAZAS", "SET DE VAJILLA"]},
-            {"nombre": "VIDRIO", "subcategorias": ["TAZAS DOBLE FONDO", "VASOS", "BOTELLA/JARRAS/DISPENSER"]},
-            {"nombre": "DECORACION", "subcategorias": ["PORTAVELAS", "CUADROS"]},
-            {"nombre": "ILUMINACION", "subcategorias": ["LAMPARAS", "LINTERNAS"]},
-            {"nombre": "BAÑO", "subcategorias": ["DISPENSER", "PORTAROLLOS", "SET DE BAÑO", "ACCESORIOS"]},
-            {"nombre": "PETIT MUEBLES", "subcategorias": []}
-        ]
-        for c in precarga:
-            nueva = Categoria(nombre=c["nombre"], subcategorias_text=",".join(c["subcategorias"]))
-            db.session.add(nueva)
-        db.session.commit()
 
-# --- SEGURIDAD ---
 def login_requerido(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -141,8 +117,6 @@ def index():
     articulos_db = Articulo.query.all()
     productos = [a.to_dict() for a in articulos_db]
     banners = cargar_datos(BANNERS_JSON)
-    
-    # 🌟 LEER DESDE BASE DE DATOS
     categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
     
     cat = request.args.get('cat')
@@ -157,7 +131,6 @@ def index():
         
     return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
 
-# --- ADMINISTRACIÓN ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -173,18 +146,47 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+# --- VISTAS ADMINISTRATIVAS ---
 @app.route('/admin')
 @login_requerido
 def admin():
     productos = [a.to_dict() for a in Articulo.query.order_by(Articulo.id.desc()).all()]
-    pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
-    
-    # 🌟 LEER DESDE BASE DE DATOS PARA EL PANEL
     categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
-    
-    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias, categories=categorias, pedidos=pedidos)
+    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias, categories=categorias)
 
-# --- GESTIÓN DE CATEGORÍAS EN BASE DE DATOS ---
+@app.route('/admin/pedidos')
+@login_requerido
+def ver_pedidos_seccion():
+    pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
+    return render_template('pedidos.html', pedidos=pedidos)
+
+# --- ACCIONES PEDIDOS ---
+@app.route('/admin/pedido/hecho/<int:id>')
+@login_requerido
+def pedido_hecho(id):
+    pedido = Pedido.query.get(id)
+    if pedido and pedido.estado == "PENDIENTE":
+        for d in pedido.detalles:
+            articulo = Articulo.query.get(d.articulo_id)
+            if articulo: articulo.stock = max(0, articulo.stock - d.cantidad)
+        pedido.estado = "HECHO"
+        db.session.commit()
+    if request.args.get('from') == 'pedidos':
+        return redirect(url_for('ver_pedidos_seccion'))
+    return redirect(url_for('admin'))
+
+@app.route('/admin/pedido/cancelar/<int:id>')
+@login_requerido
+def pedido_cancelar(id):
+    pedido = Pedido.query.get(id)
+    if pedido and pedido.estado == "PENDIENTE":
+        pedido.estado = "CANCELADO"
+        db.session.commit()
+    if request.args.get('from') == 'pedidos':
+        return redirect(url_for('ver_pedidos_seccion'))
+    return redirect(url_for('admin'))
+
+# --- ABM CATEGORÍAS ---
 @app.route('/admin/categorias/agregar', methods=['POST'])
 @login_requerido
 def agregar_categoria():
@@ -231,7 +233,7 @@ def eliminar_subcategoria(padre, nombre_sub):
             db.session.commit()
     return redirect(url_for('admin'))
 
-# --- PRODUCTOS ABM ---
+# --- ABM PRODUCTOS ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -288,7 +290,7 @@ def eliminar_producto(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# --- REPARTO RESTANTE ---
+# --- CARRITO Y FIN PEDIDO ---
 @app.route('/finalizar_pedido', methods=['POST'])
 def finalizar_pedido():
     ids = session.get('carrito', [])
@@ -322,63 +324,6 @@ def finalizar_pedido():
     msj += f"--------------------\nTotal Final: {formato_pesos(total_final)}"
     session['carrito'] = []; session['envio'] = 0; session['zona'] = 'No seleccionada'
     return redirect(f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}")
-
-@app.route('/admin/pedido/hecho/<int:id>')
-@login_requerido
-def pedido_hecho(id):
-    pedido = Pedido.query.get(id)
-    if pedido and pedido.estado == "PENDIENTE":
-        for d in pedido.detalles:
-            articulo = Articulo.query.get(d.articulo_id)
-            if articulo: articulo.stock = max(0, articulo.stock - d.cantidad)
-        pedido.estado = "HECHO"
-        db.session.commit()
-    return redirect(url_for('admin'))
-
-@app.route('/admin/pedido/cancelar/<int:id>')
-@login_requerido
-def pedido_cancelar(id):
-    pedido = Pedido.query.get(id)
-    if pedido and pedido.estado == "PENDIENTE":
-        pedido.estado = "CANCELADO"
-        db.session.commit()
-    return redirect(url_for('admin'))
-
-@app.route('/admin/importar_excel', methods=['POST'])
-@login_requerido
-def importar_excel():
-    file = request.files.get('archivo_excel')
-    if file and file.filename != '':
-        df = pd.read_excel(file)
-        max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
-        nuevo_id = max_id + 1
-        for _, row in df.iterrows():
-            nuevo_art = Articulo(id=nuevo_id, nombre=str(row['Nombre']).upper(), precio=float(row['Precio']), categoria=str(row['Categoría']).upper(), subcategoria=str(row.get('Subcategoría', '')).upper(), stock=int(row.get('Stock', 0)), imagen="default.jpg", imagenes_extras="")
-            db.session.add(nuevo_art)
-            nuevo_id += 1
-        db.session.commit()
-    return redirect(url_for('admin'))
-
-@app.route('/admin/banner/agregar', methods=['POST'])
-@login_requerido
-def agregar_banner():
-    banners = cargar_datos(BANNERS_JSON)
-    f = request.files.get('imagen')
-    if f and f.filename != '':
-        try:
-            res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
-            if res.json().get("success"):
-                banners.append({"id": max([b['id'] for b in banners], default=0) + 1, "titulo": request.form.get('titulo'), "descripcion": request.form.get('descripcion'), "imagen": res.json()["data"]["url"], "link": f"/?q={request.form.get('producto_id')}"})
-                guardar_datos(BANNERS_JSON, banners)
-        except: pass
-    return redirect(url_for('admin'))
-
-@app.route('/admin/banner/eliminar/<int:id>')
-@login_requerido
-def eliminar_banner(id):
-    banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
-    guardar_datos(BANNERS_JSON, banners)
-    return redirect(url_for('admin'))
 
 @app.route('/agregar_al_carrito', methods=['POST'])
 def agregar_al_carrito():
@@ -416,7 +361,7 @@ def calcular_envio():
     zona = request.form.get('zona')
     session['zona'] = zona
     costos = {"CABA": 10000, "Zona Norte": 15000, "Zona Sur": 7000, "Zona Oeste": 10000, "Retiro en local": 0}
-    session['envio'] =硬costos.get(zona, 0)
+    session['envio'] = costos.get(zona, 0)
     return redirect(url_for('mostrar_carrito'))
 
 @app.route('/carrito')
@@ -435,6 +380,42 @@ def mostrar_carrito():
     envio = session.get('envio', 0)
     zona = session.get('zona', 'No seleccionada')
     return render_template('carrito.html', carrito=items, total=total, envio=envio, zona=zona, total_final=total+envio)
+
+@app.route('/admin/banner/agregar', methods=['POST'])
+@login_requerido
+def agregar_banner():
+    banners = cargar_datos(BANNERS_JSON)
+    f = request.files.get('imagen')
+    if f and f.filename != '':
+        try:
+            res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
+            if res.json().get("success"):
+                banners.append({"id": max([b['id'] for b in banners], default=0) + 1, "titulo": request.form.get('titulo'), "descripcion": request.form.get('descripcion'), "imagen": res.json()["data"]["url"], "link": f"/?q={request.form.get('producto_id')}"})
+                guardar_datos(BANNERS_JSON, banners)
+        except: pass
+    return redirect(url_for('admin'))
+
+@app.route('/admin/banner/eliminar/<int:id>')
+@login_requerido
+def eliminar_banner(id):
+    banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
+    guardar_datos(BANNERS_JSON, banners)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/importar_excel', methods=['POST'])
+@login_requerido
+def importar_excel():
+    file = request.files.get('archivo_excel')
+    if file and file.filename != '':
+        df = pd.read_excel(file)
+        max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
+        nuevo_id = max_id + 1
+        for _, row in df.iterrows():
+            nuevo_art = Articulo(id=nuevo_id, nombre=str(row['Nombre']).upper(), precio=float(row['Precio']), categoria=str(row['Categoría']).upper(), subcategoria=str(row.get('Subcategoría', '')).upper(), stock=int(row.get('Stock', 0)), imagen="default.jpg", imagenes_extras="")
+            db.session.add(nuevo_art)
+            nuevo_id += 1
+        db.session.commit()
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
