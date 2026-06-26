@@ -37,9 +37,12 @@ class Articulo(db.Model):
     precio = db.Column(db.Float, nullable=False)
     categoria = db.Column(db.String(100), nullable=True)
     subcategoria = db.Column(db.String(100), nullable=True, default="")
-    stock = db.Column(db.Integer, default=0)
+    stock = db.Column(db.Integer, default=0) # Stock general (si no usa variantes)
     imagen = db.Column(db.String(500), nullable=True)
     imagenes_extras = db.Column(db.Text, nullable=True, default="") 
+    
+    # Relación con las variantes individuales
+    variantes = db.relationship('Variante', backref='articulo', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         img_ex = self.imagenes_extras.split(',') if self.imagenes_extras else []
@@ -51,8 +54,19 @@ class Articulo(db.Model):
             "subcategoria": self.subcategoria if self.subcategoria else "",
             "stock": self.stock,
             "imagen": self.imagen if self.imagen else "default.jpg",
-            "imagenes_extras": img_ex
+            "imagenes_extras": img_ex,
+            "variantes": [v.to_dict() for v in self.variantes]
         }
+
+class Variante(db.Model):
+    __tablename__ = 'variantes'
+    id = db.Column(db.Integer, primary_key=True)
+    articulo_id = db.Column(db.Integer, db.ForeignKey('articulos.id'), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False) # Ej: "NEGRO", "BLANCO"
+    stock = db.Column(db.Integer, default=0)
+
+    def to_dict(self):
+        return {"id": self.id, "nombre": self.nombre, "stock": self.stock}
 
 class Categoria(db.Model):
     __tablename__ = 'categorias'
@@ -80,6 +94,7 @@ class DetallePedido(db.Model):
     pedido_id = db.Column(db.Integer, db.ForeignKey('pedidos.id'), nullable=False)
     articulo_id = db.Column(db.Integer, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
+    variante_nombre = db.Column(db.String(100), nullable=True, default="") # Variante elegida
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
@@ -159,7 +174,7 @@ def ver_pedidos_seccion():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('pedidos.html', pedidos=pedidos)
 
-# --- ACCIONES PEDIDOS ---
+# --- ACCIONES PEDIDOS Y DESCUENTO DE STOCK ---
 @app.route('/admin/pedido/hecho/<int:id>')
 @login_requerido
 def pedido_hecho(id):
@@ -167,7 +182,14 @@ def pedido_hecho(id):
     if pedido and pedido.estado == "PENDIENTE":
         for d in pedido.detalles:
             articulo = Articulo.query.get(d.articulo_id)
-            if articulo: articulo.stock = max(0, articulo.stock - d.cantidad)
+            if articulo:
+                # Si el pedido tiene variante, descontamos el stock de la variante
+                if d.variante_nombre:
+                    var = Variante.query.filter_by(articulo_id=articulo.id, nombre=d.variante_nombre).first()
+                    if var:
+                        var.stock = max(0, var.stock - d.cantidad)
+                else:
+                    articulo.stock = max(0, articulo.stock - d.cantidad)
         pedido.estado = "HECHO"
         db.session.commit()
     if request.args.get('from') == 'pedidos':
@@ -244,15 +266,30 @@ def agregar_producto():
                 res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (img.filename, img.read())})
                 if res.json().get("success"): urls_subidas.append(res.json()["data"]["url"])
             except: pass
+            
     max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
+    nuevo_id = max_id + 1
+    
     nuevo_articulo = Articulo(
-        id=max_id + 1, nombre=request.form.get('nombre', '').upper(), precio=float(request.form.get('precio') or 0),
+        id=nuevo_id, nombre=request.form.get('nombre', '').upper(), precio=float(request.form.get('precio') or 0),
         categoria=request.form.get('categoria'), subcategoria=request.form.get('subcategoria'),
         stock=int(request.form.get('stock') or 0), imagen=urls_subidas[0] if urls_subidas else "default.jpg",
         imagenes_extras=",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else ""
     )
     db.session.add(nuevo_articulo)
     db.session.commit()
+    
+    # Procesar variantes si se enviaron desde el admin (se reciben separadas por coma)
+    # Formato esperado: "NEGRO:10, BLANCO:5"
+    variantes_raw = request.form.get('variantes_input', '')
+    if variantes_raw:
+        for v_item in variantes_raw.split(','):
+            if ':' in v_item:
+                v_nom, v_stk = v_item.split(':')
+                nueva_v = Variante(articulo_id=nuevo_id, nombre=v_nom.strip().upper(), stock=int(v_stk.strip() or 0))
+                db.session.add(nueva_v)
+        db.session.commit()
+        
     return redirect(url_for('admin'))
 
 @app.route('/admin/producto/editar', methods=['POST'])
@@ -289,21 +326,30 @@ def eliminar_producto(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# --- CARRITO Y FIN PEDIDO ---
+# --- CARRITO Y PROCESAMIENTO CON VARIANTES ---
 @app.route('/finalizar_pedido', methods=['POST'])
 def finalizar_pedido():
-    ids = session.get('carrito', [])
-    if not ids: return redirect(url_for('index'))
+    ids_raw = session.get('carrito', []) # Ahora guardará strings estilo "id_articulo:variante_nombre" o solo "id_articulo"
+    if not ids_raw: return redirect(url_for('index'))
+    
     todos = [a.to_dict() for a in Articulo.query.all()]
     items = []
     total = 0
-    for p_id in set(ids):
+    
+    # Procesamos los items únicos del carrito
+    for item_key in set(ids_raw):
+        p_id = item_key.split(':')[0]
+        v_nombre = item_key.split(':')[1] if ':' in item_key else ""
+        
         p = next((prod for prod in todos if str(prod['id']) == p_id), None)
         if p:
-            cant = ids.count(p_id)
+            cant = ids_raw.count(item_key)
             total += p['precio'] * cant
-            it = p.copy(); it['cantidad'] = cant
+            it = p.copy()
+            it['cantidad'] = cant
+            it['variante_elegida'] = v_nombre
             items.append(it)
+            
     envio = session.get('envio', 0)
     zona = session.get('zona', 'Retiro en local')
     total_final = total + envio
@@ -313,41 +359,59 @@ def finalizar_pedido():
     db.session.commit()
 
     for i in items:
-        detalle = DetallePedido(pedido_id=nuevo_pedido.id, articulo_id=i['id'], nombre=i['nombre'], precio=i['precio'], cantidad=i['cantidad'], imagen=i['imagen'])
+        detalle = DetallePedido(
+            pedido_id=nuevo_pedido.id, 
+            articulo_id=i['id'], 
+            nombre=i['nombre'], 
+            variante_nombre=i['variante_elegida'],
+            precio=i['precio'], 
+            cantidad=i['cantidad'], 
+            imagen=i['imagen']
+        )
         db.session.add(detalle)
     db.session.commit()
 
     msj = f"Hola Bazar Guille! Pedido #{nuevo_pedido.id}\nMetodo: {zona}\n--------------------\n"
-    for i in items: msj += f"- {i['nombre']} x{i['cantidad']} ({formato_pesos(i['precio'] * i['cantidad'])})\n"
+    for i in items: 
+        var_txt = f" [{i['variante_elegida']}]" if i['variante_elegida'] else ""
+        msj += f"- {i['nombre']}{var_txt} x{i['cantidad']} ({formato_pesos(i['precio'] * i['cantidad'])})\n"
     if envio > 0: msj += f"Envio: {formato_pesos(envio)}\n"
     msj += f"--------------------\nTotal Final: {formato_pesos(total_final)}"
-    session['carrito'] = []; session['envio'] = 0; session['zona'] = 'No seleccionada'
+    
+    session['carrito'] = []
+    session['envio'] = 0
+    session['zona'] = 'No seleccionada'
     return redirect(f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}")
 
 @app.route('/agregar_al_carrito', methods=['POST'])
 def agregar_al_carrito():
     carrito = session.get('carrito', [])
-    carrito.append(str(request.form.get('id')))
-    session['carrito'] = carrito; session.modified = True
+    art_id = request.form.get('id')
+    var_nom = request.form.get('variante', '') # Recibe la variante seleccionada en la tienda
+    
+    item_key = f"{art_id}:{var_nom}" if var_nom else str(art_id)
+    carrito.append(item_key)
+    session['carrito'] = carrito
+    session.modified = True
     return redirect(url_for('index'))
 
-@app.route('/aumentar/<id>')
-def aumentar_carrito(id):
+@app.route('/aumentar/<key>')
+def aumentar_carrito(key):
     carrito = session.get('carrito', [])
-    carrito.append(str(id))
+    carrito.append(str(key))
     session['carrito'] = carrito; session.modified = True
     return redirect(url_for('mostrar_carrito'))
 
-@app.route('/disminuir/<id>')
-def disminuir_carrito(id):
+@app.route('/disminuir/<key>')
+def disminuir_carrito(key):
     carrito = session.get('carrito', [])
-    if str(id) in carrito: carrito.remove(str(id))
+    if str(key) in carrito: carrito.remove(str(key))
     session['carrito'] = carrito; session.modified = True
     return redirect(url_for('mostrar_carrito'))
 
-@app.route('/carrito/eliminar/<id>')
-def eliminar_carrito(id):
-    session['carrito'] = [x for x in session.get('carrito', []) if x != str(id)]; session.modified = True
+@app.route('/carrito/eliminar/<key>')
+def eliminar_carrito(key):
+    session['carrito'] = [x for x in session.get('carrito', []) if x != str(key)]; session.modified = True
     return redirect(url_for('mostrar_carrito'))
 
 @app.route('/carrito/vaciar')
@@ -365,16 +429,22 @@ def calcular_envio():
 
 @app.route('/carrito')
 def mostrar_carrito():
-    ids = session.get('carrito', [])
+    ids_raw = session.get('carrito', [])
     todos = [a.to_dict() for a in Articulo.query.all()]
     items = []
     total = 0
-    for p_id in set(ids):
+    for item_key in set(ids_raw):
+        p_id = item_key.split(':')[0]
+        v_nombre = item_key.split(':')[1] if ':' in item_key else ""
+        
         p = next((prod for prod in todos if str(prod['id']) == p_id), None)
         if p:
-            cant = ids.count(p_id)
+            cant = ids_raw.count(item_key)
             total += p['precio'] * cant
-            it = p.copy(); it['cantidad'] = cant
+            it = p.copy()
+            it['cantidad'] = cant
+            it['key'] = item_key
+            it['variante_elegida'] = v_nombre
             items.append(it)
     envio = session.get('envio', 0)
     zona = session.get('zona', 'No seleccionada')
