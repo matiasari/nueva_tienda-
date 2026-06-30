@@ -150,7 +150,7 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn-act btn-edit-color" onclick="abrirModalEditar({{ p|tojson }})">✏️ Editar</button>
+                        <button class="btn-act btn-edit-color" onclick="abrirModalEditar('{{ p|tojson|forceescape }}')">✏️ Editar</button>
                         
                         <a href="/admin/producto/toggle_pausa/{{ p.id }}" class="btn-act btn-pausa-color {% if not p.activo %}inactivo{% endif %}">
                             {% if p.activo %}⏸️ Agotar{% else %}▶️ Activar{% endif %}
@@ -215,7 +215,9 @@
             }
         }
 
-        function abrirModalEditar(p) {
+        function abrirModalEditar(pRaw) {
+            const p = JSON.parse(pRaw);
+            
             document.getElementById('editId').value = p.id;
             document.getElementById('editNombre').value = p.nombre;
             document.getElementById('editPrecio').value = p.precio;
@@ -224,12 +226,16 @@
             document.getElementById('editSubcategoria').value = p.subcategoria;
 
             // Formatear las variantes de la DB a string editable
-            let varString = p.variantes.map(v => `${v.nombre}:${v.stock}`).join(', ');
+            let varString = p.variantes && p.variantes.length > 0 
+            ? p.variantes.map(v => `${v.nombre}:${v.stock}`).join(', ') 
+            : '';
             document.getElementById('editVariantes').value = varString;
 
             document.getElementById('modalEditar').style.display = 'flex';
-        }
-
+}
+            
+            
+      
         function cerrarModal() {
             document.getElementById('modalEditar').style.display = 'none';
         }
