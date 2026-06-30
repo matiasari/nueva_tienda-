@@ -34,7 +34,6 @@
         .tabla-productos th { background: #f8f9fc; color: var(--dark); font-weight: 600; }
         .img-prod { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
         
-        /* Botonera de acciones */
         .btn-act { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-block; margin-right: 5px; border: none; cursor: pointer; }
         .btn-edit-color { background: var(--warning); color: #333; }
         .btn-pausa-color { background: #36b9cc; color: white; }
@@ -42,7 +41,6 @@
         .btn-del-color { background: var(--danger); color: white; }
         .badge-variante { display: inline-block; background: #e2e8f0; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 4px; }
         
-        /* Modal estilo moderno */
         .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border-radius: 10px; width: 500px; max-width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
@@ -93,8 +91,8 @@
                     </div>
                 </div>
                 <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px;">
-                    <label style="color: #856404; margin-top: 0; font-weight: bold;">🎨 Variantes de Color / Modelo (Opcional):</label>
-                    <input type="text" name="variantes_input" placeholder="Ej: NEGRO:10, ROJO:15">
+                    <label style="color: #856404; margin-top: 0; font-weight: bold;">🎨 Variantes (Opcional):</label>
+                    <input type="text" name="variantes_input" placeholder="Ej: NEGRO:10:URL_FOTO, ROJO:15">
                 </div>
                 <button type="submit" class="btn-submit">Guardar Artículo</button>
             </form>
@@ -165,7 +163,7 @@
     </div>
 
     <div id="modalEditar" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <h2 style="color:var(--primary)">✏️ Editar Artículo</h2>
                 <span class="close-btn" onclick="cerrarModal()">&times;</span>
@@ -182,19 +180,29 @@
                 <label>Stock General (Si no usa variantes):</label>
                 <input type="number" name="stock" id="editStock">
 
-                <label>Cambiar foto (Opcional):</label>
+                <label>Cambiar foto principal (Opcional):</label>
                 <input type="file" name="fotos_nuevas" multiple accept="image/*">
 
                 <label>Categoría:</label>
-                <input type="text" name="categoria" id="editCategoria" readonly style="background:#e9ecef;">
+                <select name="categoria" id="editCategoria" required onchange="actualizarSubcats(this.value, 'editSubcategoria')">
+                    <option value="">Seleccionar...</option>
+                    {% for c in categories %}
+                        <option value="{{ c.nombre }}">{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
                 
                 <label>Subcategoría:</label>
-                <input type="text" name="subcategoria" id="editSubcategoria" readonly style="background:#e9ecef;">
+                <select name="subcategoria" id="editSubcategoria">
+                    <option value="">Sin subcategoría</option>
+                </select>
 
                 <div style="margin-top:15px; padding:12px; background:#e2e8f0; border-radius:6px;">
-                    <label style="margin-top:0;">🎨 Editar Variantes y Stock actual:</label>
-                    <input type="text" name="variantes_input" id="editVariantes" placeholder="Ej: NEGRO:5, BLANCO:10">
-                    <small style="color:#555;">Modificá el texto respetando el formato <code>NOMBRE:STOCK</code> separados por comas.</small>
+                    <label style="margin-top:0; color:#2d3748;">🎨 Editar Variantes y URLs de Fotos:</label>
+                    <input type="text" name="variantes_input" id="editVariantes" placeholder="Ej: NEGRO:10:https://link.com/foto.jpg, ROJO:5">
+                    <small style="color:#4a5568; display:block; margin-top:4px; line-height:1.4;">
+                        Estructura: <code>NOMBRE:STOCK:URL_FOTO</code> separados por comas.<br>
+                        <em>Ejemplo: NEGRO:12:https://i.ibb.co/MiFoto.jpg, BLANCO:8</em> (La URL de la foto es opcional).
+                    </small>
                 </div>
 
                 <button type="submit" class="btn-submit" style="background:var(--primary)">Actualizar Cambios</button>
@@ -204,13 +212,20 @@
 
     <script>
         const categoriasData = {{ categories|tojson }};
-        function actualizarSubcats(catNombre, selectId) {
+        
+        function actualizarSubcats(catNombre, selectId, subcatSeleccionada = "") {
             const subSelect = document.getElementById(selectId);
             subSelect.innerHTML = '<option value="">Sin subcategoría</option>';
             const enc = categoriasData.find(c => c.nombre === catNombre);
             if (enc && enc.subcategorias) {
                 enc.subcategorias.forEach(s => {
-                    let o = document.createElement('option'); o.value = s; o.textContent = s; subSelect.appendChild(o);
+                    let o = document.createElement('option'); 
+                    o.value = s; 
+                    o.textContent = s;
+                    if(s === subcatSeleccionada) {
+                        o.selected = true;
+                    }
+                    subSelect.appendChild(o);
                 });
             }
         }
@@ -222,20 +237,18 @@
             document.getElementById('editNombre').value = p.nombre;
             document.getElementById('editPrecio').value = p.precio;
             document.getElementById('editStock').value = p.stock;
-            document.getElementById('editCategoria').value = p.categoria;
-            document.getElementById('editSubcategoria').value = p.subcategoria;
+            
+            document.getElementById('editCategoria').value = p.categoria || "";
+            actualizarSubcats(p.categoria, 'editSubcategoria', p.subcategoria);
 
-            // Formatear las variantes de la DB a string editable
             let varString = p.variantes && p.variantes.length > 0 
-            ? p.variantes.map(v => `${v.nombre}:${v.stock}`).join(', ') 
-            : '';
+                ? p.variantes.map(v => v.imagen ? `${v.nombre}:${v.stock}:${v.imagen}` : `${v.nombre}:${v.stock}`).join(', ') 
+                : '';
             document.getElementById('editVariantes').value = varString;
 
             document.getElementById('modalEditar').style.display = 'flex';
-}
+        }
             
-            
-      
         function cerrarModal() {
             document.getElementById('modalEditar').style.display = 'none';
         }

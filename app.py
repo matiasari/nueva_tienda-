@@ -69,7 +69,7 @@ class Variante(db.Model):
     articulo_id = db.Column(db.Integer, db.ForeignKey('articulos.id'), nullable=False)
     nombre = db.Column(db.String(100), nullable=False) 
     stock = db.Column(db.Integer, default=0)
-    imagen = db.Column(db.String(500), nullable=True) # ✨ NUEVO: Foto exclusiva para la variante
+    imagen = db.Column(db.String(500), nullable=True) 
 
     def to_dict(self):
         return {"id": self.id, "nombre": self.nombre, "stock": self.stock, "imagen": self.imagen if self.imagen else ""}
@@ -222,11 +222,12 @@ def agregar_producto():
     variantes_raw = request.form.get('variantes_input', '')
     if variantes_raw:
         for v_item in variantes_raw.split(','):
+            if not v_item.strip(): continue
             parts = v_item.split(':')
             if len(parts) >= 2:
                 v_nom = parts[0].strip().upper()
                 v_stk = int(parts[1].strip() or 0)
-                v_img = parts[2].strip() if len(parts) == 3 else None
+                v_img = ":".join(parts[2:]).strip() if len(parts) >= 3 else None
                 nueva_v = Variante(articulo_id=nuevo_id, nombre=v_nom, stock=v_stk, imagen=v_img)
                 db.session.add(nueva_v)
         db.session.commit()
@@ -242,7 +243,7 @@ def editar_producto():
         articulo.nombre = request.form.get('nombre', '').upper()
         articulo.precio = float(request.form.get('precio') or 0)
         articulo.categoria = request.form.get('categoria')
-        articulo.subcategoria = request.form.get('subcategoria')
+        articulo.subcategoria = request.form.get('subcategoria') or ""
         articulo.stock = int(request.form.get('stock') or 0)
         
         nuevas_fotos = request.files.getlist('fotos_nuevas')
@@ -263,11 +264,12 @@ def editar_producto():
         if variantes_raw:
             Variante.query.filter_by(articulo_id=articulo.id).delete()
             for v_item in variantes_raw.split(','):
+                if not v_item.strip(): continue
                 parts = v_item.split(':')
                 if len(parts) >= 2:
                     v_nom = parts[0].strip().upper()
                     v_stk = int(parts[1].strip() or 0)
-                    v_img = parts[2].strip() if len(parts) == 3 else None
+                    v_img = ":".join(parts[2:]).strip() if len(parts) >= 3 else None
                     nueva_v = Variante(articulo_id=articulo.id, nombre=v_nom, stock=v_stk, imagen=v_img)
                     db.session.add(nueva_v)
         
@@ -292,7 +294,6 @@ def eliminar_producto(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# (Rutas de carrito y pedidos simplificadas y optimizadas)
 @app.route('/agregar_al_carrito', methods=['POST'])
 def agregar_al_carrito():
     carrito = session.get('carrito', [])
@@ -314,7 +315,6 @@ def mostrar_carrito():
             cant = ids_raw.count(item_key)
             total += p['precio'] * cant
             it = p.copy(); it['cantidad'] = cant; it['key'] = item_key; it['variante_elegida'] = v_nombre
-            # Si la variante elegida tiene foto propia, la ponemos en el carrito
             v_obj = next((v for v in p['variantes'] if v['nombre'] == v_nombre), None)
             if v_obj and v_obj['imagen']: it['imagen'] = v_obj['imagen']
             items.append(it)
