@@ -116,13 +116,6 @@ def guardar_datos(archivo, datos):
 # ✨ MIGRACIÓN DE TABLAS SEGURA Y TOLERANTE A ERRORES
 with app.app_context():
     db.create_all()
-    try:
-        # Inyecta la columna variante_nombre usando SQL nativo si no existía previamente
-        db.session.execute(text("ALTER TABLE detalles_pedido ADD COLUMN IF NOT EXISTS variante_nombre VARCHAR(100) DEFAULT '';"))
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(f"Aviso en migración: {e}")
 
 def login_requerido(f):
     @wraps(f)
