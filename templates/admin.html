@@ -10,6 +10,7 @@
             --primary: #4e73df;
             --success: #2e7d32;
             --danger: #e74a3b;
+            --warning: #f6c23e;
             --dark: #5a5c69;
             --bg: #f8f9fa;
         }
@@ -25,24 +26,27 @@
         .panel-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         label { font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px; font-size: 14px; color: #444; }
         input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #d1d3e2; border-radius: 5px; margin-bottom: 5px; outline: none; font-size: 14px; }
-        input:focus, select:focus { border-color: var(--primary); }
-        .btn-submit { background: var(--success); color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px; transition: background 0.2s; }
-        .btn-submit:hover { filter: brightness(0.9); }
         
-        /* Lista de productos */
+        .btn-submit { background: var(--success); color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px; }
         .productos-box { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 25px; }
         .tabla-productos { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         .tabla-productos th, .tabla-productos td { padding: 12px; text-align: left; border-bottom: 1px solid #e3e6f0; }
         .tabla-productos th { background: #f8f9fc; color: var(--dark); font-weight: 600; }
         .img-prod { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
-        .btn-delete { color: var(--danger); text-decoration: none; font-weight: bold; margin-left: 10px; }
         
-        /* Badges de variantes */
-        .badge-variante { display: inline-block; background: #e2e8f0; color: #4a5568; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 4px; margin-bottom: 4px; border: 1px solid #cbd5e1; }
+        /* Botonera de acciones */
+        .btn-act { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-block; margin-right: 5px; border: none; cursor: pointer; }
+        .btn-edit-color { background: var(--warning); color: #333; }
+        .btn-pausa-color { background: #36b9cc; color: white; }
+        .btn-pausa-color.inactivo { background: #858796; color: white; }
+        .btn-del-color { background: var(--danger); color: white; }
+        .badge-variante { display: inline-block; background: #e2e8f0; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 4px; }
         
-        .flex-group { display: flex; gap: 10px; align-items: flex-end; }
-        .badge-cat { display: inline-block; background: #eaedf7; color: var(--primary); padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-top: 5px; }
-        .badge-cat a { color: var(--danger); text-decoration: none; margin-left: 6px; font-weight: bold; }
+        /* Modal estilo moderno */
+        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; width: 500px; max-width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .close-btn { font-size: 24px; font-weight: bold; cursor: pointer; color: #aaa; }
     </style>
 </head>
 <body>
@@ -50,7 +54,7 @@
     <header>
         <div>
             <h1>🏪 Panel de Administración</h1>
-            <p style="font-size: 13px; color: #858796;">Bazar Guille - Control de Inventario y Contenidos</p>
+            <p style="font-size: 13px; color: #858796;">Bazar Guille - Inventario Inteligente con Variantes</p>
         </div>
         <div>
             <a href="/admin/pedidos" class="btn-pedidos">📦 Ver Pedidos</a>
@@ -60,7 +64,6 @@
     </header>
 
     <div class="container-admin">
-        
         <div class="panel-box">
             <h2 style="color: var(--primary);">✨ Agregar Nuevo Artículo</h2>
             <form action="/admin/producto/agregar" method="POST" enctype="multipart/form-data">
@@ -68,134 +71,92 @@
                     <div>
                         <label>Nombre del Producto:</label>
                         <input type="text" name="nombre" required placeholder="Ej: TERMO MEDIA MANIJA 1L">
-                        
                         <label>Precio ($):</label>
                         <input type="number" step="0.01" name="precio" required placeholder="14500">
-                        
                         <label>Stock General (Sin variantes):</label>
                         <input type="number" name="stock" value="0">
                     </div>
-                    
                     <div>
                         <label>Categoría:</label>
-                        <select name="categoria" id="adminCat" required onchange="actualizarSubcats(this.value, 'adminSubcat')">
+                        <select name="categoria" required onchange="actualizarSubcats(this.value, 'adminSubcat')">
                             <option value="">Seleccionar...</option>
                             {% for c in categories %}
                                 <option value="{{ c.nombre }}">{{ c.nombre }}</option>
                             {% endfor %}
                         </select>
-                        
                         <label>Subcategoría:</label>
                         <select name="subcategoria" id="adminSubcat">
                             <option value="">Sin subcategoría</option>
                         </select>
-
-                        <label>Fotos (Múltiple selección):</label>
+                        <label>Fotos:</label>
                         <input type="file" name="imagenes_extras" multiple accept="image/*">
                     </div>
                 </div>
-
                 <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px;">
-                    <label style="color: #856404; margin-top: 0; font-weight: bold;">🎨 Colores / Modelos con Stock Propio (Opcional):</label>
-                    <input type="text" name="variantes_input" placeholder="Ej: NEGRO:12, BLANCO:8, ROJO:15" style="border-color: #ffeeba;">
-                    <small style="color: #6c757d; display: block; margin-top: 4px; font-size: 11px;">Escribí Nombre:Stock separados por dos puntos y cada variante con coma. Si usás esto, podés dejar el Stock General en 0.</small>
+                    <label style="color: #856404; margin-top: 0; font-weight: bold;">🎨 Variantes de Color / Modelo (Opcional):</label>
+                    <input type="text" name="variantes_input" placeholder="Ej: NEGRO:10, ROJO:15">
                 </div>
-
                 <button type="submit" class="btn-submit">Guardar Artículo</button>
             </form>
         </div>
 
-        <div class="panel-box" style="display: flex; flex-direction: column; gap: 20px;">
-            <div>
-                <h2 style="color: var(--primary);">📂 Gestión de Categorías</h2>
-                <form action="/admin/categorias/agregar" method="POST" class="flex-group">
-                    <div style="flex: 1;">
-                        <input type="text" name="nombre" required placeholder="NUEVA CATEGORÍA" style="text-transform: uppercase; margin-bottom: 0;">
-                    </div>
-                    <button type="submit" class="btn-submit" style="margin-top:0; width: auto; padding: 10px 20px;">+</button>
-                </form>
-                
-                <div style="margin-top: 10px;">
-                    {% for c in categories %}
-                        <span class="badge-cat">{{ c.nombre }} <a href="/admin/categorias/eliminar/{{ c.nombre }}">×</a></span>
-                    {% endfor %}
-                </div>
-
-                <form action="/admin/subcategorias/agregar" method="POST" class="flex-group" style="margin-top: 15px;">
-                    <div style="flex: 1;">
-                        <label>Categoría Padre:</label>
-                        <select name="padre" required>
-                            {% for c in categories %}
-                                <option value="{{ c.nombre }}">{{ c.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Nueva Subcategoría:</label>
-                        <input type="text" name="nombre_sub" required placeholder="EJ: MATES" style="text-transform: uppercase; margin-bottom: 0;">
-                    </div>
-                    <button type="submit" class="btn-submit" style="margin-top:0; width: auto; padding: 10px 20px;">+</button>
-                </form>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid #e3e6f0;">
-
-            <div>
-                <h2 style="color: var(--primary);">🖼️ Banners del Carrusel</h2>
-                <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data">
-                    <input type="text" name="titulo" placeholder="Título del Banner" required>
-                    <input type="text" name="descripcion" placeholder="Descripción corta">
-                    <input type="number" name="producto_id" placeholder="ID Producto Vinculado (Opcional)">
-                    <input type="file" name="imagen" accept="image/*" required>
-                    <button type="submit" class="btn-submit" style="background: var(--primary);">Subir Banner</button>
-                </form>
-            </div>
+        <div class="panel-box">
+            <h2 style="color: var(--primary);">📂 Gestión de Categorías</h2>
+            <form action="/admin/categorias/agregar" method="POST" style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" name="nombre" required placeholder="NUEVA CATEGORÍA" style="text-transform: uppercase;">
+                <button type="submit" class="btn-submit" style="margin-top:0; width:auto; padding:5px 15px;">+</button>
+            </form>
+            <form action="/admin/subcategorias/agregar" method="POST">
+                <select name="padre" required>
+                    {% for c in categories %} <option value="{{ c.nombre }}">{{ c.nombre }}</option> {% endfor %}
+                </select>
+                <input type="text" name="nombre_sub" required placeholder="NUEVA SUBCATEGORÍA" style="text-transform: uppercase;">
+                <button type="submit" class="btn-submit" style="margin-top:5px;">Agregar Subcategoría</button>
+            </form>
         </div>
-
     </div>
 
     <div class="productos-box">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="color: var(--dark); font-weight: bold; font-size: 20px;">📦 Artículos en Catálogo ({{ productos|length }})</h2>
-            <form action="/admin/importar_excel" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;">
-                <input type="file" name="archivo_excel" accept=".xlsx, .xls" required style="padding: 5px; font-size: 12px; margin-bottom: 0; width: auto;">
-                <button type="submit" style="background: #2c3e50; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px;">📊 Importar Excel</button>
-            </form>
-        </div>
-
+        <h2>📦 Artículos en Inventario ({{ productos|length }})</h2>
         <table class="tabla-productos">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Imagen</th>
                     <th>Nombre</th>
-                    <th>Categoría / Subcat</th>
                     <th>Precio</th>
                     <th>Stock / Variantes</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for p in productos %}
-                <tr>
+                <tr style="opacity: {% if not p.activo %}0.5{% else %}1{% endif %};">
                     <td><strong>#{{ p.id }}</strong></td>
-                    <td><img src="{{ p.imagen }}" class="img-prod" onerror="this.src='/static/uploads/default.jpg'"></td>
-                    <td><span style="font-weight: 600; color: #4e73df;">{{ p.nombre }}</span></td>
-                    <td><span style="font-size: 12px; background: #f1f3f9; padding: 3px 8px; border-radius: 4px; color: #6e707e;">{{ p.categoria }} / {{ p.subcategoria if p.subcategoria else 'Ninguna' }}</span></td>
-                    <td><strong>{{ p.precio|pesos }}</strong></td>
+                    <td><img src="{{ p.imagen }}" class="img-prod"></td>
+                    <td><strong>{{ p.nombre }}</strong></td>
+                    <td>{{ p.precio|pesos }}</td>
                     <td>
                         {% if p.variantes|length > 0 %}
-                            {% for v in p.variantes %}
-                                <span class="badge-variante">{{ v.nombre }}: <strong>{{ v.stock }}</strong></span>
-                            {% endfor %}
+                            {% for v in p.variantes %} <span class="badge-variante">{{ v.nombre }} ({{ v.stock }})</span> {% endfor %}
                         {% else %}
-                            <span style="color: {% if p.stock > 0 %}#2e7d32{% else %}#e74a3b{% endif %}; font-weight: bold;">
-                                {{ p.stock }} unidades
-                            </span>
+                            {{ p.stock }} un.
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-delete" onclick="return confirm('¿Seguro querés eliminar este producto definitivo?')">❌ Eliminar</a>
+                        <span style="color: {% if p.activo %}#2e7d32{% else %}#e74a3b{% endif %}; font-weight: bold;">
+                            {% if p.activo %}🟢 Activo{% else %}🔴 Agotado{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-act btn-edit-color" onclick="abrirModalEditar({{ p|tojson }})">✏️ Editar</button>
+                        
+                        <a href="/admin/producto/toggle_pausa/{{ p.id }}" class="btn-act btn-pausa-color {% if not p.activo %}inactivo{% endif %}">
+                            {% if p.activo %}⏸️ Agotar{% else %}▶️ Activar{% endif %}
+                        </a>
+                        
+                        <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar definitivo?')">❌</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -203,21 +164,74 @@
         </table>
     </div>
 
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:var(--primary)">✏️ Editar Artículo</h2>
+                <span class="close-btn" onclick="cerrarModal()">&times;</span>
+            </div>
+            <form action="/admin/producto/editar" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="editId">
+                
+                <label>Nombre del Producto:</label>
+                <input type="text" name="nombre" id="editNombre" required>
+
+                <label>Precio ($):</label>
+                <input type="number" step="0.01" name="precio" id="editPrecio" required>
+
+                <label>Stock General (Si no usa variantes):</label>
+                <input type="number" name="stock" id="editStock">
+
+                <label>Cambiar foto (Opcional):</label>
+                <input type="file" name="fotos_nuevas" multiple accept="image/*">
+
+                <label>Categoría:</label>
+                <input type="text" name="categoria" id="editCategoria" readonly style="background:#e9ecef;">
+                
+                <label>Subcategoría:</label>
+                <input type="text" name="subcategoria" id="editSubcategoria" readonly style="background:#e9ecef;">
+
+                <div style="margin-top:15px; padding:12px; background:#e2e8f0; border-radius:6px;">
+                    <label style="margin-top:0;">🎨 Editar Variantes y Stock actual:</label>
+                    <input type="text" name="variantes_input" id="editVariantes" placeholder="Ej: NEGRO:5, BLANCO:10">
+                    <small style="color:#555;">Modificá el texto respetando el formato <code>NOMBRE:STOCK</code> separados por comas.</small>
+                </div>
+
+                <button type="submit" class="btn-submit" style="background:var(--primary)">Actualizar Cambios</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Lógica dinámica para cargar subcategorías en el formulario
         const categoriasData = {{ categories|tojson }};
         function actualizarSubcats(catNombre, selectId) {
             const subSelect = document.getElementById(selectId);
             subSelect.innerHTML = '<option value="">Sin subcategoría</option>';
-            const encontrada = categoriasData.find(c => c.nombre === catNombre);
-            if (encontrada && encontrada.subcategorias) {
-                encontrada.subcategorias.forEach(sub => {
-                    const opt = document.createElement('option');
-                    opt.value = sub;
-                    opt.textContent = sub;
-                    subSelect.appendChild(opt);
+            const enc = categoriasData.find(c => c.nombre === catNombre);
+            if (enc && enc.subcategorias) {
+                enc.subcategorias.forEach(s => {
+                    let o = document.createElement('option'); o.value = s; o.textContent = s; subSelect.appendChild(o);
                 });
             }
+        }
+
+        function abrirModalEditar(p) {
+            document.getElementById('editId').value = p.id;
+            document.getElementById('editNombre').value = p.nombre;
+            document.getElementById('editPrecio').value = p.precio;
+            document.getElementById('editStock').value = p.stock;
+            document.getElementById('editCategoria').value = p.categoria;
+            document.getElementById('editSubcategoria').value = p.subcategoria;
+
+            // Formatear las variantes de la DB a string editable
+            let varString = p.variantes.map(v => `${v.nombre}:${v.stock}`).join(', ');
+            document.getElementById('editVariantes').value = varString;
+
+            document.getElementById('modalEditar').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalEditar').style.display = 'none';
         }
     </script>
 </body>
