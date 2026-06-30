@@ -8,7 +8,7 @@ from functools import wraps
 import io
 import requests
 from datetime import datetime
-from sqlalchemy.text import text
+from sqlalchemy import text
 
 app = Flask(__name__)
 
