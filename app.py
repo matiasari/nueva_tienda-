@@ -8,6 +8,7 @@ from functools import wraps
 import io
 import requests
 from datetime import datetime
+from sqlalchemy.text import text
 
 app = Flask(__name__)
 
@@ -37,15 +38,18 @@ class Articulo(db.Model):
     precio = db.Column(db.Float, nullable=False)
     categoria = db.Column(db.String(100), nullable=True)
     subcategoria = db.Column(db.String(100), nullable=True, default="")
-    stock = db.Column(db.Integer, default=0) # Stock general (si no usa variantes)
+    stock = db.Column(db.Integer, default=0) 
     imagen = db.Column(db.String(500), nullable=True)
     imagenes_extras = db.Column(db.Text, nullable=True, default="") 
     
-    # Relación con las variantes individuales
     variantes = db.relationship('Variante', backref='articulo', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         img_ex = self.imagenes_extras.split(',') if self.imagenes_extras else []
+        try:
+            vars_list = [v.to_dict() for v in self.variantes]
+        except:
+            vars_list = [] # Tolerancia por si el deploy tarda en migrar
         return {
             "id": self.id,
             "nombre": self.nombre,
@@ -55,14 +59,14 @@ class Articulo(db.Model):
             "stock": self.stock,
             "imagen": self.imagen if self.imagen else "default.jpg",
             "imagenes_extras": img_ex,
-            "variantes": [v.to_dict() for v in self.variantes]
+            "variantes": vars_list
         }
 
 class Variante(db.Model):
     __tablename__ = 'variantes'
     id = db.Column(db.Integer, primary_key=True)
     articulo_id = db.Column(db.Integer, db.ForeignKey('articulos.id'), nullable=False)
-    nombre = db.Column(db.String(100), nullable=False) # Ej: "NEGRO", "BLANCO"
+    nombre = db.Column(db.String(100), nullable=False) 
     stock = db.Column(db.Integer, default=0)
 
     def to_dict(self):
@@ -94,7 +98,7 @@ class DetallePedido(db.Model):
     pedido_id = db.Column(db.Integer, db.ForeignKey('pedidos.id'), nullable=False)
     articulo_id = db.Column(db.Integer, nullable=False)
     nombre = db.Column(db.String(250), nullable=False)
-    variante_nombre = db.Column(db.String(100), nullable=True, default="") # Variante elegida
+    variante_nombre = db.Column(db.String(100), nullable=True, default="") 
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
@@ -109,8 +113,16 @@ def guardar_datos(archivo, datos):
     with open(archivo, 'w', encoding='utf-8') as f:
         json.dump(datos, f, indent=4, ensure_ascii=False)
 
+# ✨ MIGRACIÓN DE TABLAS SEGURA Y TOLERANTE A ERRORES
 with app.app_context():
     db.create_all()
+    try:
+        # Inyecta la columna variante_nombre usando SQL nativo si no existía previamente
+        db.session.execute(text("ALTER TABLE detalles_pedido ADD COLUMN IF NOT EXISTS variante_nombre VARCHAR(100) DEFAULT '';"))
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Aviso en migración: {e}")
 
 def login_requerido(f):
     @wraps(f)
@@ -183,8 +195,7 @@ def pedido_hecho(id):
         for d in pedido.detalles:
             articulo = Articulo.query.get(d.articulo_id)
             if articulo:
-                # Si el pedido tiene variante, descontamos el stock de la variante
-                if d.variante_nombre:
+                if getattr(d, 'variante_nombre', None):
                     var = Variante.query.filter_by(articulo_id=articulo.id, nombre=d.variante_nombre).first()
                     if var:
                         var.stock = max(0, var.stock - d.cantidad)
@@ -279,8 +290,6 @@ def agregar_producto():
     db.session.add(nuevo_articulo)
     db.session.commit()
     
-    # Procesar variantes si se enviaron desde el admin (se reciben separadas por coma)
-    # Formato esperado: "NEGRO:10, BLANCO:5"
     variantes_raw = request.form.get('variantes_input', '')
     if variantes_raw:
         for v_item in variantes_raw.split(','):
@@ -326,17 +335,16 @@ def eliminar_producto(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
-# --- CARRITO Y PROCESAMIENTO CON VARIANTES ---
+# --- CARRITO Y PROCESAMIENTO ---
 @app.route('/finalizar_pedido', methods=['POST'])
 def finalizar_pedido():
-    ids_raw = session.get('carrito', []) # Ahora guardará strings estilo "id_articulo:variante_nombre" o solo "id_articulo"
+    ids_raw = session.get('carrito', [])
     if not ids_raw: return redirect(url_for('index'))
     
     todos = [a.to_dict() for a in Articulo.query.all()]
     items = []
     total = 0
     
-    # Procesamos los items únicos del carrito
     for item_key in set(ids_raw):
         p_id = item_key.split(':')[0]
         v_nombre = item_key.split(':')[1] if ':' in item_key else ""
@@ -387,7 +395,7 @@ def finalizar_pedido():
 def agregar_al_carrito():
     carrito = session.get('carrito', [])
     art_id = request.form.get('id')
-    var_nom = request.form.get('variante', '') # Recibe la variante seleccionada en la tienda
+    var_nom = request.form.get('variante', '')
     
     item_key = f"{art_id}:{var_nom}" if var_nom else str(art_id)
     carrito.append(item_key)
