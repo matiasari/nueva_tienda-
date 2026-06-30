@@ -8,7 +8,7 @@ from functools import wraps
 import io
 import requests
 from datetime import datetime
-from sqlalchemy import text
+from sqlalchemy.orm import selectinload
 
 app = Flask(__name__)
 
@@ -29,6 +29,9 @@ BANNERS_JSON = 'banners.json'
 API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
+# Cache global en memoria para los banners (Evita lectura de disco constante)
+CACHE_BANNERS = None
+
 # --- MODELOS DE LA BASE DE DATOS ---
 
 class Articulo(db.Model):
@@ -46,10 +49,6 @@ class Articulo(db.Model):
 
     def to_dict(self):
         img_ex = self.imagenes_extras.split(',') if self.imagenes_extras else []
-        try:
-            vars_list = [v.to_dict() for v in self.variantes]
-        except:
-            vars_list = [] # Tolerancia por si el deploy tarda en migrar
         return {
             "id": self.id,
             "nombre": self.nombre,
@@ -59,7 +58,7 @@ class Articulo(db.Model):
             "stock": self.stock,
             "imagen": self.imagen if self.imagen else "default.jpg",
             "imagenes_extras": img_ex,
-            "variantes": vars_list
+            "variantes": [v.to_dict() for v in self.variantes]
         }
 
 class Variante(db.Model):
@@ -103,19 +102,24 @@ class DetallePedido(db.Model):
     cantidad = db.Column(db.Integer, nullable=False) 
     imagen = db.Column(db.String(500), nullable=True)
 
-def cargar_datos(archivo):
-    if not os.path.exists(archivo): return []
-    with open(archivo, 'r', encoding='utf-8') as f:
-        try: return json.load(f)
-        except: return []
+def cargar_datos_banners():
+    global CACHE_BANNERS
+    if CACHE_BANNERS is not None:
+        return CACHE_BANNERS
+    if not os.path.exists(BANNERS_JSON): 
+        return []
+    with open(BANNERS_JSON, 'r', encoding='utf-8') as f:
+        try: 
+            CACHE_BANNERS = json.load(f)
+            return CACHE_BANNERS
+        except: 
+            return []
 
-def guardar_datos(archivo, datos):
-    with open(archivo, 'w', encoding='utf-8') as f:
+def guardar_datos_banners(datos):
+    global CACHE_BANNERS
+    CACHE_BANNERS = datos
+    with open(BANNERS_JSON, 'w', encoding='utf-8') as f:
         json.dump(datos, f, indent=4, ensure_ascii=False)
-
-# ✨ MIGRACIÓN DE TABLAS SEGURA Y TOLERANTE A ERRORES
-with app.app_context():
-    db.create_all()
 
 def login_requerido(f):
     @wraps(f)
@@ -133,22 +137,27 @@ def formato_pesos(valor):
 # --- RUTAS PÚBLICAS ---
 @app.route('/')
 def index():
-    articulos_db = Articulo.query.all()
-    productos = [a.to_dict() for a in articulos_db]
-    banners = cargar_datos(BANNERS_JSON)
-    categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
-    
     cat = request.args.get('cat')
     q = request.args.get('q')
     
-    prod_mostrar = productos
+    # ⚡ OPTIMIZACIÓN 1: Armamos el query base con selectinload evitando el problema N+1
+    query = Articulo.query.options(selectinload(Articulo.variantes))
+    
+    # ⚡ OPTIMIZACIÓN 2: Filtramos directamente en Postgres en lugar de traer todo a Python
     if cat and cat != "Todos":
-        prod_mostrar = [p for p in prod_mostrar if p.get('categoria') == cat or p.get('subcategoria') == cat]
+        query = query.filter((Articulo.categoria == cat) | (Articulo.subcategoria == cat))
     if q:
-        q_l = q.lower()
-        prod_mostrar = [p for p in prod_mostrar if q_l in p.get('nombre', '').lower() or str(p.get('id')) == q_l]
+        q_l = f"%{q.lower()}%"
+        query = query.filter((Articulo.nombre.ilike(q_l)) | (db.cast(Articulo.id, db.String).ilike(q_l)))
         
-    return render_template('tienda.html', productos=prod_mostrar, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
+    articulos_db = query.all()
+    # Convertimos a diccionario únicamente el subconjunto de productos requeridos
+    productos = [a.to_dict() for a in articulos_db]
+    
+    banners = cargar_datos_banners()
+    categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
+        
+    return render_template('tienda.html', productos=productos, banners=banners, carrito_total=len(session.get('carrito', [])), categorias=categorias, categories=categorias)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -169,9 +178,12 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-    productos = [a.to_dict() for a in Articulo.query.order_by(Articulo.id.desc()).all()]
+    # ⚡ OPTIMIZACIÓN 3: El panel de administración ahora trae variantes de golpe en 2 consultas
+    articulos_db = Articulo.query.options(selectinload(Articulo.variantes)).order_by(Articulo.id.desc()).all()
+    productos = [a.to_dict() for a in articulos_db]
+    
     categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
-    return render_template('admin.html', productos=productos, banners=cargar_datos(BANNERS_JSON), categorias=categorias, categories=categorias)
+    return render_template('admin.html', productos=productos, banners=cargar_datos_banners(), categorias=categorias, categories=categorias)
 
 @app.route('/admin/pedidos')
 @login_requerido
@@ -188,7 +200,7 @@ def pedido_hecho(id):
         for d in pedido.detalles:
             articulo = Articulo.query.get(d.articulo_id)
             if articulo:
-                if getattr(d, 'variante_nombre', None):
+                if d.variante_nombre:
                     var = Variante.query.filter_by(articulo_id=articulo.id, nombre=d.variante_nombre).first()
                     if var:
                         var.stock = max(0, var.stock - d.cantidad)
@@ -334,7 +346,9 @@ def finalizar_pedido():
     ids_raw = session.get('carrito', [])
     if not ids_raw: return redirect(url_for('index'))
     
-    todos = [a.to_dict() for a in Articulo.query.all()]
+    # ⚡ OPTIMIZACIÓN 4: Evitamos consultas N+1 al procesar el checkout
+    articulos_db = Articulo.query.options(selectinload(Articulo.variantes)).all()
+    todos = [a.to_dict() for a in articulos_db]
     items = []
     total = 0
     
@@ -431,7 +445,9 @@ def calcular_envio():
 @app.route('/carrito')
 def mostrar_carrito():
     ids_raw = session.get('carrito', [])
-    todos = [a.to_dict() for a in Articulo.query.all()]
+    # ⚡ OPTIMIZACIÓN 5: Carrito usando la carga por lotes de variantes
+    articulos_db = Articulo.query.options(selectinload(Articulo.variantes)).all()
+    todos = [a.to_dict() for a in articulos_db]
     items = []
     total = 0
     for item_key in set(ids_raw):
@@ -454,22 +470,22 @@ def mostrar_carrito():
 @app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
 def agregar_banner():
-    banners = cargar_datos(BANNERS_JSON)
+    banners = cargar_datos_banners()
     f = request.files.get('imagen')
     if f and f.filename != '':
         try:
             res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
             if res.json().get("success"):
                 banners.append({"id": max([b['id'] for b in banners], default=0) + 1, "titulo": request.form.get('titulo'), "descripcion": request.form.get('descripcion'), "imagen": res.json()["data"]["url"], "link": f"/?q={request.form.get('producto_id')}"})
-                guardar_datos(BANNERS_JSON, banners)
+                guardar_datos_banners(banners)
         except: pass
     return redirect(url_for('admin'))
 
 @app.route('/admin/banner/eliminar/<int:id>')
 @login_requerido
 def eliminar_banner(id):
-    banners = [b for b in cargar_datos(BANNERS_JSON) if b['id'] != id]
-    guardar_datos(BANNERS_JSON, banners)
+    banners = [b for b in cargar_datos_banners() if b['id'] != id]
+    guardar_datos_banners(banners)
     return redirect(url_for('admin'))
 
 @app.route('/admin/importar_excel', methods=['POST'])
