@@ -97,6 +97,7 @@
                 <button type="submit" class="btn-submit">Guardar Artículo</button>
             </form>
         </div>
+        
 
         <div class="panel-box">
             <h2 style="color: var(--primary);">📂 Gestión de Categorías</h2>
@@ -113,6 +114,42 @@
             </form>
         </div>
     </div>
+    <div class="panel-box">
+    <h2 style="color: var(--primary);">🖼️ Banners de la tienda</h2>
+
+    <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data">
+        <label>Título del banner:</label>
+        <input type="text" name="titulo" required placeholder="Ej: OFERTAS DE LA SEMANA">
+
+        <label>Descripción:</label>
+        <input type="text" name="descripcion" placeholder="Ej: Productos seleccionados">
+
+        <label>ID o nombre del producto:</label>
+        <input type="text" name="producto_id" required placeholder="Ej: 123 o TERMO">
+
+        <label>Imagen del banner:</label>
+        <input type="file" name="imagen" accept="image/*" required>
+
+        <button type="submit" class="btn-submit">Agregar Banner</button>
+    </form>
+
+    <div style="margin-top: 20px;">
+        {% if banners %}
+            {% for b in banners %}
+                <div style="display:flex; gap:12px; align-items:center; border-bottom:1px solid #e3e6f0; padding:10px 0;">
+                    <img src="{{ b.imagen }}" style="width:90px; height:55px; object-fit:cover; border-radius:5px;">
+                    <div style="flex:1;">
+                        <strong>{{ b.titulo }}</strong><br>
+                        <small style="color:#858796;">{{ b.descripcion }}</small>
+                    </div>
+                    <a href="/admin/banner/eliminar/{{ b.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar este banner?')">Eliminar</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="font-size:13px; color:#858796;">Todavía no hay banners cargados.</p>
+        {% endif %}
+    </div>
+</div>
 
     <div class="productos-box">
         <h2>📦 Artículos en Inventario ({{ productos|length }})</h2>
