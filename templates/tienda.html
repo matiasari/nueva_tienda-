@@ -6,9 +6,7 @@
     <title>Bazar Guille - Tienda</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
-
-
-
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -22,215 +20,141 @@
 
 <header class="header">
     <div class="header-left">
-        <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo Bazar Guille" class="logo-img">
+        <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo" class="logo-img">
         <span class="nombre">BAZAR GUILLE</span>
     </div>
-  
+    <div class="header-right">
+        <a href="/carrito" class="carrito-btn">
+            🛒 Carrito
+            {% if carrito_total > 0 %}
+                <span class="contador">{{ carrito_total }}</span>
+            {% endif %}
+        </a>
+    </div>
 </header>
 
 {% if banners %}
-<section class="slider-container" aria-label="Promociones">
+<section class="slider-container">
     {% for b in banners %}
-        <div class="slide {% if loop.first %}active{% endif %}"
-             style="background-image: url('{% if b.imagen and b.imagen.startswith('http') %}{{ b.imagen }}{% else %}{{ url_for('static', filename='uploads/' + b.imagen) }}{% endif %}');">
-            {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
-                <div class="slide-text-container">
-                    {% if b.titulo %}<h2>{{ b.titulo }}</h2>{% endif %}
-                    {% if b.descripcion %}<p>{{ b.descripcion }}</p>{% endif %}
-                    {% if b.link and b.link != "/?q=" and b.link != "#productos" %}
-                        <a href="{{ b.link }}" class="btn-promo">Ver producto</a>
-                    {% endif %}
-                </div>
+    <!-- 🔴 CORREGIDO: Lógica inteligente para renderizar Banners desde ImgBB o Local -->
+    <div class="slide {% if loop.first %}active{% endif %}" 
+         style="background-image: url('{% if b.imagen and b.imagen.startswith('http') %}{{ b.imagen }}{% else %}{{ url_for('static', filename='uploads/' + b.imagen) }}{% endif %}');">
+        {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
+        <div class="slide-text-container">
+            {% if b.titulo %}<h2>{{ b.titulo }}</h2>{% endif %}
+            {% if b.descripcion %}<p>{{ b.descripcion }}</p>{% endif %}
+            {% if b.link and b.link != "/?q=" and b.link != "#productos" %}
+                <a href="{{ b.link }}" class="btn-promo">Ver Producto</a>
             {% endif %}
         </div>
+        {% endif %}
+    </div>
     {% endfor %}
-
-    {% if banners|length > 1 %}
-        <div class="slider-dots" aria-label="Cambiar banner">
-            {% for b in banners %}
-                <button class="slider-dot {% if loop.first %}active{% endif %}" type="button" onclick="mostrarSlide({{ loop.index0 }})"></button>
-            {% endfor %}
-        </div>
-    {% endif %}
 </section>
 {% endif %}
 
-<div class="tienda-tools">
-    <div class="buscador">
-        <form action="/" method="GET">
-            <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="¿Qué estás buscando hoy?">
-            <button type="submit">Buscar</button>
-            {% if request.args.get('q') %}
-                <a href="/" class="btn-limpiar">Limpiar</a>
-            {% endif %}
-        </form>
-    </div>
+<div class="buscador">
+    <form action="/" method="GET">
+        <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" required>
+        <button type="submit">Buscar</button>
+    </form>
 </div>
 
 <div class="categorias-nav">
     <a href="/" class="cat-chip {% if not request.args.get('cat') %}activo{% endif %}">Todos</a>
-
+    
     {% for cat in categorias %}
-        <div class="dropdown-cat">
-            <a href="/?cat={{ cat.nombre }}" class="cat-chip {% if request.args.get('cat') == cat.nombre %}activo{% endif %}">
-                {{ cat.nombre }}
-            </a>
-
-            {% if cat.subcategorias %}
-                <div class="dropdown-content">
-                    {% for sub in cat.subcategorias %}
-                        <a href="/?cat={{ sub }}">{{ sub }}</a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+    <div class="dropdown-cat">
+        <a href="/?cat={{ cat.nombre }}" class="cat-chip {% if request.args.get('cat') == cat.nombre %}activo{% endif %}">
+            {{ cat.nombre }}
+        </a>
+        
+        {% if cat.subcategorias %}
+        <div class="dropdown-content">
+            {% for sub in cat.subcategorias %}
+                <a href="/?cat={{ sub }}">{{ sub }}</a>
+            {% endfor %}
         </div>
+        {% endif %}
+    </div>
     {% endfor %}
 </div>
 
 <div class="contenedor-categorias" id="productos">
-    {% if productos %}
-        {% for categoria, items in productos | groupby('categoria') %}
-            <section class="categoria-bloque">
-                <h2 class="titulo-categoria">{{ categoria | upper if categoria else 'VARIOS' }}</h2>
-                <div class="grid-productos">
-                    {% for p in items %}
-                        {% set ns = namespace(stock_total=p.stock) %}
-                        {% if p.variantes %}
-                            {% set ns.stock_total = 0 %}
-                            {% for v in p.variantes %}
-                                {% set ns.stock_total = ns.stock_total + v.stock %}
-                            {% endfor %}
-                        {% endif %}
-
-                        <div class="card" id="prod-{{ p.id }}">
-                            <div class="contenedor-foto-principal">
-                                <span class="stock-badge {% if ns.stock_total <= 0 %}sin-stock{% endif %}">
-                                    {% if ns.stock_total > 0 %}Stock {{ ns.stock_total }}{% else %}Sin stock{% endif %}
-                                </span>
-
-                                <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}"
-                                     id="main-{{ p.id }}"
-                                     class="foto-principal"
-                                     onclick="abrirModal(this, this.src)"
-                                     title="Click para ampliar"
-                                     alt="{{ p.nombre }}"
-                                     loading="lazy">
-                            </div>
-
-                            <div class="galeria-miniaturas">
-                                <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}"
-                                     onclick="cambiarPrincipal(this, 'main-{{ p.id }}')"
-                                     class="mini-foto activa"
-                                     alt="{{ p.nombre }}">
-
-                                {% if p.imagenes_extras %}
-                                    {% for foto in p.imagenes_extras %}
-                                        <img src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + foto) }}{% endif %}"
-                                             onclick="cambiarPrincipal(this, 'main-{{ p.id }}')"
-                                             class="mini-foto"
-                                             alt="{{ p.nombre }}">
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if p.variantes %}
-                                    {% for v in p.variantes %}
-                                        {% if v.imagen %}
-                                            <img src="{% if v.imagen.startswith('http') %}{{ v.imagen }}{% else %}{{ url_for('static', filename='uploads/' + v.imagen) }}{% endif %}"
-                                                 onclick="cambiarPrincipal(this, 'main-{{ p.id }}')"
-                                                 class="mini-foto"
-                                                 alt="{{ p.nombre }} {{ v.nombre }}">
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-
-                            <div class="card-content">
-                                <h3>{{ p.nombre }}</h3>
-                                <p class="precio">{{ p.precio | pesos }}</p>
-
-                                <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
-                                    <input type="hidden" name="id" value="{{ p.id }}">
-
-                                    {% if p.variantes %}
-                                        <select name="variante" class="selector-variante" {% if ns.stock_total > 0 %}required{% else %}disabled{% endif %}>
-                                            <option value="">Elegir variante</option>
-                                            {% for v in p.variantes %}
-                                                {% if v.stock > 0 %}
-                                                    <option value="{{ v.nombre }}">{{ v.nombre }} - Stock {{ v.stock }}</option>
-                                                {% else %}
-                                                    <option value="{{ v.nombre }}" disabled>{{ v.nombre }} - Sin stock</option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                    {% endif %}
-
-                                    {% if ns.stock_total > 0 %}
-                                        <button type="submit" class="btn-comprar">Añadir al carrito</button>
-                                    {% else %}
-                                        <button type="button" class="btn-comprar agotado" disabled>Sin stock</button>
-                                    {% endif %}
-                                </form>
-                            </div>
+    {% for categoria, items in productos | groupby('categoria') %}
+        <section class="categoria-bloque">
+            <h2 class="titulo-categoria">{{ categoria | upper if categoria else 'VARIOS' }}</h2>
+            <div class="grid-productos">
+                {% for p in items %}
+                    <div class="card" id="prod-{{ p.id }}">
+                        <div class="contenedor-foto-principal">
+                            <!-- 🔴 CORREGIDO: Lógica inteligente para la foto de portada de la tarjeta -->
+                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
+                                 id="main-{{ p.id }}" 
+                                 class="foto-principal"
+                                 onclick="abrirModal(this.src)" 
+                                 title="Click para ampliar"
+                                 loading="lazy">
                         </div>
-                    {% endfor %}
-                </div>
-            </section>
-        {% endfor %}
-    {% else %}
-        <div class="sin-resultados">
-            <h2>No encontramos productos</h2>
-            <p>Probá con otra búsqueda o elegí una categoría diferente.</p>
-            <a href="/" class="btn-promo">Ver todos</a>
-        </div>
-    {% endif %}
+                        
+                        <div class="galeria-miniaturas">
+                            <!-- 🔴 CORREGIDO: Miniatura de la foto principal -->
+                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
+                                 onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
+                                 class="mini-foto">
+                            
+                            {% if p.imagenes_extras %}
+                                {% for foto in p.imagenes_extras %}
+                                    <!-- 🔴 CORREGIDO: Lógica para las miniaturas secundarias -->
+                                    <img src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + foto) }}{% endif %}" 
+                                         onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
+                                         class="mini-foto">
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="card-content">
+                            <h3>{{ p.nombre }}</h3>
+                            <p class="precio">{{ p.precio | pesos }}</p>
+                            <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
+                                <input type="hidden" name="id" value="{{ p.id }}">
+                                <button type="submit" class="btn-comprar">🛒 Añadir al Carrito</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
 </div>
 
-<div id="modalZoom" class="modal-zoom" onclick="cerrarModal()">
+<div id="modalZoom" class="modal-zoom" style="display: none;" onclick="cerrarModal()">
     <span class="cerrar-zoom">&times;</span>
-    <button class="nav-btn prev" type="button" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
-    <img class="modal-contenido" id="imgAmpliada" onclick="event.stopPropagation()" alt="Imagen ampliada">
-    <button class="nav-btn next" type="button" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
+    
+    <button class="nav-btn prev" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
+    
+    <img class="modal-contenido" id="imgAmpliada" onclick="event.stopPropagation()">
+    
+    <button class="nav-btn next" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
 </div>
 
 <footer class="footer">
     <div class="footer-content">
-        <a href="https://instagram.com/bazar_guille" class="instagram-btn" target="_blank" rel="noopener">Síguenos en Instagram</a>
+        <a href="https://instagram.com/bazar_guille" class="instagram-btn" target="_blank">Síguenos en Instagram</a>
         <p class="copyright">© 2026 Bazar Guille - Todos los derechos reservados</p>
     </div>
 </footer>
 
-<a href="https://wa.me/5491149899616?text=Hola!%20Tengo%20una%20consulta"
-   class="whatsapp-float" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-</a>
-
-<a href="/carrito" class="carrito-float" aria-label="Ir al carrito">
-    <span class="icono-carrito">🛒</span>
-    {% if carrito_total > 0 %}
-        <span class="contador-float">{{ carrito_total }}</span>
-    {% endif %}
-</a>
-
 <script>
+    // Lógica del Slider
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
-    const dots = document.querySelectorAll('.slider-dot');
-
-    function mostrarSlide(index) {
-        if (!slides.length) return;
-
-        slides[currentSlide].classList.remove('active');
-        if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
-
-        currentSlide = index;
-
-        slides[currentSlide].classList.add('active');
-        if (dots[currentSlide]) dots[currentSlide].classList.add('active');
-    }
 
     function nextSlide() {
-        if (slides.length > 1) {
-            mostrarSlide((currentSlide + 1) % slides.length);
+        if (slides.length > 0) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
         }
     }
 
@@ -238,39 +162,28 @@
         setInterval(nextSlide, 5000);
     }
 
-    function cambiarPrincipal(thumb, mainId) {
-        const main = document.getElementById(mainId);
-        if (!main) return;
-
-        main.src = thumb.src;
-
-        const galeria = thumb.closest('.galeria-miniaturas');
-        if (galeria) {
-            galeria.querySelectorAll('.mini-foto').forEach(img => img.classList.remove('activa'));
-            thumb.classList.add('activa');
-        }
-    }
-
     let fotosProductoActual = [];
     let indiceFotoActual = 0;
 
-    function abrirModal(elemento, imgSrc) {
+    function abrirModal(imgSrc) {
         const modal = document.getElementById('modalZoom');
         const modalImg = document.getElementById('imgAmpliada');
-        const card = elemento.closest('.card');
-        const todasLasFotos = card ? card.querySelectorAll('.galeria-miniaturas img') : [];
-
+        
+        const card = event.target.closest('.card');
+        const todasLasFotos = card.querySelectorAll('.galeria-miniaturas img');
+        
+        // Agarramos las fuentes exactas de las miniaturas para el carrusel de zoom
         fotosProductoActual = Array.from(todasLasFotos).map(img => img.src);
         indiceFotoActual = fotosProductoActual.indexOf(imgSrc);
-        if (indiceFotoActual === -1) indiceFotoActual = 0;
 
-        modalImg.src = fotosProductoActual[indiceFotoActual] || imgSrc;
+        // Si se clickea la principal y no mapea directo al index, forzamos la asignación
+        if(indiceFotoActual === -1) indiceFotoActual = 0;
+
+        modalImg.src = fotosProductoActual[indiceFotoActual];
         modal.style.display = 'flex';
     }
 
     function cambiarFoto(direccion) {
-        if (!fotosProductoActual.length) return;
-
         indiceFotoActual += direccion;
 
         if (indiceFotoActual >= fotosProductoActual.length) {
@@ -288,26 +201,34 @@
         fotosProductoActual = [];
     }
 
+    // Cerrar con tecla Escape
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") {
             cerrarModal();
         }
-
-        const modal = document.getElementById("modalZoom");
-        if (modal.style.display === "flex") {
-            if (event.key === "ArrowLeft") cambiarFoto(-1);
-            if (event.key === "ArrowRight") cambiarFoto(1);
-        }
     });
 
+    // Auto-scroll si hay búsqueda
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('q') || urlParams.has('cat')) {
         const productosSection = document.getElementById('productos');
         if (productosSection) {
-            productosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            productosSection.scrollIntoView({ behavior: 'smooth' });
         }
     }
 </script>
+
+<a href="https://wa.me/5491149899616?text=Hola!%20Tengo%20una%20consulta" 
+   class="whatsapp-float" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+</a>
+ 
+<a href="/carrito" class="carrito-float">
+    <span class="icono-carrito">🛒</span>
+    {% if carrito_total > 0 %}
+        <span class="contador-float">{{ carrito_total }}</span>
+    {% endif %}
+</a>
 
 </body>
 </html>
