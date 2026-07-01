@@ -116,9 +116,18 @@
 
     <div class="productos-box">
         <h2>📦 Artículos en Inventario ({{ productos|length }})</h2>
-        <form method="GET" action="/admin" class="buscador-admin">
-    <input type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Buscar por nombre, categoría o ID...">
+       <form method="GET" action="/admin" class="buscador-admin">
+    <input
+        type="search"
+        name="buscar"
+        value="{{ buscar }}"
+        placeholder="Buscar por nombre o ID..."
+    >
     <button type="submit" class="btn-buscar">Buscar</button>
+
+    {% if buscar %}
+        <a href="/admin" class="btn-limpiar">Limpiar</a>
+    {% endif %}
 </form>
         
         <table class="tabla-productos">
