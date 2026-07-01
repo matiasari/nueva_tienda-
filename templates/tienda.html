@@ -6,7 +6,681 @@
     <title>Bazar Guille - Tienda</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
-    
+
+    <style>
+        :root {
+            --brand: #4e73df;
+            --brand-dark: #3154b8;
+            --accent: #2e7d32;
+            --danger: #d64545;
+            --ink: #222;
+            --muted: #727782;
+            --line: #e7e9f0;
+            --soft: #f7f8fb;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--soft);
+            color: var(--ink);
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 12px clamp(14px, 4vw, 42px);
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .logo-img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            flex: 0 0 auto;
+        }
+
+        .nombre {
+            font-weight: 800;
+            font-size: clamp(18px, 3vw, 24px);
+            color: var(--brand);
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        .carrito-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 9px 14px;
+            background: var(--brand);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .contador,
+        .contador-float {
+            display: inline-flex;
+            min-width: 22px;
+            height: 22px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: #ffcc32;
+            color: #1d1d1d;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .slider-container {
+            position: relative;
+            height: clamp(240px, 42vw, 430px);
+            overflow: hidden;
+            background: #dfe4ef;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 650ms ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .slide::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.58), rgba(0,0,0,0.22), rgba(0,0,0,0.06));
+        }
+
+        .slide-text-container {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            color: white;
+            padding-bottom: 28px;
+        }
+
+        .slide-text-container h2 {
+            max-width: 620px;
+            margin: 0 0 8px;
+            font-size: clamp(28px, 5vw, 54px);
+            line-height: 1.04;
+            letter-spacing: 0;
+        }
+
+        .slide-text-container p {
+            max-width: 520px;
+            margin: 0 0 18px;
+            color: rgba(255,255,255,0.92);
+            font-size: clamp(15px, 2.4vw, 19px);
+        }
+
+        .btn-promo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: white;
+            color: var(--brand-dark);
+            text-decoration: none;
+            font-weight: 800;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .slider-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 14px;
+            z-index: 3;
+            display: flex;
+            gap: 8px;
+            transform: translateX(-50%);
+        }
+
+        .slider-dot {
+            width: 9px;
+            height: 9px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.55);
+            cursor: pointer;
+        }
+
+        .slider-dot.active {
+            width: 24px;
+            background: white;
+        }
+
+        .tienda-tools {
+            position: relative;
+            z-index: 5;
+            width: min(1120px, calc(100% - 24px));
+            margin: -24px auto 18px;
+            padding: 14px;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: 0 12px 30px rgba(25, 30, 45, 0.08);
+        }
+
+        .buscador form {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+        }
+
+        .buscador input {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .buscador input:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.12);
+        }
+
+        .buscador button,
+        .btn-limpiar {
+            min-height: 44px;
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand);
+            color: white;
+            text-decoration: none;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .btn-limpiar {
+            background: #777e8c;
+        }
+
+        .categorias-nav {
+            width: min(1120px, calc(100% - 24px));
+            margin: 0 auto 24px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0 10px;
+            scrollbar-width: thin;
+        }
+
+        .dropdown-cat {
+            position: relative;
+            flex: 0 0 auto;
+        }
+
+        .cat-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 38px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: white;
+            color: #363b46;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .cat-chip.activo,
+        .cat-chip:hover {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            min-width: 190px;
+            top: 42px;
+            left: 0;
+            padding: 8px;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 12px 24px rgba(25, 30, 45, 0.14);
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 6px;
+            color: #343946;
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--soft);
+        }
+
+        .dropdown-cat:hover .dropdown-content {
+            display: block;
+        }
+
+        .contenedor-categorias {
+            width: min(1120px, calc(100% - 24px));
+            margin: 0 auto 36px;
+        }
+
+        .categoria-bloque {
+            margin: 0 0 34px;
+        }
+
+        .titulo-categoria {
+            margin: 0 0 14px;
+            color: #2f3542;
+            font-size: clamp(20px, 3vw, 28px);
+            letter-spacing: 0;
+        }
+
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: 0 8px 18px rgba(20, 27, 45, 0.05);
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px rgba(20, 27, 45, 0.09);
+        }
+
+        .contenedor-foto-principal {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #f0f2f7;
+            overflow: hidden;
+        }
+
+        .foto-principal {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: zoom-in;
+            display: block;
+        }
+
+        .stock-badge {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.92);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .stock-badge.sin-stock {
+            color: var(--danger);
+        }
+
+        .galeria-miniaturas {
+            display: flex;
+            gap: 6px;
+            padding: 8px 10px 0;
+            overflow-x: auto;
+            min-height: 48px;
+        }
+
+        .mini-foto {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            background: #f1f3f8;
+            flex: 0 0 auto;
+        }
+
+        .mini-foto:hover,
+        .mini-foto.activa {
+            border-color: var(--brand);
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 12px;
+        }
+
+        .card-content h3 {
+            min-height: 44px;
+            margin: 0 0 8px;
+            color: #252b36;
+            font-size: 15px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+
+        .precio {
+            margin: 0 0 10px;
+            color: var(--brand-dark);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .selector-variante {
+            width: 100%;
+            min-height: 40px;
+            margin-bottom: 10px;
+            padding: 8px 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: white;
+            color: #252b36;
+            font-size: 14px;
+        }
+
+        .btn-comprar {
+            width: 100%;
+            min-height: 42px;
+            margin-top: auto;
+            border: 0;
+            border-radius: 8px;
+            background: var(--accent);
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-comprar:hover {
+            filter: brightness(0.96);
+        }
+
+        .btn-comprar.agotado,
+        .btn-comprar:disabled {
+            background: #a0a6b2;
+            cursor: not-allowed;
+        }
+
+        .sin-resultados {
+            margin: 28px auto 44px;
+            padding: 34px 18px;
+            text-align: center;
+            background: white;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+        }
+
+        .sin-resultados h2 {
+            margin: 0 0 8px;
+            color: #2f3542;
+        }
+
+        .sin-resultados p {
+            margin: 0 0 18px;
+            color: var(--muted);
+        }
+
+        .modal-zoom {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(0,0,0,0.82);
+        }
+
+        .modal-contenido {
+            max-width: min(920px, 92vw);
+            max-height: 86vh;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .cerrar-zoom {
+            position: fixed;
+            right: 18px;
+            top: 12px;
+            color: white;
+            font-size: 38px;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 205;
+        }
+
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 46px;
+            height: 46px;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.92);
+            color: #222;
+            font-size: 26px;
+            cursor: pointer;
+            z-index: 205;
+        }
+
+        .nav-btn.prev {
+            left: 18px;
+        }
+
+        .nav-btn.next {
+            right: 18px;
+        }
+
+        .footer {
+            padding: 26px 16px 82px;
+            background: white;
+            border-top: 1px solid var(--line);
+            text-align: center;
+        }
+
+        .instagram-btn {
+            display: inline-flex;
+            min-height: 40px;
+            padding: 9px 15px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #d62976;
+            color: white;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .copyright {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .whatsapp-float,
+        .carrito-float {
+            position: fixed;
+            z-index: 100;
+            right: 16px;
+            width: 54px;
+            height: 54px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+            text-decoration: none;
+        }
+
+        .whatsapp-float {
+            bottom: 18px;
+            background: #25d366;
+        }
+
+        .whatsapp-float img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .carrito-float {
+            bottom: 84px;
+            background: var(--brand);
+            color: white;
+        }
+
+        .icono-carrito {
+            font-size: 24px;
+        }
+
+        .contador-float {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        @media (max-width: 720px) {
+            .header {
+                padding: 10px 12px;
+            }
+
+            .nombre {
+                white-space: normal;
+                line-height: 1.05;
+            }
+
+            .carrito-btn {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            .slider-container {
+                height: 320px;
+            }
+
+            .slide::after {
+                background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+            }
+
+            .slide-text-container {
+                justify-content: flex-end;
+                padding-bottom: 44px;
+            }
+
+            .tienda-tools {
+                margin-top: 12px;
+            }
+
+            .buscador form {
+                grid-template-columns: 1fr;
+            }
+
+            .categorias-nav {
+                margin-bottom: 18px;
+            }
+
+            .grid-productos {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .card-content {
+                padding: 10px;
+            }
+
+            .card-content h3 {
+                font-size: 13px;
+                min-height: 38px;
+            }
+
+            .precio {
+                font-size: 17px;
+            }
+
+            .galeria-miniaturas {
+                padding: 7px 8px 0;
+            }
+
+            .mini-foto {
+                width: 34px;
+                height: 34px;
+            }
+
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -20,12 +694,12 @@
 
 <header class="header">
     <div class="header-left">
-        <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo" class="logo-img">
+        <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo Bazar Guille" class="logo-img">
         <span class="nombre">BAZAR GUILLE</span>
     </div>
     <div class="header-right">
         <a href="/carrito" class="carrito-btn">
-            🛒 Carrito
+            Carrito
             {% if carrito_total > 0 %}
                 <span class="contador">{{ carrito_total }}</span>
             {% endif %}
@@ -34,127 +708,208 @@
 </header>
 
 {% if banners %}
-<section class="slider-container">
+<section class="slider-container" aria-label="Promociones">
     {% for b in banners %}
-    <!-- 🔴 CORREGIDO: Lógica inteligente para renderizar Banners desde ImgBB o Local -->
-    <div class="slide {% if loop.first %}active{% endif %}" 
-         style="background-image: url('{% if b.imagen and b.imagen.startswith('http') %}{{ b.imagen }}{% else %}{{ url_for('static', filename='uploads/' + b.imagen) }}{% endif %}');">
-        {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
-        <div class="slide-text-container">
-            {% if b.titulo %}<h2>{{ b.titulo }}</h2>{% endif %}
-            {% if b.descripcion %}<p>{{ b.descripcion }}</p>{% endif %}
-            {% if b.link and b.link != "/?q=" and b.link != "#productos" %}
-                <a href="{{ b.link }}" class="btn-promo">Ver Producto</a>
+        <div class="slide {% if loop.first %}active{% endif %}"
+             style="background-image: url('{% if b.imagen and b.imagen.startswith('http') %}{{ b.imagen }}{% else %}{{ url_for('static', filename='uploads/' + b.imagen) }}{% endif %}');">
+            {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
+                <div class="slide-text-container">
+                    {% if b.titulo %}<h2>{{ b.titulo }}</h2>{% endif %}
+                    {% if b.descripcion %}<p>{{ b.descripcion }}</p>{% endif %}
+                    {% if b.link and b.link != "/?q=" and b.link != "#productos" %}
+                        <a href="{{ b.link }}" class="btn-promo">Ver producto</a>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
-        {% endif %}
-    </div>
     {% endfor %}
+
+    {% if banners|length > 1 %}
+        <div class="slider-dots" aria-label="Cambiar banner">
+            {% for b in banners %}
+                <button class="slider-dot {% if loop.first %}active{% endif %}" type="button" onclick="mostrarSlide({{ loop.index0 }})"></button>
+            {% endfor %}
+        </div>
+    {% endif %}
 </section>
 {% endif %}
 
-<div class="buscador">
-    <form action="/" method="GET">
-        <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" required>
-        <button type="submit">Buscar</button>
-    </form>
+<div class="tienda-tools">
+    <div class="buscador">
+        <form action="/" method="GET">
+            <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="¿Qué estás buscando hoy?">
+            <button type="submit">Buscar</button>
+            {% if request.args.get('q') %}
+                <a href="/" class="btn-limpiar">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
 </div>
 
 <div class="categorias-nav">
     <a href="/" class="cat-chip {% if not request.args.get('cat') %}activo{% endif %}">Todos</a>
-    
+
     {% for cat in categorias %}
-    <div class="dropdown-cat">
-        <a href="/?cat={{ cat.nombre }}" class="cat-chip {% if request.args.get('cat') == cat.nombre %}activo{% endif %}">
-            {{ cat.nombre }}
-        </a>
-        
-        {% if cat.subcategorias %}
-        <div class="dropdown-content">
-            {% for sub in cat.subcategorias %}
-                <a href="/?cat={{ sub }}">{{ sub }}</a>
-            {% endfor %}
+        <div class="dropdown-cat">
+            <a href="/?cat={{ cat.nombre }}" class="cat-chip {% if request.args.get('cat') == cat.nombre %}activo{% endif %}">
+                {{ cat.nombre }}
+            </a>
+
+            {% if cat.subcategorias %}
+                <div class="dropdown-content">
+                    {% for sub in cat.subcategorias %}
+                        <a href="/?cat={{ sub }}">{{ sub }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
     {% endfor %}
 </div>
 
 <div class="contenedor-categorias" id="productos">
-    {% for categoria, items in productos | groupby('categoria') %}
-        <section class="categoria-bloque">
-            <h2 class="titulo-categoria">{{ categoria | upper if categoria else 'VARIOS' }}</h2>
-            <div class="grid-productos">
-                {% for p in items %}
-                    <div class="card" id="prod-{{ p.id }}">
-                        <div class="contenedor-foto-principal">
-                            <!-- 🔴 CORREGIDO: Lógica inteligente para la foto de portada de la tarjeta -->
-                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
-                                 id="main-{{ p.id }}" 
-                                 class="foto-principal"
-                                 onclick="abrirModal(this.src)" 
-                                 title="Click para ampliar"
-                                 loading="lazy">
-                        </div>
-                        
-                        <div class="galeria-miniaturas">
-                            <!-- 🔴 CORREGIDO: Miniatura de la foto principal -->
-                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
-                                 onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
-                                 class="mini-foto">
-                            
-                            {% if p.imagenes_extras %}
-                                {% for foto in p.imagenes_extras %}
-                                    <!-- 🔴 CORREGIDO: Lógica para las miniaturas secundarias -->
-                                    <img src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + foto) }}{% endif %}" 
-                                         onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
-                                         class="mini-foto">
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+    {% if productos %}
+        {% for categoria, items in productos | groupby('categoria') %}
+            <section class="categoria-bloque">
+                <h2 class="titulo-categoria">{{ categoria | upper if categoria else 'VARIOS' }}</h2>
+                <div class="grid-productos">
+                    {% for p in items %}
+                        {% set ns = namespace(stock_total=p.stock) %}
+                        {% if p.variantes %}
+                            {% set ns.stock_total = 0 %}
+                            {% for v in p.variantes %}
+                                {% set ns.stock_total = ns.stock_total + v.stock %}
+                            {% endfor %}
+                        {% endif %}
 
-                        <div class="card-content">
-                            <h3>{{ p.nombre }}</h3>
-                            <p class="precio">{{ p.precio | pesos }}</p>
-                            <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
-                                <input type="hidden" name="id" value="{{ p.id }}">
-                                <button type="submit" class="btn-comprar">🛒 Añadir al Carrito</button>
-                            </form>
+                        <div class="card" id="prod-{{ p.id }}">
+                            <div class="contenedor-foto-principal">
+                                <span class="stock-badge {% if ns.stock_total <= 0 %}sin-stock{% endif %}">
+                                    {% if ns.stock_total > 0 %}Stock {{ ns.stock_total }}{% else %}Sin stock{% endif %}
+                                </span>
+
+                                <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}"
+                                     id="main-{{ p.id }}"
+                                     class="foto-principal"
+                                     onclick="abrirModal(this, this.src)"
+                                     title="Click para ampliar"
+                                     alt="{{ p.nombre }}"
+                                     loading="lazy">
+                            </div>
+
+                            <div class="galeria-miniaturas">
+                                <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}"
+                                     onclick="cambiarPrincipal(this, 'main-{{ p.id }}')"
+                                     class="mini-foto activa"
+                                     alt="{{ p.nombre }}">
+
+                                {% if p.imagenes_extras %}
+                                    {% for foto in p.imagenes_extras %}
+                                        <img src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + foto) }}{% endif %}"
+                                             onclick="cambiarPrincipal(this, 'main-{{ p.id }}')"
+                                             class="mini-foto"
+                                             alt="{{ p.nombre }}">
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if p.variantes %}
+                                    {% for v in p.variantes %}
+                                        {% if v.imagen %}
+                                            <img src="{% if v.imagen.startswith('http') %}{{ v.imagen }}{% else %}{{ url_for('static', filename='uploads/' + v.imagen) }}{% endif %}"
+                                                 onclick="cambiarPrincipal(this, 'main-{{ p.id }}')"
+                                                 class="mini-foto"
+                                                 alt="{{ p.nombre }} {{ v.nombre }}">
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="card-content">
+                                <h3>{{ p.nombre }}</h3>
+                                <p class="precio">{{ p.precio | pesos }}</p>
+
+                                <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
+                                    <input type="hidden" name="id" value="{{ p.id }}">
+
+                                    {% if p.variantes %}
+                                        <select name="variante" class="selector-variante" {% if ns.stock_total > 0 %}required{% else %}disabled{% endif %}>
+                                            <option value="">Elegir variante</option>
+                                            {% for v in p.variantes %}
+                                                {% if v.stock > 0 %}
+                                                    <option value="{{ v.nombre }}">{{ v.nombre }} - Stock {{ v.stock }}</option>
+                                                {% else %}
+                                                    <option value="{{ v.nombre }}" disabled>{{ v.nombre }} - Sin stock</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+
+                                    {% if ns.stock_total > 0 %}
+                                        <button type="submit" class="btn-comprar">Añadir al carrito</button>
+                                    {% else %}
+                                        <button type="button" class="btn-comprar agotado" disabled>Sin stock</button>
+                                    {% endif %}
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
-    {% endfor %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+    {% else %}
+        <div class="sin-resultados">
+            <h2>No encontramos productos</h2>
+            <p>Probá con otra búsqueda o elegí una categoría diferente.</p>
+            <a href="/" class="btn-promo">Ver todos</a>
+        </div>
+    {% endif %}
 </div>
 
-<div id="modalZoom" class="modal-zoom" style="display: none;" onclick="cerrarModal()">
+<div id="modalZoom" class="modal-zoom" onclick="cerrarModal()">
     <span class="cerrar-zoom">&times;</span>
-    
-    <button class="nav-btn prev" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
-    
-    <img class="modal-contenido" id="imgAmpliada" onclick="event.stopPropagation()">
-    
-    <button class="nav-btn next" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
+    <button class="nav-btn prev" type="button" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
+    <img class="modal-contenido" id="imgAmpliada" onclick="event.stopPropagation()" alt="Imagen ampliada">
+    <button class="nav-btn next" type="button" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
 </div>
 
 <footer class="footer">
     <div class="footer-content">
-        <a href="https://instagram.com/bazar_guille" class="instagram-btn" target="_blank">Síguenos en Instagram</a>
+        <a href="https://instagram.com/bazar_guille" class="instagram-btn" target="_blank" rel="noopener">Síguenos en Instagram</a>
         <p class="copyright">© 2026 Bazar Guille - Todos los derechos reservados</p>
     </div>
 </footer>
 
+<a href="https://wa.me/5491149899616?text=Hola!%20Tengo%20una%20consulta"
+   class="whatsapp-float" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+</a>
+
+<a href="/carrito" class="carrito-float" aria-label="Ir al carrito">
+    <span class="icono-carrito">🛒</span>
+    {% if carrito_total > 0 %}
+        <span class="contador-float">{{ carrito_total }}</span>
+    {% endif %}
+</a>
+
 <script>
-    // Lógica del Slider
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slider-dot');
+
+    function mostrarSlide(index) {
+        if (!slides.length) return;
+
+        slides[currentSlide].classList.remove('active');
+        if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+
+        currentSlide = index;
+
+        slides[currentSlide].classList.add('active');
+        if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+    }
 
     function nextSlide() {
-        if (slides.length > 0) {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+        if (slides.length > 1) {
+            mostrarSlide((currentSlide + 1) % slides.length);
         }
     }
 
@@ -162,28 +917,39 @@
         setInterval(nextSlide, 5000);
     }
 
+    function cambiarPrincipal(thumb, mainId) {
+        const main = document.getElementById(mainId);
+        if (!main) return;
+
+        main.src = thumb.src;
+
+        const galeria = thumb.closest('.galeria-miniaturas');
+        if (galeria) {
+            galeria.querySelectorAll('.mini-foto').forEach(img => img.classList.remove('activa'));
+            thumb.classList.add('activa');
+        }
+    }
+
     let fotosProductoActual = [];
     let indiceFotoActual = 0;
 
-    function abrirModal(imgSrc) {
+    function abrirModal(elemento, imgSrc) {
         const modal = document.getElementById('modalZoom');
         const modalImg = document.getElementById('imgAmpliada');
-        
-        const card = event.target.closest('.card');
-        const todasLasFotos = card.querySelectorAll('.galeria-miniaturas img');
-        
-        // Agarramos las fuentes exactas de las miniaturas para el carrusel de zoom
+        const card = elemento.closest('.card');
+        const todasLasFotos = card ? card.querySelectorAll('.galeria-miniaturas img') : [];
+
         fotosProductoActual = Array.from(todasLasFotos).map(img => img.src);
         indiceFotoActual = fotosProductoActual.indexOf(imgSrc);
+        if (indiceFotoActual === -1) indiceFotoActual = 0;
 
-        // Si se clickea la principal y no mapea directo al index, forzamos la asignación
-        if(indiceFotoActual === -1) indiceFotoActual = 0;
-
-        modalImg.src = fotosProductoActual[indiceFotoActual];
+        modalImg.src = fotosProductoActual[indiceFotoActual] || imgSrc;
         modal.style.display = 'flex';
     }
 
     function cambiarFoto(direccion) {
+        if (!fotosProductoActual.length) return;
+
         indiceFotoActual += direccion;
 
         if (indiceFotoActual >= fotosProductoActual.length) {
@@ -201,34 +967,26 @@
         fotosProductoActual = [];
     }
 
-    // Cerrar con tecla Escape
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") {
             cerrarModal();
         }
+
+        const modal = document.getElementById("modalZoom");
+        if (modal.style.display === "flex") {
+            if (event.key === "ArrowLeft") cambiarFoto(-1);
+            if (event.key === "ArrowRight") cambiarFoto(1);
+        }
     });
 
-    // Auto-scroll si hay búsqueda
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('q') || urlParams.has('cat')) {
         const productosSection = document.getElementById('productos');
         if (productosSection) {
-            productosSection.scrollIntoView({ behavior: 'smooth' });
+            productosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 </script>
-
-<a href="https://wa.me/5491149899616?text=Hola!%20Tengo%20una%20consulta" 
-   class="whatsapp-float" target="_blank">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-</a>
- 
-<a href="/carrito" class="carrito-float">
-    <span class="icono-carrito">🛒</span>
-    {% if carrito_total > 0 %}
-        <span class="contador-float">{{ carrito_total }}</span>
-    {% endif %}
-</a>
 
 </body>
 </html>
