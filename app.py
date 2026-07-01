@@ -183,28 +183,59 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-    # Recibimos el parámetro 'page' desde la URL, por defecto es la 1
+
     page = request.args.get('page', 1, type=int)
-    per_page = 30  # Mostramos 30 productos por página
+    buscar = request.args.get('buscar', '').strip()
+    categoria = request.args.get('categoria', '')
+    stock = request.args.get('stock', '')
 
-    # Usamos paginate nativo de SQLAlchemy
-    productos_paginados = Articulo.query.options(
-        selectinload(Articulo.variantes)
-    ).order_by(Articulo.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    consulta = Articulo.query.options(selectinload(Articulo.variantes))
 
-    # Convertimos a diccionario solo los 30 de la página actual
-    productos = [a.to_dict() for a in productos_paginados.items]
-    
-    categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
-    
-    # Le pasamos el objeto completo 'productos_paginados' al HTML para armar los botones
+    if buscar:
+        if buscar.isdigit():
+            consulta = consulta.filter(
+                (Articulo.id == int(buscar)) |
+                (Articulo.nombre.ilike(f"%{buscar}%"))
+            )
+        else:
+            consulta = consulta.filter(
+                Articulo.nombre.ilike(f"%{buscar}%")
+            )
+
+    if categoria:
+        consulta = consulta.filter(Articulo.categoria == categoria)
+
+    if stock == "sin":
+        consulta = consulta.filter(Articulo.stock <= 0)
+
+    elif stock == "con":
+        consulta = consulta.filter(Articulo.stock > 0)
+
+    pagination = consulta.order_by(
+        Articulo.id.desc()
+    ).paginate(
+        page=page,
+        per_page=30,
+        error_out=False
+    )
+
+    productos = [p.to_dict() for p in pagination.items]
+
+    categorias = [
+        c.to_dict()
+        for c in Categoria.query.order_by(Categoria.nombre).all()
+    ]
+
     return render_template(
-        'admin.html', 
-        productos=productos, 
-        productos_paginados=productos_paginados, 
-        banners=cargar_datos_banners(), 
-        categorias=categorias, 
-        categories=categorias
+        "admin.html",
+        productos=productos,
+        pagination=pagination,
+        banners=cargar_datos_banners(),
+        categorias=categorias,
+        categories=categorias,
+        buscar=buscar,
+        categoria_actual=categoria,
+        stock_actual=stock
     )
 @app.route('/admin/pedidos')
 @login_requerido
