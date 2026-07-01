@@ -12,66 +12,451 @@
             --danger: #e74a3b;
             --warning: #f6c23e;
             --dark: #5a5c69;
+            --muted: #858796;
+            --border: #e3e6f0;
             --bg: #f8f9fa;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background: var(--bg); color: #333; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        h1 { color: var(--primary); font-size: 24px; }
-        h2 { font-size: 18px; margin-bottom: 15px; color: var(--dark); }
-        .btn-logout { background: var(--danger); color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 14px; }
-        .btn-pedidos { background: var(--primary); color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 14px; margin-right: 10px; }
-        .container-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
-        @media (max-width: 900px) { .container-admin { grid-template-columns: 1fr; } }
-        .panel-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        label { font-weight: bold; display: block; margin-top: 10px; margin-bottom: 5px; font-size: 14px; color: #444; }
-        input[type="text"], input[type="number"], select, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #d1d3e2; border-radius: 5px; margin-bottom: 5px; outline: none; font-size: 14px; }
-        
-        .btn-submit { background: var(--success); color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px; }
-        .productos-box { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 25px; }
-        .tabla-productos { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        .tabla-productos th, .tabla-productos td { padding: 12px; text-align: left; border-bottom: 1px solid #e3e6f0; }
-        .tabla-productos th { background: #f8f9fc; color: var(--dark); font-weight: 600; }
-        .img-prod { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
-        
-        .btn-act { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-decoration: none; display: inline-block; margin-right: 5px; border: none; cursor: pointer; }
-        .btn-edit-color { background: var(--warning); color: #333; }
-        .btn-pausa-color { background: #36b9cc; color: white; }
-        .btn-pausa-color.inactivo { background: #858796; color: white; }
-        .btn-del-color { background: var(--danger); color: white; }
-        .badge-variante { display: inline-block; background: #e2e8f0; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 4px; }
-        
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 10px; width: 500px; max-width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .close-btn { font-size: 24px; font-weight: bold; cursor: pointer; color: #aaa; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: #333;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-logout,
+        .btn-pedidos {
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .btn-logout {
+            background: var(--danger);
+        }
+
+        .btn-pedidos {
+            background: var(--primary);
+        }
+
+        .container-admin {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .panel-box,
+        .productos-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .productos-box {
+            padding: 25px;
+            margin-top: 25px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="search"],
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d3e2;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            outline: none;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.12);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-submit {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        .btn-submit:hover,
+        .btn-pedidos:hover,
+        .btn-logout:hover,
+        .btn-act:hover {
+            filter: brightness(0.95);
+        }
+
+        .buscador-admin {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px) minmax(130px, 170px) auto auto;
+            gap: 10px;
+            align-items: end;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .buscador-admin label {
+            margin-top: 0;
+        }
+
+        .buscador-admin input,
+        .buscador-admin select {
+            margin-bottom: 0;
+        }
+
+        .btn-buscar,
+        .btn-limpiar {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-buscar {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-limpiar {
+            background: var(--muted);
+            color: white;
+        }
+
+        .tabla-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+            min-width: 820px;
+        }
+
+        .tabla-productos th,
+        .tabla-productos td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .tabla-productos th {
+            background: #f8f9fc;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .img-prod {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+            background: #f1f3f8;
+        }
+
+        .btn-act {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin: 2px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-edit-color {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .btn-pausa-color {
+            background: #36b9cc;
+            color: white;
+        }
+
+        .btn-pausa-color.inactivo {
+            background: var(--muted);
+            color: white;
+        }
+
+        .btn-del-color {
+            background: var(--danger);
+            color: white;
+        }
+
+        .badge-variante {
+            display: inline-block;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px 4px 2px 0;
+        }
+
+        .banner-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 0;
+        }
+
+        .banner-item:last-child {
+            border-bottom: 0;
+        }
+
+        .banner-img {
+            width: 90px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 5px;
+            background: #f1f3f8;
+            flex: 0 0 auto;
+        }
+
+        .banner-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .banner-info strong,
+        .banner-info small {
+            display: block;
+        }
+
+        .banner-info small {
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .paginacion {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagina-disabled {
+            color: #ccc;
+            padding: 6px 12px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .empty-state {
+            padding: 25px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 1050px) {
+            .container-admin {
+                grid-template-columns: 1fr;
+            }
+
+            .buscador-admin {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 12px;
+            }
+
+            header {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 15px;
+            }
+
+            .header-actions,
+            .btn-pedidos,
+            .btn-logout {
+                width: 100%;
+            }
+
+            .form-grid,
+            .buscador-admin {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-box,
+            .productos-box {
+                padding: 15px;
+            }
+
+            .banner-item {
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div>
-            <h1>🏪 Panel de Administración</h1>
-            <p style="font-size: 13px; color: #858796;">Bazar Guille - Inventario Inteligente con Variantes</p>
+            <h1>Panel de Administración</h1>
+            <p style="font-size: 13px; color: var(--muted);">Bazar Guille - Inventario inteligente con variantes</p>
         </div>
-        <div>
-            <a href="/admin/pedidos" class="btn-pedidos">📦 Ver Pedidos</a>
-            <a href="/" target="_blank" class="btn-pedidos" style="background:#858796;">👁️ Ver Tienda</a>
+        <div class="header-actions">
+            <a href="/admin/pedidos" class="btn-pedidos">Ver Pedidos</a>
+            <a href="/" target="_blank" class="btn-pedidos" style="background:#858796;">Ver Tienda</a>
             <a href="/logout" class="btn-logout">Cerrar Sesión</a>
         </div>
     </header>
 
     <div class="container-admin">
         <div class="panel-box">
-            <h2 style="color: var(--primary);">✨ Agregar Nuevo Artículo</h2>
+            <h2 style="color: var(--primary);">Agregar Nuevo Artículo</h2>
             <form action="/admin/producto/agregar" method="POST" enctype="multipart/form-data">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-grid">
                     <div>
                         <label>Nombre del Producto:</label>
                         <input type="text" name="nombre" required placeholder="Ej: TERMO MEDIA MANIJA 1L">
+
                         <label>Precio ($):</label>
                         <input type="number" step="0.01" name="precio" required placeholder="14500">
-                        <label>Stock General (Sin variantes):</label>
+
+                        <label>Stock General (sin variantes):</label>
                         <input type="number" name="stock" value="0">
                     </div>
                     <div>
@@ -82,173 +467,215 @@
                                 <option value="{{ c.nombre }}">{{ c.nombre }}</option>
                             {% endfor %}
                         </select>
+
                         <label>Subcategoría:</label>
                         <select name="subcategoria" id="adminSubcat">
                             <option value="">Sin subcategoría</option>
                         </select>
+
                         <label>Fotos:</label>
                         <input type="file" name="imagenes_extras" multiple accept="image/*">
                     </div>
                 </div>
+
                 <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px;">
-                    <label style="color: #856404; margin-top: 0; font-weight: bold;">🎨 Variantes (Opcional):</label>
+                    <label style="color: #856404; margin-top: 0; font-weight: bold;">Variantes (opcional):</label>
                     <input type="text" name="variantes_input" placeholder="Ej: NEGRO:10:URL_FOTO, ROJO:15">
                 </div>
+
                 <button type="submit" class="btn-submit">Guardar Artículo</button>
             </form>
         </div>
-        
 
         <div class="panel-box">
-            <h2 style="color: var(--primary);">📂 Gestión de Categorías</h2>
+            <h2 style="color: var(--primary);">Gestión de Categorías</h2>
             <form action="/admin/categorias/agregar" method="POST" style="display:flex; gap:10px; margin-bottom:15px;">
                 <input type="text" name="nombre" required placeholder="NUEVA CATEGORÍA" style="text-transform: uppercase;">
                 <button type="submit" class="btn-submit" style="margin-top:0; width:auto; padding:5px 15px;">+</button>
             </form>
+
             <form action="/admin/subcategorias/agregar" method="POST">
+                <label>Categoría padre:</label>
                 <select name="padre" required>
-                    {% for c in categories %} <option value="{{ c.nombre }}">{{ c.nombre }}</option> {% endfor %}
+                    {% for c in categories %}
+                        <option value="{{ c.nombre }}">{{ c.nombre }}</option>
+                    {% endfor %}
                 </select>
+
+                <label>Subcategoría:</label>
                 <input type="text" name="nombre_sub" required placeholder="NUEVA SUBCATEGORÍA" style="text-transform: uppercase;">
+
                 <button type="submit" class="btn-submit" style="margin-top:5px;">Agregar Subcategoría</button>
             </form>
         </div>
-    </div>
-    <div class="panel-box">
-    <h2 style="color: var(--primary);">🖼️ Banners de la tienda</h2>
 
-    <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data">
-        <label>Título del banner:</label>
-        <input type="text" name="titulo" required placeholder="Ej: OFERTAS DE LA SEMANA">
+        <div class="panel-box">
+            <h2 style="color: var(--primary);">Banners de la tienda</h2>
 
-        <label>Descripción:</label>
-        <input type="text" name="descripcion" placeholder="Ej: Productos seleccionados">
+            <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data">
+                <label>Título del banner:</label>
+                <input type="text" name="titulo" required placeholder="Ej: OFERTAS DE LA SEMANA">
 
-        <label>ID o nombre del producto:</label>
-        <input type="text" name="producto_id" required placeholder="Ej: 123 o TERMO">
+                <label>Descripción:</label>
+                <input type="text" name="descripcion" placeholder="Ej: Productos seleccionados con descuento">
 
-        <label>Imagen del banner:</label>
-        <input type="file" name="imagen" accept="image/*" required>
+                <label>ID o nombre del producto al que apunta:</label>
+                <input type="text" name="producto_id" required placeholder="Ej: 123 o TERMO">
 
-        <button type="submit" class="btn-submit">Agregar Banner</button>
-    </form>
+                <label>Imagen del banner:</label>
+                <input type="file" name="imagen" accept="image/*" required>
 
-    <div style="margin-top: 20px;">
-        {% if banners %}
-            {% for b in banners %}
-                <div style="display:flex; gap:12px; align-items:center; border-bottom:1px solid #e3e6f0; padding:10px 0;">
-                    <img src="{{ b.imagen }}" style="width:90px; height:55px; object-fit:cover; border-radius:5px;">
-                    <div style="flex:1;">
-                        <strong>{{ b.titulo }}</strong><br>
-                        <small style="color:#858796;">{{ b.descripcion }}</small>
-                    </div>
-                    <a href="/admin/banner/eliminar/{{ b.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar este banner?')">Eliminar</a>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p style="font-size:13px; color:#858796;">Todavía no hay banners cargados.</p>
-        {% endif %}
-    </div>
-</div>
+                <button type="submit" class="btn-submit">Agregar Banner</button>
+            </form>
 
-    <div class="productos-box">
-        <h2>📦 Artículos en Inventario ({{ productos|length }})</h2>
-       <form method="GET" action="/admin" class="buscador-admin">
-    <input
-        type="search"
-        name="buscar"
-        value="{{ buscar }}"
-        placeholder="Buscar por nombre o ID..."
-    >
-    <button type="submit" class="btn-buscar">Buscar</button>
-
-    {% if buscar %}
-        <a href="/admin" class="btn-limpiar">Limpiar</a>
-    {% endif %}
-</form>
-        
-        <table class="tabla-productos">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Imagen</th>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Stock / Variantes</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for p in productos %}
-                <tr style="opacity: {% if not p.activo %}0.5{% else %}1{% endif %};">
-                    <td><strong>#{{ p.id }}</strong></td>
-                    <td><img src="{{ p.imagen }}" class="img-prod"></td>
-                    <td><strong>{{ p.nombre }}</strong></td>
-                    <td>{{ p.precio|pesos }}</td>
-                    <td>
-                        {% if p.variantes|length > 0 %}
-                            {% for v in p.variantes %} <span class="badge-variante">{{ v.nombre }} ({{ v.stock }})</span> {% endfor %}
-                        {% else %}
-                            {{ p.stock }} un.
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span style="color: {% if p.activo %}#2e7d32{% else %}#e74a3b{% endif %}; font-weight: bold;">
-                            {% if p.activo %}🟢 Activo{% else %}🔴 Agotado{% endif %}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn-act btn-edit-color" onclick="abrirModalEditar('{{ p|tojson|forceescape }}')">✏️ Editar</button>
-                        
-                        <a href="/admin/producto/toggle_pausa/{{ p.id }}" class="btn-act btn-pausa-color {% if not p.activo %}inactivo{% endif %}">
-                            {% if p.activo %}⏸️ Agotar{% else %}▶️ Activar{% endif %}
-                        </a>
-                        
-                        <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar definitivo?')">❌</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <div style="margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px;">
-            {% if pagination.has_prev %}
-                <a href="/admin?page={{ pagination.prev_num }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">« Anterior</a>
-            {% else %}
-                <span style="color: #ccc; padding: 6px 12px; border: 1px solid #eee; border-radius: 4px; font-size: 12px;">« Anterior</span>
-            {% endif %}
-
-            <div style="font-size: 14px; font-weight: bold; color: var(--dark);">
-                Página {{ pagination.page }} de {{ pagination.pages }}
+            <div style="margin-top: 20px;">
+                {% if banners %}
+                    {% for b in banners %}
+                        <div class="banner-item">
+                            <img src="{{ b.imagen }}" class="banner-img" alt="Banner {{ b.titulo }}">
+                            <div class="banner-info">
+                                <strong>{{ b.titulo }}</strong>
+                                <small>{{ b.descripcion }}</small>
+                                <small>{{ b.link }}</small>
+                            </div>
+                            <a href="/admin/banner/eliminar/{{ b.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar este banner?')">Eliminar</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="font-size: 13px; color: var(--muted);">Todavía no hay banners cargados.</p>
+                {% endif %}
             </div>
-
-            {% if pagination.has_next %}
-                <a href="/admin?page={{ pagination.next_num }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">Siguiente »</a>
-            {% else %}
-                <span style="color: #ccc; padding: 6px 12px; border: 1px solid #eee; border-radius: 4px; font-size: 12px;">Siguiente »</span>
-            {% endif %}
         </div>
     </div>
 
+    <div class="productos-box">
+        <h2>Artículos en Inventario ({{ pagination.total if pagination else productos|length }})</h2>
+
+        <form method="GET" action="/admin" class="buscador-admin">
+            <div>
+                <label>Buscar:</label>
+                <input type="search" name="buscar" value="{{ buscar or '' }}" placeholder="Nombre o ID del producto">
+            </div>
+
+            <div>
+                <label>Categoría:</label>
+                <select name="categoria">
+                    <option value="">Todas</option>
+                    {% for c in categories %}
+                        <option value="{{ c.nombre }}" {% if categoria_actual == c.nombre %}selected{% endif %}>{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label>Stock:</label>
+                <select name="stock">
+                    <option value="" {% if not stock_actual %}selected{% endif %}>Todos</option>
+                    <option value="con" {% if stock_actual == 'con' %}selected{% endif %}>Con stock</option>
+                    <option value="sin" {% if stock_actual == 'sin' %}selected{% endif %}>Sin stock</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-buscar">Buscar</button>
+            <a href="/admin" class="btn-limpiar">Limpiar</a>
+        </form>
+
+        {% if productos %}
+            <div class="tabla-wrap">
+                <table class="tabla-productos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Stock / Variantes</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in productos %}
+                            <tr style="opacity: {% if not p.activo %}0.5{% else %}1{% endif %};">
+                                <td><strong>#{{ p.id }}</strong></td>
+                                <td><img src="{{ p.imagen }}" class="img-prod" alt="{{ p.nombre }}"></td>
+                                <td><strong>{{ p.nombre }}</strong></td>
+                                <td>{{ p.precio|pesos }}</td>
+                                <td>
+                                    {% if p.variantes|length > 0 %}
+                                        {% for v in p.variantes %}
+                                            <span class="badge-variante">{{ v.nombre }} ({{ v.stock }})</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ p.stock }} un.
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span style="color: {% if p.activo %}#2e7d32{% else %}#e74a3b{% endif %}; font-weight: bold;">
+                                        {% if p.activo %}Activo{% else %}Agotado{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn-act btn-edit-color" onclick="abrirModalEditar('{{ p|tojson|forceescape }}')">Editar</button>
+
+                                    <a href="/admin/producto/toggle_pausa/{{ p.id }}" class="btn-act btn-pausa-color {% if not p.activo %}inactivo{% endif %}">
+                                        {% if p.activo %}Agotar{% else %}Activar{% endif %}
+                                    </a>
+
+                                    <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar definitivo?')">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                No hay artículos para mostrar con esos filtros.
+            </div>
+        {% endif %}
+
+        {% if pagination %}
+            <div class="paginacion">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for('admin', page=pagination.prev_num, buscar=buscar, categoria=categoria_actual, stock=stock_actual) }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">« Anterior</a>
+                {% else %}
+                    <span class="pagina-disabled">« Anterior</span>
+                {% endif %}
+
+                <div style="font-size: 14px; font-weight: bold; color: var(--dark);">
+                    Página {{ pagination.page }} de {{ pagination.pages }}
+                </div>
+
+                {% if pagination.has_next %}
+                    <a href="{{ url_for('admin', page=pagination.next_num, buscar=buscar, categoria=categoria_actual, stock=stock_actual) }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">Siguiente »</a>
+                {% else %}
+                    <span class="pagina-disabled">Siguiente »</span>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
     <div id="modalEditar" class="modal">
-        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 style="color:var(--primary)">✏️ Editar Artículo</h2>
+                <h2 style="color:var(--primary); margin-bottom:0;">Editar Artículo</h2>
                 <span class="close-btn" onclick="cerrarModal()">&times;</span>
             </div>
+
             <form action="/admin/producto/editar" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="editId">
-                
+
                 <label>Nombre del Producto:</label>
                 <input type="text" name="nombre" id="editNombre" required>
 
                 <label>Precio ($):</label>
                 <input type="number" step="0.01" name="precio" id="editPrecio" required>
 
-                <label>Stock General (Si no usa variantes):</label>
+                <label>Stock General (si no usa variantes):</label>
                 <input type="number" name="stock" id="editStock">
 
-                <label>Cambiar foto principal (Opcional):</label>
+                <label>Cambiar foto principal (opcional):</label>
                 <input type="file" name="fotos_nuevas" multiple accept="image/*">
 
                 <label>Categoría:</label>
@@ -258,39 +685,42 @@
                         <option value="{{ c.nombre }}">{{ c.nombre }}</option>
                     {% endfor %}
                 </select>
-                
+
                 <label>Subcategoría:</label>
                 <select name="subcategoria" id="editSubcategoria">
                     <option value="">Sin subcategoría</option>
                 </select>
 
                 <div style="margin-top:15px; padding:12px; background:#e2e8f0; border-radius:6px;">
-                    <label style="margin-top:0; color:#2d3748;">🎨 Editar Variantes y URLs de Fotos:</label>
+                    <label style="margin-top:0; color:#2d3748;">Editar Variantes y URLs de Fotos:</label>
                     <input type="text" name="variantes_input" id="editVariantes" placeholder="Ej: NEGRO:10:https://link.com/foto.jpg, ROJO:5">
                     <small style="color:#4a5568; display:block; margin-top:4px; line-height:1.4;">
                         Estructura: <code>NOMBRE:STOCK:URL_FOTO</code> separados por comas.<br>
-                        <em>Ejemplo: NEGRO:12:https://i.ibb.co/MiFoto.jpg, BLANCO:8</em> (La URL de la foto es opcional).
+                        <em>Ejemplo: NEGRO:12:https://i.ibb.co/MiFoto.jpg, BLANCO:8</em> (la URL de la foto es opcional).
                     </small>
                 </div>
 
-                <button type="submit" class="btn-submit" style="background:var(--primary)">Actualizar Cambios</button>
+                <button type="submit" class="btn-submit" style="background:var(--primary);">Actualizar Cambios</button>
             </form>
         </div>
     </div>
 
     <script>
         const categoriasData = {{ categories|tojson }};
-        
+
         function actualizarSubcats(catNombre, selectId, subcatSeleccionada = "") {
             const subSelect = document.getElementById(selectId);
+            if (!subSelect) return;
+
             subSelect.innerHTML = '<option value="">Sin subcategoría</option>';
             const enc = categoriasData.find(c => c.nombre === catNombre);
+
             if (enc && enc.subcategorias) {
                 enc.subcategorias.forEach(s => {
-                    let o = document.createElement('option'); 
-                    o.value = s; 
+                    const o = document.createElement('option');
+                    o.value = s;
                     o.textContent = s;
-                    if(s === subcatSeleccionada) {
+                    if (s === subcatSeleccionada) {
                         o.selected = true;
                     }
                     subSelect.appendChild(o);
@@ -300,26 +730,38 @@
 
         function abrirModalEditar(pRaw) {
             const p = JSON.parse(pRaw);
-            
+
             document.getElementById('editId').value = p.id;
             document.getElementById('editNombre').value = p.nombre;
             document.getElementById('editPrecio').value = p.precio;
             document.getElementById('editStock').value = p.stock;
-            
+
             document.getElementById('editCategoria').value = p.categoria || "";
             actualizarSubcats(p.categoria, 'editSubcategoria', p.subcategoria);
 
-            let varString = p.variantes && p.variantes.length > 0 
-                ? p.variantes.map(v => v.imagen ? `${v.nombre}:${v.stock}:${v.imagen}` : `${v.nombre}:${v.stock}`).join(', ') 
+            const varString = p.variantes && p.variantes.length > 0
+                ? p.variantes.map(v => v.imagen ? `${v.nombre}:${v.stock}:${v.imagen}` : `${v.nombre}:${v.stock}`).join(', ')
                 : '';
-            document.getElementById('editVariantes').value = varString;
 
+            document.getElementById('editVariantes').value = varString;
             document.getElementById('modalEditar').style.display = 'flex';
         }
-            
+
         function cerrarModal() {
             document.getElementById('modalEditar').style.display = 'none';
         }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarModal();
+            }
+        });
+
+        document.getElementById('modalEditar').addEventListener('click', function(event) {
+            if (event.target === this) {
+                cerrarModal();
+            }
+        });
     </script>
 </body>
 </html>
