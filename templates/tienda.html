@@ -25,14 +25,7 @@
         <img src="{{ url_for('static', filename='logo.ico') }}" alt="Logo Bazar Guille" class="logo-img">
         <span class="nombre">BAZAR GUILLE</span>
     </div>
-    <div class="header-right">
-        <a href="/carrito" class="carrito-btn">
-            Carrito
-            {% if carrito_total > 0 %}
-                <span class="contador">{{ carrito_total }}</span>
-            {% endif %}
-        </a>
-    </div>
+  
 </header>
 
 {% if banners %}
