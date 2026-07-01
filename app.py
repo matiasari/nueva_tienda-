@@ -183,11 +183,29 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-    articulos_db = Articulo.query.options(selectinload(Articulo.variantes)).order_by(Articulo.id.desc()).all()
-    productos = [a.to_dict() for a in articulos_db]
-    categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
-    return render_template('admin.html', productos=productos, banners=cargar_datos_banners(), categorias=categorias, categories=categorias)
+    # Recibimos el parámetro 'page' desde la URL, por defecto es la 1
+    page = request.args.get('page', 1, type=int)
+    per_page = 30  # Mostramos 30 productos por página
 
+    # Usamos paginate nativo de SQLAlchemy
+    productos_paginados = Articulo.query.options(
+        selectinload(Articulo.variantes)
+    ).order_by(Articulo.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    # Convertimos a diccionario solo los 30 de la página actual
+    productos = [a.to_dict() for a in productos_paginados.items]
+    
+    categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
+    
+    # Le pasamos el objeto completo 'productos_paginados' al HTML para armar los botones
+    return render_template(
+        'admin.html', 
+        productos=productos, 
+        productos_paginados=productos_paginados, 
+        banners=cargar_datos_banners(), 
+        categorias=categorias, 
+        categories=categorias
+    )
 @app.route('/admin/pedidos')
 @login_requerido
 def ver_pedidos_seccion():
