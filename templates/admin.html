@@ -161,18 +161,18 @@
             </tbody>
         </table>
         <div style="margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px;">
-            {% if productos_paginados.has_prev %}
-                <a href="/admin?page={{ productos_paginados.prev_num }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">« Anterior</a>
+            {% if pagination.has_prev %}
+                <a href="/admin?page={{ pagination.prev_num }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">« Anterior</a>
             {% else %}
                 <span style="color: #ccc; padding: 6px 12px; border: 1px solid #eee; border-radius: 4px; font-size: 12px;">« Anterior</span>
             {% endif %}
 
             <div style="font-size: 14px; font-weight: bold; color: var(--dark);">
-                Página {{ productos_paginados.page }} de {{ productos_paginados.pages }}
+                Página {{ pagination.page }} de {{ pagination.pages }}
             </div>
 
-            {% if productos_paginados.has_next %}
-                <a href="/admin?page={{ productos_paginados.next_num }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">Siguiente »</a>
+            {% if pagination.has_next %}
+                <a href="/admin?page={{ pagination.next_num }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">Siguiente »</a>
             {% else %}
                 <span style="color: #ccc; padding: 6px 12px; border: 1px solid #eee; border-radius: 4px; font-size: 12px;">Siguiente »</span>
             {% endif %}
