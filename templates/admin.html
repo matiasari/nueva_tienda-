@@ -387,6 +387,53 @@
             margin-top: 15px;
         }
 
+        /* Estilos de la lista de categorías */
+        .cat-list-box {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .cat-card {
+            background: #f8f9fc;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .cat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 13px;
+            color: var(--dark);
+        }
+
+        .subcat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+            padding: 3px 0;
+            border-top: 1px dashed #e2e8f0;
+            margin-top: 3px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0 2px;
+        }
+
         @media (max-width: 1050px) {
             .container-admin {
                 grid-template-columns: 1fr;
@@ -489,6 +536,7 @@
 
         <div class="panel-box">
             <h2 style="color: var(--primary);">Gestión de Categorías</h2>
+            
             <form action="/admin/categorias/agregar" method="POST" style="display:flex; gap:10px; margin-bottom:15px;">
                 <input type="text" name="nombre" required placeholder="NUEVA CATEGORÍA" style="text-transform: uppercase;">
                 <button type="submit" class="btn-submit" style="margin-top:0; width:auto; padding:5px 15px;">+</button>
@@ -507,28 +555,60 @@
 
                 <button type="submit" class="btn-submit" style="margin-top:5px;">Agregar Subcategoría</button>
             </form>
+
+            <div class="cat-list-box">
+                {% for c in categories %}
+                    <div class="cat-card">
+                        <div class="cat-card-header">
+                            <span>{{ c.nombre }}</span>
+                            <div>
+                                <button class="icon-btn" onclick="renombrarCat('{{ c.id if c.id is defined else 0 }}', '{{ c.nombre }}')" title="Renombrar">✏️</button>
+                                <a href="/admin/categorias/eliminar/{{ c.nombre }}" class="icon-btn" style="color: var(--danger); text-decoration:none;" onclick="return confirm('¿Borrar categoría {{ c.nombre }} y sus subcategorías?')" title="Eliminar">🗑️</a>
+                            </div>
+                        </div>
+
+                        {% if c.subcategorias %}
+                            <div style="margin-top:5px;">
+                                {% for sub in c.subcategorias %}
+                                    <div class="subcat-item">
+                                        <span>• {{ sub }}</span>
+                                        <div>
+                                            <button class="icon-btn" onclick="renombrarSub('{{ c.nombre }}', '{{ sub }}')" title="Renombrar">✏️</button>
+                                            <a href="/admin/subcategorias/eliminar/{{ c.nombre }}/{{ sub }}" class="icon-btn" style="color: var(--danger); text-decoration:none;" onclick="return confirm('¿Eliminar subcategoría {{ sub }}?')" title="Eliminar">×</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="panel-box">
+        <div class="panel-box" style="grid-column: span 2;">
             <h2 style="color: var(--primary);">Banners de la tienda</h2>
 
-            <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data">
-                <label>Título del banner:</label>
-                <input type="text" name="titulo" required placeholder="Ej: OFERTAS DE LA SEMANA">
-
-                <label>Descripción:</label>
-                <input type="text" name="descripcion" placeholder="Ej: Productos seleccionados con descuento">
-
-                <label>ID o nombre del producto al que apunta:</label>
-                <input type="text" name="producto_id" required placeholder="Ej: 123 o TERMO">
-
-                <label>Imagen del banner:</label>
-                <input type="file" name="imagen" accept="image/*" required>
-
-                <button type="submit" class="btn-submit">Agregar Banner</button>
+            <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: end;">
+                <div>
+                    <label>Título del banner:</label>
+                    <input type="text" name="titulo" required placeholder="Ej: OFERTAS DE LA SEMANA">
+                </div>
+                <div>
+                    <label>Descripción:</label>
+                    <input type="text" name="descripcion" placeholder="Ej: Productos seleccionados">
+                </div>
+                <div>
+                    <label>ID o búsqueda de producto:</label>
+                    <input type="text" name="producto_id" required placeholder="Ej: 123 o TERMO">
+                </div>
+                <div>
+                    <label>Imagen del banner:</label>
+                    <input type="file" name="imagen" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn-submit" style="margin-top:0; height: 42px;">Agregar Banner</button>
             </form>
 
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
                 {% if banners %}
                     {% for b in banners %}
                         <div class="banner-item">
@@ -749,6 +829,39 @@
 
         function cerrarModal() {
             document.getElementById('modalEditar').style.display = 'none';
+        }
+
+        function renombrarCat(id, nombreActual) {
+            let nuevoNombre = prompt("Nuevo nombre para la categoría:", nombreActual);
+            if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== nombreActual) {
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/categorias/editar';
+                
+                form.innerHTML = `
+                    <input type="hidden" name="id" value="${id}">
+                    <input type="hidden" name="nombre" value="${nuevoNombre.trim()}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function renombrarSub(padre, subActual) {
+            let nuevoNombre = prompt(`Nuevo nombre para la subcategoría de ${padre}:`, subActual);
+            if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== subActual) {
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/subcategorias/editar';
+                
+                form.innerHTML = `
+                    <input type="hidden" name="padre" value="${padre}">
+                    <input type="hidden" name="sub_vieja" value="${subActual}">
+                    <input type="hidden" name="sub_nueva" value="${nuevoNombre.trim()}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
 
         document.addEventListener('keydown', function(event) {

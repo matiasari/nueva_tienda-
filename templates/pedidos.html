@@ -35,8 +35,8 @@
                             <div>
                                 {% if ped.estado == 'PENDIENTE' %}
                                     <span style="background: #f1c40f; color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: bold;">⏳ PENDIENTE</span>
-                                {% elif ped.estado == 'HECHO' %}
-                                    <span style="background: #2ecc71; color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ HECHO</span>
+                                {% elif ped.estado == 'ENTREGADO' or ped.estado == 'HECHO' %}
+                                    <span style="background: #2ecc71; color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ ENTREGADO</span>
                                 {% else %}
                                     <span style="background: #e74c3c; color: #fff; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: bold;">❌ CANCELADO</span>
                                 {% endif %}
@@ -47,7 +47,12 @@
                             {% for det in ped.detalles %}
                             <div style="display: flex; align-items: center; gap: 12px; background: #fdfdfd; padding: 6px; border-radius: 5px; border: 1px solid #f0f0f0;">
                                 <img src="{{ det.imagen if det.imagen and det.imagen.startswith('http') else url_for('static', filename='uploads/' + (det.imagen if det.imagen else 'default.jpg')) }}" width="45" height="45" style="object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
-                                <div style="flex: 1; font-size: 13px;"><strong>{{ det.nombre }}</strong></div>
+                                <div style="flex: 1; font-size: 13px;">
+                                    <strong>{{ det.nombre }}</strong>
+                                    {% if det.variante_nombre %}
+                                        <span style="color: #3498db; font-weight: bold;"> [{{ det.variante_nombre }}]</span>
+                                    {% endif %}
+                                </div>
                                 <div style="font-size: 13px; font-weight: bold;">x{{ det.cantidad }} — {{ (det.precio * det.cantidad) | pesos }}</div>
                             </div>
                             {% endfor %}

@@ -183,7 +183,6 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-
     page = request.args.get('page', 1, type=int)
     buscar = request.args.get('buscar', '').strip()
     categoria = request.args.get('categoria', '')
@@ -207,7 +206,6 @@ def admin():
 
     if stock == "sin":
         consulta = consulta.filter(Articulo.stock <= 0)
-
     elif stock == "con":
         consulta = consulta.filter(Articulo.stock > 0)
 
@@ -220,11 +218,7 @@ def admin():
     )
 
     productos = [p.to_dict() for p in pagination.items]
-
-    categorias = [
-        c.to_dict()
-        for c in Categoria.query.order_by(Categoria.nombre).all()
-    ]
+    categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre).all()]
 
     return render_template(
         "admin.html",
@@ -237,13 +231,163 @@ def admin():
         categoria_actual=categoria,
         stock_actual=stock
     )
+
 @app.route('/admin/pedidos')
 @login_requerido
 def ver_pedidos_seccion():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('pedidos.html', pedidos=pedidos)
 
+# --- GESTIÓN Y ESTADOS DE PEDIDOS CON DESCUENTO DE STOCK ---
+
+@app.route('/admin/pedido/hecho/<int:id>')
+@login_requerido
+def marcar_pedido_hecho(id):
+    pedido = Pedido.query.get(id)
+    if pedido and pedido.estado != "ENTREGADO":
+        # Descontamos stock de los artículos o variantes del pedido
+        for detalle in pedido.detalles:
+            articulo = Articulo.query.get(detalle.articulo_id)
+            if articulo:
+                if detalle.variante_nombre:
+                    var = Variante.query.filter_by(articulo_id=articulo.id, nombre=detalle.variante_nombre).first()
+                    if var:
+                        var.stock = max(0, var.stock - detalle.cantidad)
+                else:
+                    articulo.stock = max(0, articulo.stock - detalle.cantidad)
+        
+        pedido.estado = "ENTREGADO"
+        db.session.commit()
+    
+    if request.args.get('from') == 'pedidos':
+        return redirect(url_for('ver_pedidos_seccion'))
+    return redirect(url_for('ver_pedidos_seccion'))
+
+@app.route('/admin/pedido/cancelar/<int:id>')
+@login_requerido
+def marcar_pedido_cancelado(id):
+    pedido = Pedido.query.get(id)
+    if pedido and pedido.estado != "CANCELADO":
+        # Si antes estuvo ENTREGADO y ahora se cancela, devolvemos el stock
+        if pedido.estado == "ENTREGADO":
+            for detalle in pedido.detalles:
+                articulo = Articulo.query.get(detalle.articulo_id)
+                if articulo:
+                    if detalle.variante_nombre:
+                        var = Variante.query.filter_by(articulo_id=articulo.id, nombre=detalle.variante_nombre).first()
+                        if var:
+                            var.stock += detalle.cantidad
+                    else:
+                        articulo.stock += detalle.cantidad
+
+        pedido.estado = "CANCELADO"
+        db.session.commit()
+    
+    if request.args.get('from') == 'pedidos':
+        return redirect(url_for('ver_pedidos_seccion'))
+    return redirect(url_for('ver_pedidos_seccion'))
+
+@app.route('/admin/pedido/eliminar/<int:id>')
+@login_requerido
+def eliminar_pedido(id):
+    pedido = Pedido.query.get(id)
+    if pedido:
+        db.session.delete(pedido)
+        db.session.commit()
+    
+    if request.args.get('from') == 'pedidos':
+        return redirect(url_for('ver_pedidos_seccion'))
+    return redirect(url_for('ver_pedidos_seccion'))
+
+# --- GESTIÓN DE CATEGORÍAS EN BASE DE DATOS ---
+
+@app.route('/admin/categorias/agregar', methods=['POST'])
+@login_requerido
+def agregar_categoria():
+    nombre = request.form.get('nombre', '').strip().upper()
+    if nombre:
+        cat_existente = Categoria.query.filter_by(nombre=nombre).first()
+        if not cat_existente:
+            nueva_cat = Categoria(nombre=nombre, subcategorias_text="")
+            db.session.add(nueva_cat)
+            db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/subcategorias/agregar', methods=['POST'])
+@login_requerido
+def agregar_subcategoria():
+    padre = request.form.get('padre')
+    nueva_sub = request.form.get('nombre_sub', '').strip().upper()
+    
+    if padre and nueva_sub:
+        cat = Categoria.query.filter_by(nombre=padre).first()
+        if cat:
+            subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()] if cat.subcategorias_text else []
+            if nueva_sub not in subs:
+                subs.append(nueva_sub)
+                cat.subcategorias_text = ",".join(subs)
+                db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/categorias/eliminar/<nombre>')
+@login_requerido
+def eliminar_categoria(nombre):
+    cat = Categoria.query.filter_by(nombre=nombre).first()
+    if cat:
+        db.session.delete(cat)
+        db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/subcategorias/eliminar/<padre>/<nombre_sub>')
+@login_requerido
+def eliminar_subcategoria(padre, nombre_sub):
+    cat = Categoria.query.filter_by(nombre=padre).first()
+    if cat and cat.subcategorias_text:
+        subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()]
+        if nombre_sub in subs:
+            subs.remove(nombre_sub)
+            cat.subcategorias_text = ",".join(subs)
+            db.session.commit()
+    return redirect(url_for('admin'))
+
+# --- EDITAR Y MODIFICAR CATEGORÍAS ---
+
+@app.route('/admin/categorias/editar', methods=['POST'])
+@login_requerido
+def editar_categoria():
+    cat_id = request.form.get('id')
+    nuevo_nombre = request.form.get('nombre', '').strip().upper()
+    
+    if cat_id and nuevo_nombre:
+        cat = Categoria.query.get(cat_id)
+        if cat:
+            nombre_viejo = cat.nombre
+            cat.nombre = nuevo_nombre
+            Articulo.query.filter_by(categoria=nombre_viejo).update({Articulo.categoria: nuevo_nombre})
+            db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/subcategorias/editar', methods=['POST'])
+@login_requerido
+def editar_subcategoria():
+    padre = request.form.get('padre')
+    sub_vieja = request.form.get('sub_vieja')
+    sub_nueva = request.form.get('sub_nueva', '').strip().upper()
+    
+    if padre and sub_vieja and sub_nueva:
+        cat = Categoria.query.filter_by(nombre=padre).first()
+        if cat and cat.subcategorias_text:
+            subs = [s.strip() for s in cat.subcategorias_text.split(',') if s.strip()]
+            if sub_vieja in subs:
+                index = subs.index(sub_vieja)
+                subs[index] = sub_nueva
+                cat.subcategorias_text = ",".join(subs)
+                Articulo.query.filter_by(subcategoria=sub_vieja).update({Articulo.subcategoria: sub_nueva})
+                db.session.commit()
+    return redirect(url_for('admin'))
+
 # --- ABM PRODUCTOS ---
+
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -308,7 +452,6 @@ def editar_producto():
             if len(urls_subidas) > 1:
                 articulo.imagenes_extras = ",".join(urls_subidas[1:])
         
-        # Procesar edición avanzada de variantes (Soporta COLOR:STOCK:FOTO)
         variantes_raw = request.form.get('variantes_input', '')
         if variantes_raw:
             Variante.query.filter_by(articulo_id=articulo.id).delete()
@@ -342,6 +485,8 @@ def eliminar_producto(id):
         db.session.delete(articulo)
         db.session.commit()
     return redirect(url_for('admin'))
+
+# --- CARRITO Y PEDIDOS ---
 
 @app.route('/agregar_al_carrito', methods=['POST'])
 def agregar_al_carrito():
@@ -397,7 +542,9 @@ def finalizar_pedido():
     for i in items: msj += f"- {i['nombre']}{' ['+i['variante_elegida']+']' if i['variante_elegida'] else ''} x{i['cantidad']}\n"
     msj += f"Total Final: {formato_pesos(total+session.get('envio',0))}"
     session['carrito'] = []
-    return redirect(f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}")
+    return redirect(f"https://wa.me/5491124023140?text={requests.utils.quote(msj)}")
+
+# --- BANNERS ---
 
 @app.route('/admin/banner/agregar', methods=['POST'])
 @login_requerido
