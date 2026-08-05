@@ -1052,3 +1052,25 @@ a { text-decoration: none; }
 }
 
 
+
+
+.header-left{
+    position: relative;
+    padding: 25px 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.header-left::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255,140,0,.40),
+        rgba(255,170,0,.20)
+    );
+    border-radius: 20px;
+    z-index: -1;
+}
