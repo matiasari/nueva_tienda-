@@ -10,6 +10,7 @@ import requests
 from datetime import datetime
 from sqlalchemy.orm import selectinload
 from sqlalchemy import text
+from PIL import Image
 
 app = Flask(__name__)
 
@@ -31,6 +32,31 @@ API_KEY_SINCRO = "Guille_Linux_Sincro_2026"
 IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
 CACHE_BANNERS = None
+
+# --- FUNCIÓN PARA OPTIMIZAR / COMPRIMIR IMÁGENES AUTOMÁTICAMENTE ---
+def optimizar_imagen(file, max_ancho=1000, calidad=80):
+    try:
+        img = Image.open(file)
+        
+        # Convertir a RGB si viene en PNG transparente o CMYK
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+            
+        # Redimensionar proporcionalmente si supera el ancho máximo
+        if img.width > max_ancho:
+            alto_proporcional = int((max_ancho / float(img.width)) * img.height)
+            filtro = getattr(Image, 'Resampling', Image).LANCZOS
+            img = img.resize((max_ancho, alto_proporcional), filtro)
+            
+        # Guardar comprimida en buffer de memoria
+        buffer = io.BytesIO()
+        img.save(buffer, format="JPEG", quality=calidad, optimize=True)
+        buffer.seek(0)
+        return buffer
+    except Exception as e:
+        # En caso de error, devuelve el archivo original intacto
+        file.seek(0)
+        return file
 
 # --- MODELOS DE LA BASE DE DATOS ---
 
@@ -245,7 +271,6 @@ def ver_pedidos_seccion():
 def marcar_pedido_hecho(id):
     pedido = Pedido.query.get(id)
     if pedido and pedido.estado != "ENTREGADO":
-        # Descontamos stock de los artículos o variantes del pedido
         for detalle in pedido.detalles:
             articulo = Articulo.query.get(detalle.articulo_id)
             if articulo:
@@ -268,7 +293,6 @@ def marcar_pedido_hecho(id):
 def marcar_pedido_cancelado(id):
     pedido = Pedido.query.get(id)
     if pedido and pedido.estado != "CANCELADO":
-        # Si antes estuvo ENTREGADO y ahora se cancela, devolvemos el stock
         if pedido.estado == "ENTREGADO":
             for detalle in pedido.detalles:
                 articulo = Articulo.query.get(detalle.articulo_id)
@@ -386,7 +410,7 @@ def editar_subcategoria():
                 db.session.commit()
     return redirect(url_for('admin'))
 
-# --- ABM PRODUCTOS ---
+# --- ABM PRODUCTOS (CON COMPRESIÓN AUTOMÁTICA DE IMÁGENES) ---
 
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
@@ -396,7 +420,9 @@ def agregar_producto():
     for img in fotos:
         if img and img.filename != '':
             try:
-                res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (img.filename, img.read())})
+                # 🚀 Optimizar la imagen antes de enviarla a ImgBB
+                img_optimizada = optimizar_imagen(img)
+                res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (img.filename, img_optimizada)})
                 if res.json().get("success"): urls_subidas.append(res.json()["data"]["url"])
             except: pass
             
@@ -444,7 +470,9 @@ def editar_producto():
         for f in nuevas_fotos:
             if f and f.filename != '':
                 try:
-                    res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
+                    # 🚀 Optimizar la imagen antes de enviarla a ImgBB
+                    f_optimizada = optimizar_imagen(f)
+                    res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f_optimizada)})
                     if res.json().get("success"): urls_subidas.append(res.json()["data"]["url"])
                 except: pass
         if urls_subidas:
@@ -553,7 +581,9 @@ def agregar_banner():
     f = request.files.get('imagen')
     if f and f.filename != '':
         try:
-            res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f.read())})
+            # 🚀 Optimizar banner antes de subida
+            f_optimizada = optimizar_imagen(f, max_ancho=1400)
+            res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f_optimizada)})
             if res.json().get("success"):
                 banners.append({"id": max([b['id'] for b in banners], default=0) + 1, "titulo": request.form.get('titulo'), "descripcion": request.form.get('descripcion'), "imagen": res.json()["data"]["url"], "link": f"/?q={request.form.get('producto_id')}"})
                 guardar_datos_banners(banners)
