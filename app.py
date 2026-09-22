@@ -38,7 +38,7 @@ IMGBBB_API_KEY = "65c21c6edd31fca5dd8d37e1ff870739"
 
 CACHE_BANNERS = None
 
-# --- LIMPIEZA DE TEXTO PARA PDF (EVITA ERRORES DE EMOJIS/UNICODE) ---
+# --- LIMPIEZA DE TEXTO PARA PDF ---
 def limpiar_texto_pdf(texto):
     if not texto:
         return ""
@@ -198,7 +198,7 @@ def formato_pesos(valor):
     try: return f"${int(float(valor)):,}".replace(",", ".")
     except: return "$0"
 
-# --- RUTAS DE CLIENTES (LOGIN Y REGISTRO MAYORISTA) ---
+# --- RUTAS DE CLIENTES ---
 @app.route('/cliente/registro', methods=['GET', 'POST'])
 def registro_cliente():
     if request.method == 'POST':
@@ -293,7 +293,18 @@ def logout():
 @app.route('/admin')
 @login_requerido
 def admin():
-    articulos_db = Articulo.query.options(selectinload(Articulo.variantes)).order_by(Articulo.id.desc()).all()
+    q = request.args.get('q')
+    cat = request.args.get('cat')
+
+    query = Articulo.query.options(selectinload(Articulo.variantes))
+
+    if cat and cat != "Todos":
+        query = query.filter((Articulo.categoria == cat) | (Articulo.subcategoria == cat))
+    if q:
+        q_l = f"%{q.lower()}%"
+        query = query.filter((Articulo.nombre.ilike(q_l)) | (db.cast(Articulo.id, db.String).ilike(q_l)) | (Articulo.codigo.ilike(q_l)))
+
+    articulos_db = query.order_by(Articulo.id.desc()).all()
     
     total_unidades_stock = 0
     total_valor_mercaderia = 0.0
@@ -326,7 +337,7 @@ def ver_pedidos_seccion():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('pedidos.html', pedidos=pedidos)
 
-# --- GESTIÓN DE ESTADO Y CANCELACIÓN DE PEDIDOS ---
+# --- GESTIÓN DE PEDIDOS ---
 @app.route('/admin/pedido/cancelar/<int:id>')
 @login_requerido
 def cancelar_pedido(id):
@@ -366,7 +377,7 @@ def eliminar_pedido(id):
         return redirect(url_for('ver_pedidos_seccion'))
     return redirect(url_for('admin'))
 
-# --- EXPORTAR CATÁLOGO PDF MINORISTA (ULTRA EFICIENTE EN MEMORIA) ---
+# --- EXPORTAR CATÁLOGO PDF MINORISTA ---
 @app.route('/admin/articulos/exportar/pdf/minorista')
 @login_requerido
 def exportar_articulos_pdf_minorista():
@@ -428,7 +439,7 @@ def exportar_articulos_pdf_minorista():
         download_name=f"catalogo_minorista_bazar_guille_{datetime.now().strftime('%Y%m%d')}.pdf"
     )
 
-# --- EXPORTAR CATÁLOGO PDF MAYORISTA (ULTRA EFICIENTE EN MEMORIA) ---
+# --- EXPORTAR CATÁLOGO PDF MAYORISTA ---
 @app.route('/admin/articulos/exportar/pdf/mayorista')
 @login_requerido
 def exportar_articulos_pdf_mayorista():
@@ -714,7 +725,6 @@ def finalizar_pedido():
             if v_obj and v_obj['imagen']: it['imagen'] = v_obj['imagen']
             items.append(it)
 
-    # Validación de Monto Mínimo Mayorista
     if es_mayorista and total < MONTO_MINIMO_MAYORISTA:
         return redirect(url_for('mostrar_carrito', error=f"El monto mínimo para compras mayoristas es de ${int(MONTO_MINIMO_MAYORISTA):,}".replace(",", ".")))
 
