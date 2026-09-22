@@ -45,11 +45,10 @@ def limpiar_texto_pdf(texto):
         return ""
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
-# --- DESCARGA DE FOTOS DESDE IMGBB ---
+# --- DESCARGA ULTRA RÁPIDA DE FOTOS PARA EVITAR TIMEOUT DE RENDER (502) ---
 def obtener_fotos_en_paralelo(articulos):
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://imgbb.com/'
     }
     fotos_cache = {}
@@ -60,38 +59,34 @@ def obtener_fotos_en_paralelo(articulos):
             return articulo.id, None
 
         url_str = str(url).strip()
-        urls_a_probar = [url_str]
+        url_directa = url_str
+        
         if "ibb.co/" in url_str and "i.ibb.co/" not in url_str:
             codigo_img = url_str.split("ibb.co/")[-1].split("/")[0]
-            urls_a_probar.insert(0, f"https://i.ibb.co/{codigo_img}/foto.jpg")
+            url_directa = f"https://i.ibb.co/{codigo_img}/foto.jpg"
 
-        for u in urls_a_probar:
-            try:
-                if "ibb.co/" in u and "i.ibb.co/" not in u:
-                    res_p = requests.get(u, headers=headers, timeout=4)
-                    if res_p.status_code == 200:
-                        matches = re.findall(r'https://i\.ibb\.co/[^"\'\s>]+\.(?:jpg|jpeg|png)', res_p.text)
-                        if matches:
-                            u = matches[0]
-
-                res = requests.get(u, headers=headers, timeout=5)
-                if res.status_code == 200 and 'image' in res.headers.get('Content-Type', '').lower():
-                    img = Image.open(io.BytesIO(res.content))
-                    if img.mode != 'RGB':
-                        img = img.convert('RGB')
-                    
-                    img.thumbnail((300, 300))
-                    
-                    buf = io.BytesIO()
-                    img.save(buf, format='JPEG', quality=80)
-                    buf.seek(0)
-                    return articulo.id, buf
-            except Exception:
-                pass
+        try:
+            # Timeout estricto de 1.5s por foto para que no cuelgue Gunicorn en Render
+            res = requests.get(url_directa, headers=headers, timeout=1.5)
+            if res.status_code == 200 and 'image' in res.headers.get('Content-Type', '').lower():
+                img = Image.open(io.BytesIO(res.content))
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                
+                # Miniatura liviana para acelerar FPDF
+                img.thumbnail((200, 200))
+                
+                buf = io.BytesIO()
+                img.save(buf, format='JPEG', quality=75)
+                buf.seek(0)
+                return articulo.id, buf
+        except Exception:
+            pass
 
         return articulo.id, None
 
-    with ThreadPoolExecutor(max_workers=12) as executor:
+    # 30 hilos en paralelo para descargar el catálogo entero en segundos
+    with ThreadPoolExecutor(max_workers=30) as executor:
         resultados = executor.map(descargar_una, articulos)
         for prod_id, img_buf in resultados:
             fotos_cache[prod_id] = img_buf
@@ -380,7 +375,7 @@ def ver_pedidos_seccion():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('pedidos.html', pedidos=pedidos)
 
-# --- GESTIÓN DE ESTADO Y CANCELACIÓN DE PEDIDOS (SOLUCIONA EL 404) ---
+# --- GESTIÓN DE ESTADO Y CANCELACIÓN DE PEDIDOS ---
 @app.route('/admin/pedido/cancelar/<int:id>')
 @login_requerido
 def cancelar_pedido(id):
