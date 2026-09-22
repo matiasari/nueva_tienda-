@@ -45,7 +45,7 @@ def limpiar_texto_pdf(texto):
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
 
 # --- COMPRESIÓN / OPTIMIZACIÓN DE IMÁGENES AL SUBIR ---
-def optimizar_imagen(file, max_ancho=1000, calidad=80):
+def optimizar_imagen(file, max_ancho=1400, calidad=80):
     try:
         img = Image.open(file)
         if img.mode in ("RGBA", "P"):
@@ -72,7 +72,7 @@ class Cliente(db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     telefono = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    tipo_cliente = db.Column(db.String(20), default="MINORISTA") # "MINORISTA" o "MAYORISTA"
+    tipo_cliente = db.Column(db.String(20), default="MINORISTA")
     activo = db.Column(db.Boolean, default=True)
 
 class Articulo(db.Model):
@@ -80,8 +80,8 @@ class Articulo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(100), nullable=True, default="")
     nombre = db.Column(db.String(250), nullable=False)
-    precio = db.Column(db.Float, nullable=False)  # Minorista
-    precio_mayorista = db.Column(db.Float, nullable=True, default=0.0)  # Mayorista
+    precio = db.Column(db.Float, nullable=False)
+    precio_mayorista = db.Column(db.Float, nullable=True, default=0.0)
     categoria = db.Column(db.String(100), nullable=True)
     subcategoria = db.Column(db.String(100), nullable=True, default="")
     stock = db.Column(db.Integer, default=0) 
@@ -170,7 +170,6 @@ def guardar_datos_banners(datos):
     with open(BANNERS_JSON, 'w', encoding='utf-8') as f:
         json.dump(datos, f, indent=4, ensure_ascii=False)
 
-# Inyección automática de columnas en PostgreSQL
 with app.app_context():
     db.create_all()
     try:
@@ -198,7 +197,6 @@ def formato_pesos(valor):
     try: return f"${int(float(valor)):,}".replace(",", ".")
     except: return "$0"
 
-# --- RUTAS DE CLIENTES ---
 @app.route('/cliente/registro', methods=['GET', 'POST'])
 def registro_cliente():
     if request.method == 'POST':
@@ -253,7 +251,6 @@ def logout_cliente():
     session.pop('cliente_tipo', None)
     return redirect(url_for('index'))
 
-# --- RUTAS PÚBLICAS Y TIENDA ---
 @app.route('/')
 def index():
     cat = request.args.get('cat')
@@ -289,7 +286,6 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# --- VISTAS ADMINISTRATIVAS ---
 @app.route('/admin')
 @login_requerido
 def admin():
@@ -310,7 +306,6 @@ def admin():
     total_valor_mercaderia = 0.0
 
     for a in articulos_db:
-        # SOLO SUMAMOS SI EL PRODUCTO ESTÁ ACTIVO (EXCLUYE PAUSADOS)
         if a.activo:
             if a.variantes and len(a.variantes) > 0:
                 stk_prod = sum(v.stock for v in a.variantes)
@@ -339,7 +334,6 @@ def ver_pedidos_seccion():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('pedidos.html', pedidos=pedidos)
 
-# --- GESTIÓN DE PEDIDOS ---
 @app.route('/admin/pedido/cancelar/<int:id>')
 @login_requerido
 def cancelar_pedido(id):
@@ -347,7 +341,6 @@ def cancelar_pedido(id):
     if pedido:
         pedido.estado = "CANCELADO"
         db.session.commit()
-    
     from_param = request.args.get('from')
     if from_param == 'pedidos':
         return redirect(url_for('ver_pedidos_seccion'))
@@ -360,7 +353,6 @@ def cambiar_estado_pedido(id, nuevo_estado):
     if pedido:
         pedido.estado = nuevo_estado.upper()
         db.session.commit()
-    
     from_param = request.args.get('from')
     if from_param == 'pedidos':
         return redirect(url_for('ver_pedidos_seccion'))
@@ -373,65 +365,42 @@ def eliminar_pedido(id):
     if pedido:
         db.session.delete(pedido)
         db.session.commit()
-    
     from_param = request.args.get('from')
     if from_param == 'pedidos':
         return redirect(url_for('ver_pedidos_seccion'))
     return redirect(url_for('admin'))
 
-# --- EXPORTAR EXCEL ---
 @app.route('/admin/articulos/exportar/excel')
 @login_requerido
 def exportar_articulos_excel():
     articulos = Articulo.query.options(selectinload(Articulo.variantes)).order_by(Articulo.id.asc()).all()
-    
     filas = []
     for a in articulos:
         p_may = a.precio_mayorista if (a.precio_mayorista and a.precio_mayorista > 0) else a.precio
         if a.variantes and len(a.variantes) > 0:
             for v in a.variantes:
                 filas.append({
-                    "ID_Producto": a.id,
-                    "Codigo": a.codigo or '',
-                    "Nombre": a.nombre,
-                    "Categoria": a.categoria or 'VARIOS',
-                    "Subcategoria": a.subcategoria or '',
-                    "Variante": v.nombre,
-                    "Stock": v.stock,
-                    "Precio_Minorista": a.precio,
-                    "Precio_Mayorista": p_may,
-                    "Estado": "ACTIVO" if a.activo else "PAUSADO",
+                    "ID_Producto": a.id, "Codigo": a.codigo or '', "Nombre": a.nombre,
+                    "Categoria": a.categoria or 'VARIOS', "Subcategoria": a.subcategoria or '',
+                    "Variante": v.nombre, "Stock": v.stock, "Precio_Minorista": a.precio,
+                    "Precio_Mayorista": p_may, "Estado": "ACTIVO" if a.activo else "PAUSADO",
                     "Imagen": v.imagen if v.imagen else a.imagen
                 })
         else:
             filas.append({
-                "ID_Producto": a.id,
-                "Codigo": a.codigo or '',
-                "Nombre": a.nombre,
-                "Categoria": a.categoria or 'VARIOS',
-                "Subcategoria": a.subcategoria or '',
-                "Variante": "ÚNICA",
-                "Stock": a.stock,
-                "Precio_Minorista": a.precio,
-                "Precio_Mayorista": p_may,
-                "Estado": "ACTIVO" if a.activo else "PAUSADO",
+                "ID_Producto": a.id, "Codigo": a.codigo or '', "Nombre": a.nombre,
+                "Categoria": a.categoria or 'VARIOS', "Subcategoria": a.subcategoria or '',
+                "Variante": "ÚNICA", "Stock": a.stock, "Precio_Minorista": a.precio,
+                "Precio_Mayorista": p_may, "Estado": "ACTIVO" if a.activo else "PAUSADO",
                 "Imagen": a.imagen
             })
-            
     df = pd.DataFrame(filas)
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Catalogo_Bazar_Guille')
     output.seek(0)
-    
-    return send_file(
-        output,
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        as_attachment=True,
-        download_name=f"catalogo_bazar_guille_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-    )
+    return send_file(output, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, download_name=f"catalogo_bazar_guille_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx")
 
-# --- ABM PRODUCTOS ---
 @app.route('/admin/producto/agregar', methods=['POST'])
 @login_requerido
 def agregar_producto():
@@ -444,27 +413,18 @@ def agregar_producto():
                 res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (img.filename, img_opt)})
                 if res.json().get("success"): urls_subidas.append(res.json()["data"]["url"])
             except: pass
-            
     max_id = db.session.query(db.func.max(Articulo.id)).scalar() or 0
     nuevo_id = max_id + 1
-    
     nuevo_articulo = Articulo(
-        id=nuevo_id, 
-        codigo=request.form.get('codigo', '').strip().upper(),
-        nombre=request.form.get('nombre', '').upper(), 
-        precio=float(request.form.get('precio') or 0),
+        id=nuevo_id, codigo=request.form.get('codigo', '').strip().upper(),
+        nombre=request.form.get('nombre', '').upper(), precio=float(request.form.get('precio') or 0),
         precio_mayorista=float(request.form.get('precio_mayorista') or 0),
-        categoria=request.form.get('categoria'), 
-        subcategoria=request.form.get('subcategoria'),
-        stock=int(request.form.get('stock') or 0), 
-        imagen=urls_subidas[0] if urls_subidas else "default.jpg",
+        categoria=request.form.get('categoria'), subcategoria=request.form.get('subcategoria'),
+        stock=int(request.form.get('stock') or 0), imagen=urls_subidas[0] if urls_subidas else "default.jpg",
         imagenes_extras=",".join(urls_subidas[1:]) if len(urls_subidas) > 1 else "", 
-        video_url=request.form.get('video_url', '').strip(),
-        activo=True
+        video_url=request.form.get('video_url', '').strip(), activo=True
     )
-    db.session.add(nuevo_articulo)
-    db.session.commit()
-    
+    db.session.add(nuevo_articulo); db.session.commit()
     variantes_raw = request.form.get('variantes_input', '')
     if variantes_raw:
         for v_item in variantes_raw.split(','):
@@ -474,10 +434,8 @@ def agregar_producto():
                 v_nom = parts[0].strip().upper()
                 v_stk = int(parts[1].strip() or 0)
                 v_img = ":".join(parts[2:]).strip() if len(parts) >= 3 else None
-                nueva_v = Variante(articulo_id=nuevo_id, nombre=v_nom, stock=v_stk, imagen=v_img)
-                db.session.add(nueva_v)
+                db.session.add(Variante(articulo_id=nuevo_id, nombre=v_nom, stock=v_stk, imagen=v_img))
         db.session.commit()
-        
     return redirect(url_for('admin'))
 
 @app.route('/admin/producto/editar', methods=['POST'])
@@ -494,7 +452,6 @@ def editar_producto():
         articulo.subcategoria = request.form.get('subcategoria') or ""
         articulo.stock = int(request.form.get('stock') or 0)
         articulo.video_url = request.form.get('video_url', '').strip()
-        
         nuevas_fotos = request.files.getlist('fotos_nuevas')
         urls_subidas = []
         for f in nuevas_fotos:
@@ -506,9 +463,7 @@ def editar_producto():
                 except: pass
         if urls_subidas:
             articulo.imagen = urls_subidas[0]
-            if len(urls_subidas) > 1:
-                articulo.imagenes_extras = ",".join(urls_subidas[1:])
-        
+            if len(urls_subidas) > 1: articulo.imagenes_extras = ",".join(urls_subidas[1:])
         variantes_raw = request.form.get('variantes_input', '')
         if variantes_raw:
             Variante.query.filter_by(articulo_id=articulo.id).delete()
@@ -519,9 +474,7 @@ def editar_producto():
                     v_nom = parts[0].strip().upper()
                     v_stk = int(parts[1].strip() or 0)
                     v_img = ":".join(parts[2:]).strip() if len(parts) >= 3 else None
-                    nueva_v = Variante(articulo_id=articulo.id, nombre=v_nom, stock=v_stk, imagen=v_img)
-                    db.session.add(nueva_v)
-        
+                    db.session.add(Variante(articulo_id=articulo.id, nombre=v_nom, stock=v_stk, imagen=v_img))
         db.session.commit()
     return redirect(url_for('admin'))
 
@@ -557,7 +510,6 @@ def mostrar_carrito():
     todos = [a.to_dict() for a in Articulo.query.options(selectinload(Articulo.variantes)).all()]
     items = []; total = 0
     es_mayorista = session.get('cliente_tipo') == 'MAYORISTA'
-
     for item_key in set(ids_raw):
         p_id = item_key.split(':')[0]
         v_nombre = item_key.split(':')[1] if ':' in item_key else ""
@@ -567,14 +519,10 @@ def mostrar_carrito():
             precio_unitario = p['precio_mayorista'] if (es_mayorista and p['precio_mayorista'] > 0) else p['precio']
             total += precio_unitario * cant
             it = p.copy()
-            it['precio_aplicado'] = precio_unitario
-            it['cantidad'] = cant
-            it['key'] = item_key
-            it['variante_elegida'] = v_nombre
+            it['precio_aplicado'] = precio_unitario; it['cantidad'] = cant; it['key'] = item_key; it['variante_elegida'] = v_nombre
             v_obj = next((v for v in p['variantes'] if v['nombre'] == v_nombre), None)
             if v_obj and v_obj['imagen']: it['imagen'] = v_obj['imagen']
             items.append(it)
-
     error_msg = request.args.get('error')
     return render_template('carrito.html', carrito=items, total=total, envio=session.get('envio', 0), zona=session.get('zona', 'No seleccionada'), total_final=total+session.get('envio', 0), es_mayorista=es_mayorista, monto_minimo=MONTO_MINIMO_MAYORISTA, error_msg=error_msg)
 
@@ -585,7 +533,6 @@ def finalizar_pedido():
     todos = [a.to_dict() for a in Articulo.query.options(selectinload(Articulo.variantes)).all()]
     items = []; total = 0
     es_mayorista = session.get('cliente_tipo') == 'MAYORISTA'
-
     for item_key in set(ids_raw):
         p_id = item_key.split(':')[0]
         v_nombre = item_key.split(':')[1] if ':' in item_key else ""
@@ -595,38 +542,25 @@ def finalizar_pedido():
             precio_unitario = p['precio_mayorista'] if (es_mayorista and p['precio_mayorista'] > 0) else p['precio']
             total += precio_unitario * cant
             it = p.copy()
-            it['precio_aplicado'] = precio_unitario
-            it['cantidad'] = cant
-            it['variante_elegida'] = v_nombre
+            it['precio_aplicado'] = precio_unitario; it['cantidad'] = cant; it['variante_elegida'] = v_nombre
             v_obj = next((v for v in p['variantes'] if v['nombre'] == v_nombre), None)
             if v_obj and v_obj['imagen']: it['imagen'] = v_obj['imagen']
             items.append(it)
-
     if es_mayorista and total < MONTO_MINIMO_MAYORISTA:
         return redirect(url_for('mostrar_carrito', error=f"El monto mínimo para compras mayoristas es de ${int(MONTO_MINIMO_MAYORISTA):,}".replace(",", ".")))
-
     nuevo_pedido = Pedido(
-        total=total+session.get('envio',0), 
-        envio=session.get('envio',0), 
-        zona=session.get('zona','Retiro'), 
-        estado="PENDIENTE",
-        cliente_id=session.get('cliente_id'),
-        tipo_pedido="MAYORISTA" if es_mayorista else "MINORISTA"
+        total=total+session.get('envio',0), envio=session.get('envio',0), zona=session.get('zona','Retiro'), 
+        estado="PENDIENTE", cliente_id=session.get('cliente_id'), tipo_pedido="MAYORISTA" if es_mayorista else "MINORISTA"
     )
     db.session.add(nuevo_pedido); db.session.commit()
-
     for i in items:
         db.session.add(DetallePedido(pedido_id=nuevo_pedido.id, articulo_id=i['id'], nombre=i['nombre'], variante_nombre=i['variante_elegida'], precio=i['precio_aplicado'], cantidad=i['cantidad'], imagen=i['imagen']))
     db.session.commit()
-    
     msj = f"Hola Bazar Guille! Pedido {'MAYORISTA' if es_mayorista else 'MINORISTA'} #{nuevo_pedido.id}\n"
-    if session.get('cliente_nombre'):
-        msj += f"Cliente: {session.get('cliente_nombre')}\n"
+    if session.get('cliente_nombre'): msj += f"Cliente: {session.get('cliente_nombre')}\n"
     msj += "--------------------\n"
-    for i in items: 
-        msj += f"- {i['nombre']}{' ['+i['variante_elegida']+']' if i['variante_elegida'] else ''} x{i['cantidad']} ({formato_pesos(i['precio_aplicado'])})\n"
+    for i in items: msj += f"- {i['nombre']}{' ['+i['variante_elegida']+']' if i['variante_elegida'] else ''} x{i['cantidad']} ({formato_pesos(i['precio_aplicado'])})\n"
     msj += f"Total Final: {formato_pesos(total+session.get('envio',0))}"
-    
     session['carrito'] = []
     return redirect(f"https://wa.me/5491149899616?text={requests.utils.quote(msj)}")
 
@@ -640,9 +574,19 @@ def agregar_banner():
             f_opt = optimizar_imagen(f, max_ancho=1400)
             res = requests.post("https://api.imgbb.com/1/upload", data={"key": IMGBBB_API_KEY}, files={"image": (f.filename, f_opt)})
             if res.json().get("success"):
-                banners.append({"id": max([b['id'] for b in banners], default=0) + 1, "titulo": request.form.get('titulo'), "descripcion": request.form.get('descripcion'), "imagen": res.json()["data"]["url"], "link": f"/?q={request.form.get('producto_id')}"})
+                nuevo_id = max([b['id'] for b in banners], default=0) + 1
+                titulo_txt = request.form.get('titulo', '').strip() or "Bazar Guille"
+                desc_txt = request.form.get('descripcion', '').strip() or "Venta Minorista y Mayorista"
+                banners.append({
+                    "id": nuevo_id, 
+                    "titulo": titulo_txt, 
+                    "descripcion": desc_txt, 
+                    "imagen": res.json()["data"]["url"], 
+                    "link": "#"
+                })
                 guardar_datos_banners(banners)
-        except: pass
+        except Exception as e:
+            print(f"Error al subir banner: {e}")
     return redirect(url_for('admin'))
 
 @app.route('/admin/banner/eliminar/<int:id>')
