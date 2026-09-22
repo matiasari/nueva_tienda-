@@ -14,7 +14,6 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import text
 from PIL import Image
 from fpdf import FPDF
-from concurrent.futures import ThreadPoolExecutor
 
 app = Flask(__name__)
 
@@ -44,54 +43,6 @@ def limpiar_texto_pdf(texto):
     if not texto:
         return ""
     return str(texto).encode('latin-1', 'replace').decode('latin-1')
-
-# --- DESCARGA ULTRA RÁPIDA DE FOTOS PARA EVITAR TIMEOUT DE RENDER (502) ---
-def obtener_fotos_en_paralelo(articulos):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://imgbb.com/'
-    }
-    fotos_cache = {}
-
-    def descargar_una(articulo):
-        url = articulo.imagen
-        if not url or not str(url).startswith('http'):
-            return articulo.id, None
-
-        url_str = str(url).strip()
-        url_directa = url_str
-        
-        if "ibb.co/" in url_str and "i.ibb.co/" not in url_str:
-            codigo_img = url_str.split("ibb.co/")[-1].split("/")[0]
-            url_directa = f"https://i.ibb.co/{codigo_img}/foto.jpg"
-
-        try:
-            # Timeout estricto de 1.5s por foto para que no cuelgue Gunicorn en Render
-            res = requests.get(url_directa, headers=headers, timeout=1.5)
-            if res.status_code == 200 and 'image' in res.headers.get('Content-Type', '').lower():
-                img = Image.open(io.BytesIO(res.content))
-                if img.mode != 'RGB':
-                    img = img.convert('RGB')
-                
-                # Miniatura liviana para acelerar FPDF
-                img.thumbnail((200, 200))
-                
-                buf = io.BytesIO()
-                img.save(buf, format='JPEG', quality=75)
-                buf.seek(0)
-                return articulo.id, buf
-        except Exception:
-            pass
-
-        return articulo.id, None
-
-    # 30 hilos en paralelo para descargar el catálogo entero en segundos
-    with ThreadPoolExecutor(max_workers=30) as executor:
-        resultados = executor.map(descargar_una, articulos)
-        for prod_id, img_buf in resultados:
-            fotos_cache[prod_id] = img_buf
-
-    return fotos_cache
 
 # --- COMPRESIÓN / OPTIMIZACIÓN DE IMÁGENES AL SUBIR ---
 def optimizar_imagen(file, max_ancho=1000, calidad=80):
@@ -415,13 +366,11 @@ def eliminar_pedido(id):
         return redirect(url_for('ver_pedidos_seccion'))
     return redirect(url_for('admin'))
 
-# --- EXPORTAR CATÁLOGO PDF MINORISTA ---
+# --- EXPORTAR CATÁLOGO PDF MINORISTA (ULTRA EFICIENTE EN MEMORIA) ---
 @app.route('/admin/articulos/exportar/pdf/minorista')
 @login_requerido
 def exportar_articulos_pdf_minorista():
     articulos = Articulo.query.options(selectinload(Articulo.variantes)).filter_by(activo=True).order_by(Articulo.categoria.asc(), Articulo.nombre.asc()).all()
-    
-    fotos_map = obtener_fotos_en_paralelo(articulos)
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -444,41 +393,27 @@ def exportar_articulos_pdf_minorista():
             pdf.set_font("Helvetica", "B", 11)
             pdf.set_fill_color(240, 240, 240)
             pdf.cell(0, 8, limpiar_texto_pdf(f"  CATEGORÍA: {cat_actual}"), ln=1, fill=True)
-            pdf.ln(3)
+            pdf.ln(2)
         
         y_inicial = pdf.get_y()
-        
-        if y_inicial > 250:
+        if y_inicial > 260:
             pdf.add_page()
-            y_inicial = pdf.get_y()
 
-        img_buffer = fotos_map.get(a.id)
-        if img_buffer:
-            try:
-                img_buffer.seek(0)
-                pdf.image(img_buffer, x=15, y=y_inicial, w=22, h=22)
-            except:
-                pdf.rect(x=15, y=y_inicial, w=22, h=22)
-        else:
-            pdf.rect(x=15, y=y_inicial, w=22, h=22)
-
-        pdf.set_xy(42, y_inicial + 3)
         pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(100, 6, limpiar_texto_pdf(a.nombre[:48]))
+        pdf.cell(130, 6, limpiar_texto_pdf(a.nombre[:55]))
         
-        pdf.set_xy(142, y_inicial + 3)
-        pdf.set_font("Helvetica", "B", 10)
         precio_minorista = f"${int(a.precio):,}".replace(",", ".")
-        pdf.cell(50, 6, f"Precio: {precio_minorista}", align="R")
+        pdf.cell(50, 6, f"Precio: {precio_minorista}", align="R", ln=1)
 
         if a.codigo:
-            pdf.set_xy(42, y_inicial + 10)
             pdf.set_font("Helvetica", "", 8)
-            pdf.cell(100, 4, limpiar_texto_pdf(f"Cód: {a.codigo}"))
+            pdf.set_text_color(100, 100, 100)
+            pdf.cell(130, 4, limpiar_texto_pdf(f"Cód: {a.codigo}"), ln=1)
+            pdf.set_text_color(0, 0, 0)
 
-        pdf.set_y(y_inicial + 25)
         pdf.set_draw_color(230, 230, 230)
-        pdf.line(15, y_inicial + 24, 195, y_inicial + 24)
+        pdf.line(15, pdf.get_y() + 1, 195, pdf.get_y() + 1)
+        pdf.ln(2)
 
     pdf_bytes = pdf.output(dest='S')
     if isinstance(pdf_bytes, str):
@@ -490,16 +425,14 @@ def exportar_articulos_pdf_minorista():
         buffer_pdf,
         mimetype='application/pdf',
         as_attachment=True,
-        download_name=f"catalogo_bazar_guille_{datetime.now().strftime('%Y%m%d')}.pdf"
+        download_name=f"catalogo_minorista_bazar_guille_{datetime.now().strftime('%Y%m%d')}.pdf"
     )
 
-# --- EXPORTAR CATÁLOGO PDF MAYORISTA ---
+# --- EXPORTAR CATÁLOGO PDF MAYORISTA (ULTRA EFICIENTE EN MEMORIA) ---
 @app.route('/admin/articulos/exportar/pdf/mayorista')
 @login_requerido
 def exportar_articulos_pdf_mayorista():
     articulos = Articulo.query.options(selectinload(Articulo.variantes)).filter_by(activo=True).order_by(Articulo.categoria.asc(), Articulo.nombre.asc()).all()
-    
-    fotos_map = obtener_fotos_en_paralelo(articulos)
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -522,42 +455,28 @@ def exportar_articulos_pdf_mayorista():
             pdf.set_font("Helvetica", "B", 11)
             pdf.set_fill_color(240, 240, 240)
             pdf.cell(0, 8, limpiar_texto_pdf(f"  CATEGORÍA: {cat_actual}"), ln=1, fill=True)
-            pdf.ln(3)
+            pdf.ln(2)
         
         y_inicial = pdf.get_y()
-        
-        if y_inicial > 250:
+        if y_inicial > 260:
             pdf.add_page()
-            y_inicial = pdf.get_y()
 
-        img_buffer = fotos_map.get(a.id)
-        if img_buffer:
-            try:
-                img_buffer.seek(0)
-                pdf.image(img_buffer, x=15, y=y_inicial, w=22, h=22)
-            except:
-                pdf.rect(x=15, y=y_inicial, w=22, h=22)
-        else:
-            pdf.rect(x=15, y=y_inicial, w=22, h=22)
-
-        pdf.set_xy(42, y_inicial + 3)
         pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(100, 6, limpiar_texto_pdf(a.nombre[:48]))
+        pdf.cell(130, 6, limpiar_texto_pdf(a.nombre[:55]))
         
-        pdf.set_xy(142, y_inicial + 3)
-        pdf.set_font("Helvetica", "B", 10)
         p_may = a.precio_mayorista if (a.precio_mayorista and a.precio_mayorista > 0) else a.precio
         precio_mayorista = f"${int(p_may):,}".replace(",", ".")
-        pdf.cell(50, 6, f"Precio Mayor: {precio_mayorista}", align="R")
+        pdf.cell(50, 6, f"Precio Mayor: {precio_mayorista}", align="R", ln=1)
 
         if a.codigo:
-            pdf.set_xy(42, y_inicial + 10)
             pdf.set_font("Helvetica", "", 8)
-            pdf.cell(100, 4, limpiar_texto_pdf(f"Cód: {a.codigo}"))
+            pdf.set_text_color(100, 100, 100)
+            pdf.cell(130, 4, limpiar_texto_pdf(f"Cód: {a.codigo}"), ln=1)
+            pdf.set_text_color(0, 0, 0)
 
-        pdf.set_y(y_inicial + 25)
         pdf.set_draw_color(230, 230, 230)
-        pdf.line(15, y_inicial + 24, 195, y_inicial + 24)
+        pdf.line(15, pdf.get_y() + 1, 195, pdf.get_y() + 1)
+        pdf.ln(2)
 
     pdf_bytes = pdf.output(dest='S')
     if isinstance(pdf_bytes, str):
