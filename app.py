@@ -310,13 +310,15 @@ def admin():
     total_valor_mercaderia = 0.0
 
     for a in articulos_db:
-        if a.variantes and len(a.variantes) > 0:
-            stk_prod = sum(v.stock for v in a.variantes)
-        else:
-            stk_prod = a.stock or 0
-            
-        total_unidades_stock += stk_prod
-        total_valor_mercaderia += (stk_prod * (a.precio or 0.0))
+        # SOLO SUMAMOS SI EL PRODUCTO ESTÁ ACTIVO (EXCLUYE PAUSADOS)
+        if a.activo:
+            if a.variantes and len(a.variantes) > 0:
+                stk_prod = sum(v.stock for v in a.variantes)
+            else:
+                stk_prod = a.stock or 0
+                
+            total_unidades_stock += stk_prod
+            total_valor_mercaderia += (stk_prod * (a.precio or 0.0))
 
     productos = [a.to_dict() for a in articulos_db]
     categorias = [c.to_dict() for c in Categoria.query.order_by(Categoria.nombre.asc()).all()]
@@ -376,131 +378,6 @@ def eliminar_pedido(id):
     if from_param == 'pedidos':
         return redirect(url_for('ver_pedidos_seccion'))
     return redirect(url_for('admin'))
-
-# --- EXPORTAR CATÁLOGO PDF MINORISTA ---
-@app.route('/admin/articulos/exportar/pdf/minorista')
-@login_requerido
-def exportar_articulos_pdf_minorista():
-    articulos = Articulo.query.options(selectinload(Articulo.variantes)).filter_by(activo=True).order_by(Articulo.categoria.asc(), Articulo.nombre.asc()).all()
-
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, limpiar_texto_pdf("CATÁLOGO DE PRODUCTOS - BAZAR GUILLE"), ln=1, align="C")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, limpiar_texto_pdf("Precios de Venta - Sujetos a cambio sin previo aviso"), ln=1, align="C")
-    pdf.ln(5)
-    
-    cat_actual = ""
-
-    for a in articulos:
-        cat_nombre = a.categoria.upper() if a.categoria else "VARIOS"
-        
-        if cat_nombre != cat_actual:
-            cat_actual = cat_nombre
-            pdf.ln(4)
-            pdf.set_font("Helvetica", "B", 11)
-            pdf.set_fill_color(240, 240, 240)
-            pdf.cell(0, 8, limpiar_texto_pdf(f"  CATEGORÍA: {cat_actual}"), ln=1, fill=True)
-            pdf.ln(2)
-        
-        y_inicial = pdf.get_y()
-        if y_inicial > 260:
-            pdf.add_page()
-
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(130, 6, limpiar_texto_pdf(a.nombre[:55]))
-        
-        precio_minorista = f"${int(a.precio):,}".replace(",", ".")
-        pdf.cell(50, 6, f"Precio: {precio_minorista}", align="R", ln=1)
-
-        if a.codigo:
-            pdf.set_font("Helvetica", "", 8)
-            pdf.set_text_color(100, 100, 100)
-            pdf.cell(130, 4, limpiar_texto_pdf(f"Cód: {a.codigo}"), ln=1)
-            pdf.set_text_color(0, 0, 0)
-
-        pdf.set_draw_color(230, 230, 230)
-        pdf.line(15, pdf.get_y() + 1, 195, pdf.get_y() + 1)
-        pdf.ln(2)
-
-    pdf_bytes = pdf.output(dest='S')
-    if isinstance(pdf_bytes, str):
-        pdf_bytes = pdf_bytes.encode('latin1')
-
-    buffer_pdf = io.BytesIO(pdf_bytes)
-    
-    return send_file(
-        buffer_pdf,
-        mimetype='application/pdf',
-        as_attachment=True,
-        download_name=f"catalogo_minorista_bazar_guille_{datetime.now().strftime('%Y%m%d')}.pdf"
-    )
-
-# --- EXPORTAR CATÁLOGO PDF MAYORISTA ---
-@app.route('/admin/articulos/exportar/pdf/mayorista')
-@login_requerido
-def exportar_articulos_pdf_mayorista():
-    articulos = Articulo.query.options(selectinload(Articulo.variantes)).filter_by(activo=True).order_by(Articulo.categoria.asc(), Articulo.nombre.asc()).all()
-
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, limpiar_texto_pdf("CATÁLOGO MAYORISTA - BAZAR GUILLE"), ln=1, align="C")
-    pdf.set_font("Helvetica", "", 10)
-    pdf.cell(0, 6, limpiar_texto_pdf("Precios Especiales por Mayor (Mínimo $50.000) - Sujetos a cambio sin previo aviso"), ln=1, align="C")
-    pdf.ln(5)
-    
-    cat_actual = ""
-
-    for a in articulos:
-        cat_nombre = a.categoria.upper() if a.categoria else "VARIOS"
-        
-        if cat_nombre != cat_actual:
-            cat_actual = cat_nombre
-            pdf.ln(4)
-            pdf.set_font("Helvetica", "B", 11)
-            pdf.set_fill_color(240, 240, 240)
-            pdf.cell(0, 8, limpiar_texto_pdf(f"  CATEGORÍA: {cat_actual}"), ln=1, fill=True)
-            pdf.ln(2)
-        
-        y_inicial = pdf.get_y()
-        if y_inicial > 260:
-            pdf.add_page()
-
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(130, 6, limpiar_texto_pdf(a.nombre[:55]))
-        
-        p_may = a.precio_mayorista if (a.precio_mayorista and a.precio_mayorista > 0) else a.precio
-        precio_mayorista = f"${int(p_may):,}".replace(",", ".")
-        pdf.cell(50, 6, f"Precio Mayor: {precio_mayorista}", align="R", ln=1)
-
-        if a.codigo:
-            pdf.set_font("Helvetica", "", 8)
-            pdf.set_text_color(100, 100, 100)
-            pdf.cell(130, 4, limpiar_texto_pdf(f"Cód: {a.codigo}"), ln=1)
-            pdf.set_text_color(0, 0, 0)
-
-        pdf.set_draw_color(230, 230, 230)
-        pdf.line(15, pdf.get_y() + 1, 195, pdf.get_y() + 1)
-        pdf.ln(2)
-
-    pdf_bytes = pdf.output(dest='S')
-    if isinstance(pdf_bytes, str):
-        pdf_bytes = pdf_bytes.encode('latin1')
-
-    buffer_pdf = io.BytesIO(pdf_bytes)
-    
-    return send_file(
-        buffer_pdf,
-        mimetype='application/pdf',
-        as_attachment=True,
-        download_name=f"catalogo_mayorista_bazar_guille_{datetime.now().strftime('%Y%m%d')}.pdf"
-    )
 
 # --- EXPORTAR EXCEL ---
 @app.route('/admin/articulos/exportar/excel')
@@ -775,6 +652,6 @@ def eliminar_banner(id):
     guardar_datos_banners(banners)
     return redirect(url_for('admin'))
 
-if __name__ == '__main__':
+if __main__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
