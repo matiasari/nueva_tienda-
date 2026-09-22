@@ -4,877 +4,241 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Bazar Guille</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4e73df;
-            --success: #2e7d32;
-            --danger: #e74a3b;
-            --warning: #f6c23e;
-            --dark: #5a5c69;
-            --muted: #858796;
-            --border: #e3e6f0;
-            --bg: #f8f9fa;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background: var(--bg);
-            color: #333;
-            padding: 20px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            background: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-
-        h1 {
-            color: var(--primary);
-            font-size: 24px;
-        }
-
-        h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-
-        .header-actions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .btn-logout,
-        .btn-pedidos {
-            color: white;
-            padding: 8px 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 0;
-            cursor: pointer;
-        }
-
-        .btn-logout {
-            background: var(--danger);
-        }
-
-        .btn-pedidos {
-            background: var(--primary);
-        }
-
-        .container-admin {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .panel-box,
-        .productos-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .productos-box {
-            padding: 25px;
-            margin-top: 25px;
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #444;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="search"],
-        select,
-        input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d3e2;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            outline: none;
-            font-size: 14px;
-            background: white;
-        }
-
-        input:focus,
-        select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.12);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .btn-submit {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 12px;
-            width: 100%;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-
-        .btn-submit:hover,
-        .btn-pedidos:hover,
-        .btn-logout:hover,
-        .btn-act:hover {
-            filter: brightness(0.95);
-        }
-
-        .buscador-admin {
-            display: grid;
-            grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px) minmax(130px, 170px) auto auto;
-            gap: 10px;
-            align-items: end;
-            margin: 15px 0;
-            padding: 15px;
-            background: #f8f9fc;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .buscador-admin label {
-            margin-top: 0;
-        }
-
-        .buscador-admin input,
-        .buscador-admin select {
-            margin-bottom: 0;
-        }
-
-        .btn-buscar,
-        .btn-limpiar {
-            border: none;
-            padding: 10px 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-            min-height: 42px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-buscar {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-limpiar {
-            background: var(--muted);
-            color: white;
-        }
-
-        .tabla-wrap {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .tabla-productos {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 14px;
-            min-width: 820px;
-        }
-
-        .tabla-productos th,
-        .tabla-productos td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
-
-        .tabla-productos th {
-            background: #f8f9fc;
-            color: var(--dark);
-            font-weight: 600;
-        }
-
-        .img-prod {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 5px;
-            background: #f1f3f8;
-        }
-
-        .btn-act {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            margin: 2px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-edit-color {
-            background: var(--warning);
-            color: #333;
-        }
-
-        .btn-pausa-color {
-            background: #36b9cc;
-            color: white;
-        }
-
-        .btn-pausa-color.inactivo {
-            background: var(--muted);
-            color: white;
-        }
-
-        .btn-del-color {
-            background: var(--danger);
-            color: white;
-        }
-
-        .badge-variante {
-            display: inline-block;
-            background: #e2e8f0;
-            color: #4a5568;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 2px 4px 2px 0;
-        }
-
-        .banner-item {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding: 10px 0;
-        }
-
-        .banner-item:last-child {
-            border-bottom: 0;
-        }
-
-        .banner-img {
-            width: 90px;
-            height: 55px;
-            object-fit: cover;
-            border-radius: 5px;
-            background: #f1f3f8;
-            flex: 0 0 auto;
-        }
-
-        .banner-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .banner-info strong,
-        .banner-info small {
-            display: block;
-        }
-
-        .banner-info small {
-            color: var(--muted);
-            overflow-wrap: anywhere;
-        }
-
-        .paginacion {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .pagina-disabled {
-            color: #ccc;
-            padding: 6px 12px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 500px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .close-btn {
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #aaa;
-        }
-
-        .empty-state {
-            padding: 25px;
-            text-align: center;
-            color: var(--muted);
-            border: 1px dashed var(--border);
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        /* Estilos de la lista de categorías */
-        .cat-list-box {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
-            max-height: 250px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .cat-card {
-            background: #f8f9fc;
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--primary);
-            border-radius: 6px;
-            padding: 10px;
-        }
-
-        .cat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 13px;
-            color: var(--dark);
-        }
-
-        .subcat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: #666;
-            padding: 3px 0;
-            border-top: 1px dashed #e2e8f0;
-            margin-top: 3px;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            padding: 0 2px;
-        }
-
-        @media (max-width: 1050px) {
-            .container-admin {
-                grid-template-columns: 1fr;
-            }
-
-            .buscador-admin {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 700px) {
-            body {
-                padding: 12px;
-            }
-
-            header {
-                align-items: flex-start;
-                flex-direction: column;
-                padding: 15px;
-            }
-
-            .header-actions,
-            .btn-pedidos,
-            .btn-logout {
-                width: 100%;
-            }
-
-            .form-grid,
-            .buscador-admin {
-                grid-template-columns: 1fr;
-            }
-
-            .panel-box,
-            .productos-box {
-                padding: 15px;
-            }
-
-            .banner-item {
-                align-items: flex-start;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
 </head>
 <body>
 
-    <header>
-        <div>
-            <h1>Panel de Administración</h1>
-            <p style="font-size: 13px; color: var(--muted);">Bazar Guille - Inventario inteligente con variantes</p>
-        </div>
-        <div class="header-actions">
-            <a href="/admin/pedidos" class="btn-pedidos">Ver Pedidos</a>
-            <a href="/" target="_blank" class="btn-pedidos" style="background:#858796;">Ver Tienda</a>
-            <a href="/logout" class="btn-logout">Cerrar Sesión</a>
-        </div>
-    </header>
+<div class="admin-header">
+    <h1>PANEL DE CONTROL - BAZAR GUILLE</h1>
+    <div>
+        <a href="/" class="btn-negro" target="_blank" style="margin-right: 10px;">🌐 Ver Tienda</a>
+        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+    </div>
+</div>
 
-    <div class="container-admin">
-        <div class="panel-box">
-            <h2 style="color: var(--primary);">Agregar Nuevo Artículo</h2>
-            <form action="/admin/producto/agregar" method="POST" enctype="multipart/form-data">
-                <div class="form-grid">
-                    <div>
-                        <label>Nombre del Producto:</label>
-                        <input type="text" name="nombre" required placeholder="Ej: TERMO MEDIA MANIJA 1L">
+<div class="admin-container">
 
-                        <label>Precio ($):</label>
-                        <input type="number" step="0.01" name="precio" required placeholder="14500">
-
-                        <label>Stock General (sin variantes):</label>
-                        <input type="number" name="stock" value="0">
-                    </div>
-                    <div>
-                        <label>Categoría:</label>
-                        <select name="categoria" required onchange="actualizarSubcats(this.value, 'adminSubcat')">
-                            <option value="">Seleccionar...</option>
-                            {% for c in categories %}
-                                <option value="{{ c.nombre }}">{{ c.nombre }}</option>
-                            {% endfor %}
-                        </select>
-
-                        <label>Subcategoría:</label>
-                        <select name="subcategoria" id="adminSubcat">
-                            <option value="">Sin subcategoría</option>
-                        </select>
-
-                        <label>Fotos:</label>
-                        <input type="file" name="imagenes_extras" multiple accept="image/*">
-                    </div>
-                </div>
-
-                <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 6px;">
-                    <label style="color: #856404; margin-top: 0; font-weight: bold;">Variantes (opcional):</label>
-                    <input type="text" name="variantes_input" placeholder="Ej: NEGRO:10:URL_FOTO, ROJO:15">
-                </div>
-
-                <button type="submit" class="btn-submit">Guardar Artículo</button>
-            </form>
+    <!-- MÉTRICAS EN TIEMPO REAL -->
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 25px;">
+        <div style="flex: 1; min-width: 220px; background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: var(--shadow); text-align: center;">
+            <span style="font-size: 13px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">📦 Unidades en Stock</span>
+            <h2 style="margin: 10px 0 0 0; font-size: 28px; font-weight: 900; color: #111;">{{ total_unidades_stock }} u.</h2>
         </div>
 
-        <div class="panel-box">
-            <h2 style="color: var(--primary);">Gestión de Categorías</h2>
-            
-            <form action="/admin/categorias/agregar" method="POST" style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="text" name="nombre" required placeholder="NUEVA CATEGORÍA" style="text-transform: uppercase;">
-                <button type="submit" class="btn-submit" style="margin-top:0; width:auto; padding:5px 15px;">+</button>
-            </form>
-
-            <form action="/admin/subcategorias/agregar" method="POST">
-                <label>Categoría padre:</label>
-                <select name="padre" required>
-                    {% for c in categories %}
-                        <option value="{{ c.nombre }}">{{ c.nombre }}</option>
-                    {% endfor %}
-                </select>
-
-                <label>Subcategoría:</label>
-                <input type="text" name="nombre_sub" required placeholder="NUEVA SUBCATEGORÍA" style="text-transform: uppercase;">
-
-                <button type="submit" class="btn-submit" style="margin-top:5px;">Agregar Subcategoría</button>
-            </form>
-
-            <div class="cat-list-box">
-                {% for c in categories %}
-                    <div class="cat-card">
-                        <div class="cat-card-header">
-                            <span>{{ c.nombre }}</span>
-                            <div>
-                                <button class="icon-btn" onclick="renombrarCat('{{ c.id if c.id is defined else 0 }}', '{{ c.nombre }}')" title="Renombrar">✏️</button>
-                                <a href="/admin/categorias/eliminar/{{ c.nombre }}" class="icon-btn" style="color: var(--danger); text-decoration:none;" onclick="return confirm('¿Borrar categoría {{ c.nombre }} y sus subcategorías?')" title="Eliminar">🗑️</a>
-                            </div>
-                        </div>
-
-                        {% if c.subcategorias %}
-                            <div style="margin-top:5px;">
-                                {% for sub in c.subcategorias %}
-                                    <div class="subcat-item">
-                                        <span>• {{ sub }}</span>
-                                        <div>
-                                            <button class="icon-btn" onclick="renombrarSub('{{ c.nombre }}', '{{ sub }}')" title="Renombrar">✏️</button>
-                                            <a href="/admin/subcategorias/eliminar/{{ c.nombre }}/{{ sub }}" class="icon-btn" style="color: var(--danger); text-decoration:none;" onclick="return confirm('¿Eliminar subcategoría {{ sub }}?')" title="Eliminar">×</a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="panel-box" style="grid-column: span 2;">
-            <h2 style="color: var(--primary);">Banners de la tienda</h2>
-
-            <form action="/admin/banner/agregar" method="POST" enctype="multipart/form-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; align-items: end;">
-                <div>
-                    <label>Título del banner:</label>
-                    <input type="text" name="titulo" required placeholder="Ej: OFERTAS DE LA SEMANA">
-                </div>
-                <div>
-                    <label>Descripción:</label>
-                    <input type="text" name="descripcion" placeholder="Ej: Productos seleccionados">
-                </div>
-                <div>
-                    <label>ID o búsqueda de producto:</label>
-                    <input type="text" name="producto_id" required placeholder="Ej: 123 o TERMO">
-                </div>
-                <div>
-                    <label>Imagen del banner:</label>
-                    <input type="file" name="imagen" accept="image/*" required>
-                </div>
-                <button type="submit" class="btn-submit" style="margin-top:0; height: 42px;">Agregar Banner</button>
-            </form>
-
-            <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
-                {% if banners %}
-                    {% for b in banners %}
-                        <div class="banner-item">
-                            <img src="{{ b.imagen }}" class="banner-img" alt="Banner {{ b.titulo }}">
-                            <div class="banner-info">
-                                <strong>{{ b.titulo }}</strong>
-                                <small>{{ b.descripcion }}</small>
-                                <small>{{ b.link }}</small>
-                            </div>
-                            <a href="/admin/banner/eliminar/{{ b.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar este banner?')">Eliminar</a>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p style="font-size: 13px; color: var(--muted);">Todavía no hay banners cargados.</p>
-                {% endif %}
-            </div>
+        <div style="flex: 1; min-width: 220px; background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: var(--shadow); text-align: center;">
+            <span style="font-size: 13px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.5px;">💰 Valor en Mercadería</span>
+            <h2 style="margin: 10px 0 0 0; font-size: 28px; font-weight: 900; color: #27ae60;">{{ total_valor_mercaderia | pesos }}</h2>
         </div>
     </div>
 
-    <div class="productos-box">
-        <h2>Artículos en Inventario ({{ pagination.total if pagination else productos|length }})</h2>
+    <!-- BOTONES DE EXPORTACIÓN -->
+    <!-- BOTONES DE EXPORTACIÓN Y CATÁLOGOS -->
+<div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px;">
+    <a href="/admin/articulos/exportar/pdf/minorista" class="btn-negro" style="background: #e74c3c; text-decoration: none;">
+        📄 PDF Catálogo Minorista
+    </a>
+    <a href="/admin/articulos/exportar/pdf/mayorista" class="btn-negro" style="background: #8e44ad; text-decoration: none;">
+        🏷️ PDF Catálogo Mayorista
+    </a>
+    <a href="/admin/articulos/exportar/excel" class="btn-negro" style="background: #27ae60; text-decoration: none;">
+        📊 Exportar Excel
+    </a>
+    <a href="/admin/pedidos" class="btn-negro" style="background: #2c3e50; text-decoration: none;">
+        🛒 Ver Pedidos
+    </a>
+</div>
 
-        <form method="GET" action="/admin" class="buscador-admin">
-            <div>
-                <label>Buscar:</label>
-                <input type="search" name="buscar" value="{{ buscar or '' }}" placeholder="Nombre o ID del producto">
+
+    <!-- FORMULARIO ALTA PRODUCTO -->
+    <div class="form-seccion">
+        <h2>➕ Cargar Nuevo Artículo</h2>
+        <form action="/admin/producto/agregar" method="POST" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                <div class="input-group">
+                    <label>Código / SKU:</label>
+                    <input type="text" name="codigo" placeholder="Ej: PROD-101">
+                </div>
+                <div class="input-group">
+                    <label>Nombre (*):</label>
+                    <input type="text" name="nombre" required placeholder="TERMO MATERO 1L">
+                </div>
+                <div class="input-group">
+                    <label>Precio Por Menor ($) (*):</label>
+                    <input type="number" step="0.01" name="precio" required placeholder="15000">
+                </div>
+                <div class="input-group">
+                    <label>Precio Por Mayor ($):</label>
+                    <input type="number" step="0.01" name="precio_mayorista" placeholder="12000">
+                </div>
+                <div class="input-group">
+                    <label>Stock General:</label>
+                    <input type="number" name="stock" value="0">
+                </div>
             </div>
 
-            <div>
-                <label>Categoría:</label>
-                <select name="categoria">
-                    <option value="">Todas</option>
-                    {% for c in categories %}
-                        <option value="{{ c.nombre }}" {% if categoria_actual == c.nombre %}selected{% endif %}>{{ c.nombre }}</option>
-                    {% endfor %}
-                </select>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div class="input-group">
+                    <label>Categoría:</label>
+                    <input type="text" name="categoria" placeholder="COCINA">
+                </div>
+                <div class="input-group">
+                    <label>Subcategoría:</label>
+                    <input type="text" name="subcategoria" placeholder="TERMOS">
+                </div>
+                <div class="input-group">
+                    <label>Link Video (YouTube):</label>
+                    <input type="text" name="video_url" placeholder="https://www.youtube.com/...">
+                </div>
             </div>
 
-            <div>
-                <label>Stock:</label>
-                <select name="stock">
-                    <option value="" {% if not stock_actual %}selected{% endif %}>Todos</option>
-                    <option value="con" {% if stock_actual == 'con' %}selected{% endif %}>Con stock</option>
-                    <option value="sin" {% if stock_actual == 'sin' %}selected{% endif %}>Sin stock</option>
-                </select>
+            <div class="input-group" style="margin-top: 15px;">
+                <label>Fotos (Podés subir varias):</label>
+                <input type="file" name="imagenes_extras" multiple accept="image/*">
             </div>
 
-            <button type="submit" class="btn-buscar">Buscar</button>
-            <a href="/admin" class="btn-limpiar">Limpiar</a>
+            <div class="input-group" style="margin-top: 15px;">
+                <label>Variantes (ROJO:10, AZUL:5):</label>
+                <input type="text" name="variantes_input" placeholder="ROJO:10, NEGRO:5">
+            </div>
+
+            <button type="submit" class="btn-subir-banner" style="margin-top: 20px;">Guardar Artículo</button>
         </form>
-
-        {% if productos %}
-            <div class="tabla-wrap">
-                <table class="tabla-productos">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Imagen</th>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th>Stock / Variantes</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in productos %}
-                            <tr style="opacity: {% if not p.activo %}0.5{% else %}1{% endif %};">
-                                <td><strong>#{{ p.id }}</strong></td>
-                                <td><img src="{{ p.imagen }}" class="img-prod" alt="{{ p.nombre }}"></td>
-                                <td><strong>{{ p.nombre }}</strong></td>
-                                <td>{{ p.precio|pesos }}</td>
-                                <td>
-                                    {% if p.variantes|length > 0 %}
-                                        {% for v in p.variantes %}
-                                            <span class="badge-variante">{{ v.nombre }} ({{ v.stock }})</span>
-                                        {% endfor %}
-                                    {% else %}
-                                        {{ p.stock }} un.
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span style="color: {% if p.activo %}#2e7d32{% else %}#e74a3b{% endif %}; font-weight: bold;">
-                                        {% if p.activo %}Activo{% else %}Agotado{% endif %}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button class="btn-act btn-edit-color" onclick="abrirModalEditar('{{ p|tojson|forceescape }}')">Editar</button>
-
-                                    <a href="/admin/producto/toggle_pausa/{{ p.id }}" class="btn-act btn-pausa-color {% if not p.activo %}inactivo{% endif %}">
-                                        {% if p.activo %}Agotar{% else %}Activar{% endif %}
-                                    </a>
-
-                                    <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-act btn-del-color" onclick="return confirm('¿Eliminar definitivo?')">Eliminar</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="empty-state">
-                No hay artículos para mostrar con esos filtros.
-            </div>
-        {% endif %}
-
-        {% if pagination %}
-            <div class="paginacion">
-                {% if pagination.has_prev %}
-                    <a href="{{ url_for('admin', page=pagination.prev_num, buscar=buscar, categoria=categoria_actual, stock=stock_actual) }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">« Anterior</a>
-                {% else %}
-                    <span class="pagina-disabled">« Anterior</span>
-                {% endif %}
-
-                <div style="font-size: 14px; font-weight: bold; color: var(--dark);">
-                    Página {{ pagination.page }} de {{ pagination.pages }}
-                </div>
-
-                {% if pagination.has_next %}
-                    <a href="{{ url_for('admin', page=pagination.next_num, buscar=buscar, categoria=categoria_actual, stock=stock_actual) }}" class="btn-act" style="background: var(--primary); color: white; padding: 6px 12px;">Siguiente »</a>
-                {% else %}
-                    <span class="pagina-disabled">Siguiente »</span>
-                {% endif %}
-            </div>
-        {% endif %}
     </div>
 
-    <div id="modalEditar" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color:var(--primary); margin-bottom:0;">Editar Artículo</h2>
-                <span class="close-btn" onclick="cerrarModal()">&times;</span>
-            </div>
-
-            <form action="/admin/producto/editar" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" id="editId">
-
-                <label>Nombre del Producto:</label>
-                <input type="text" name="nombre" id="editNombre" required>
-
-                <label>Precio ($):</label>
-                <input type="number" step="0.01" name="precio" id="editPrecio" required>
-
-                <label>Stock General (si no usa variantes):</label>
-                <input type="number" name="stock" id="editStock">
-
-                <label>Cambiar foto principal (opcional):</label>
-                <input type="file" name="fotos_nuevas" multiple accept="image/*">
-
-                <label>Categoría:</label>
-                <select name="categoria" id="editCategoria" required onchange="actualizarSubcats(this.value, 'editSubcategoria')">
-                    <option value="">Seleccionar...</option>
-                    {% for c in categories %}
-                        <option value="{{ c.nombre }}">{{ c.nombre }}</option>
-                    {% endfor %}
-                </select>
-
-                <label>Subcategoría:</label>
-                <select name="subcategoria" id="editSubcategoria">
-                    <option value="">Sin subcategoría</option>
-                </select>
-
-                <div style="margin-top:15px; padding:12px; background:#e2e8f0; border-radius:6px;">
-                    <label style="margin-top:0; color:#2d3748;">Editar Variantes y URLs de Fotos:</label>
-                    <input type="text" name="variantes_input" id="editVariantes" placeholder="Ej: NEGRO:10:https://link.com/foto.jpg, ROJO:5">
-                    <small style="color:#4a5568; display:block; margin-top:4px; line-height:1.4;">
-                        Estructura: <code>NOMBRE:STOCK:URL_FOTO</code> separados por comas.<br>
-                        <em>Ejemplo: NEGRO:12:https://i.ibb.co/MiFoto.jpg, BLANCO:8</em> (la URL de la foto es opcional).
-                    </small>
-                </div>
-
-                <button type="submit" class="btn-submit" style="background:var(--primary);">Actualizar Cambios</button>
-            </form>
-        </div>
+    <!-- TABLA DE PRODUCTOS -->
+    <div class="form-seccion">
+        <h2>📦 Artículos Cargados</h2>
+        <table class="admin-tabla">
+            <thead>
+                <tr>
+                    <th>ID / CÓDIGO</th>
+                    <th>FOTO</th>
+                    <th>NOMBRE</th>
+                    <th>CATEGORÍA</th>
+                    <th>MENOR / MAYOR</th>
+                    <th>STOCK</th>
+                    <th>ESTADO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in productos %}
+                <tr>
+                    <td>
+                        <strong>#{{ p.id }}</strong>
+                        {% if p.codigo %}<br><small style="color: #666;">{{ p.codigo }}</small>{% endif %}
+                    </td>
+                    <td>
+                        <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}{% endif %}" width="50" height="50" style="object-fit: cover; border-radius: 6px;">
+                    </td>
+                    <td><strong>{{ p.nombre }}</strong></td>
+                    <td>{{ p.categoria }} {% if p.subcategoria %}<br><small style="color: #888;">({{ p.subcategoria }})</small>{% endif %}</td>
+                    <td>
+                        <strong>Menor:</strong> {{ p.precio | pesos }}<br>
+                        <small style="color: #27ae60; font-weight: bold;">Mayor: {{ p.precio_mayorista | pesos }}</small>
+                    </td>
+                    <td>
+                        {% if p.variantes and p.variantes|length > 0 %}
+                            {% for v in p.variantes %}
+                                <small>{{ v.nombre }}: {{ v.stock }}u.</small><br>
+                            {% endfor %}
+                        {% else %}
+                            {{ p.stock }} u.
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if p.activo %}
+                            <span style="color: #27ae60; font-weight: bold;">Activo</span>
+                        {% else %}
+                            <span style="color: #e74c3c; font-weight: bold;">Pausado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn-negro" onclick='abrirModalEdicion({{ p | tojson | forceescape }})' style="padding: 4px 8px; font-size: 12px;">✏️ Editar</button>
+                        <a href="/admin/producto/toggle_pausa/{{ p.id }}" class="btn-negro" style="padding: 4px 8px; font-size: 12px; background: #f39c12; text-decoration: none;">
+                            {% if p.activo %}⏸️ Pausar{% else %}▶️ Activar{% endif %}
+                        </a>
+                        <a href="/admin/producto/eliminar/{{ p.id }}" class="btn-eliminar" onclick="return confirm('¿Seguro que deseas eliminar este producto?');" style="text-decoration: none;">🗑️</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        const categoriasData = {{ categories|tojson }};
+</div>
 
-        function actualizarSubcats(catNombre, selectId, subcatSeleccionada = "") {
-            const subSelect = document.getElementById(selectId);
-            if (!subSelect) return;
+<!-- MODAL EDICIÓN -->
+<div id="modalEdicion" class="modal-zoom" style="display: none;">
+    <div class="modal-contenido-scroll">
+        <h3>Editar Producto</h3>
+        <form action="/admin/producto/editar" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="edit_id">
+            
+            <label>Código / SKU:</label>
+            <input type="text" name="codigo" id="edit_codigo">
 
-            subSelect.innerHTML = '<option value="">Sin subcategoría</option>';
-            const enc = categoriasData.find(c => c.nombre === catNombre);
+            <label>Nombre:</label>
+            <input type="text" name="nombre" id="edit_nombre" required>
 
-            if (enc && enc.subcategorias) {
-                enc.subcategorias.forEach(s => {
-                    const o = document.createElement('option');
-                    o.value = s;
-                    o.textContent = s;
-                    if (s === subcatSeleccionada) {
-                        o.selected = true;
-                    }
-                    subSelect.appendChild(o);
-                });
-            }
+            <label>Precio Por Menor ($):</label>
+            <input type="number" step="0.01" name="precio" id="edit_precio" required>
+
+            <label>Precio Por Mayor ($):</label>
+            <input type="number" step="0.01" name="precio_mayorista" id="edit_precio_mayorista">
+
+            <label>Stock General:</label>
+            <input type="number" name="stock" id="edit_stock">
+
+            <label>Categoría:</label>
+            <input type="text" name="categoria" id="edit_categoria">
+
+            <label>Subcategoría:</label>
+            <input type="text" name="subcategoria" id="edit_subcategoria">
+
+            <label>Link Video:</label>
+            <input type="text" name="video_url" id="edit_video_url">
+
+            <label>Reemplazar Fotos:</label>
+            <input type="file" name="fotos_nuevas" multiple accept="image/*">
+
+            <label>Variantes (ROJO:10, AZUL:5):</label>
+            <input type="text" name="variantes_input" id="edit_variantes">
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn-subir-banner" style="flex: 1;">Guardar Cambios</button>
+                <button type="button" class="btn-vaciar" style="flex: 1;" onclick="cerrarModalEdicion()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function abrirModalEdicion(p) {
+        document.getElementById('edit_id').value = p.id;
+        document.getElementById('edit_codigo').value = p.codigo || '';
+        document.getElementById('edit_nombre').value = p.nombre;
+        document.getElementById('edit_precio').value = p.precio;
+        document.getElementById('edit_precio_mayorista').value = p.precio_mayorista || p.precio;
+        document.getElementById('edit_stock').value = p.stock;
+        document.getElementById('edit_categoria').value = p.categoria || '';
+        document.getElementById('edit_subcategoria').value = p.subcategoria || '';
+        document.getElementById('edit_video_url').value = p.video_url || '';
+
+        if (p.variantes && p.variantes.length > 0) {
+            let varStr = p.variantes.map(v => `${v.nombre}:${v.stock}`).join(', ');
+            document.getElementById('edit_variantes').value = varStr;
+        } else {
+            document.getElementById('edit_variantes').value = '';
         }
 
-        function abrirModalEditar(pRaw) {
-            const p = JSON.parse(pRaw);
+        document.getElementById('modalEdicion').style.display = 'flex';
+    }
 
-            document.getElementById('editId').value = p.id;
-            document.getElementById('editNombre').value = p.nombre;
-            document.getElementById('editPrecio').value = p.precio;
-            document.getElementById('editStock').value = p.stock;
+    function cerrarModalEdicion() {
+        document.getElementById('modalEdicion').style.display = 'none';
+    }
+</script>
 
-            document.getElementById('editCategoria').value = p.categoria || "";
-            actualizarSubcats(p.categoria, 'editSubcategoria', p.subcategoria);
-
-            const varString = p.variantes && p.variantes.length > 0
-                ? p.variantes.map(v => v.imagen ? `${v.nombre}:${v.stock}:${v.imagen}` : `${v.nombre}:${v.stock}`).join(', ')
-                : '';
-
-            document.getElementById('editVariantes').value = varString;
-            document.getElementById('modalEditar').style.display = 'flex';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalEditar').style.display = 'none';
-        }
-
-        function renombrarCat(id, nombreActual) {
-            let nuevoNombre = prompt("Nuevo nombre para la categoría:", nombreActual);
-            if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== nombreActual) {
-                let form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/admin/categorias/editar';
-                
-                form.innerHTML = `
-                    <input type="hidden" name="id" value="${id}">
-                    <input type="hidden" name="nombre" value="${nuevoNombre.trim()}">
-                `;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        function renombrarSub(padre, subActual) {
-            let nuevoNombre = prompt(`Nuevo nombre para la subcategoría de ${padre}:`, subActual);
-            if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== subActual) {
-                let form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/admin/subcategorias/editar';
-                
-                form.innerHTML = `
-                    <input type="hidden" name="padre" value="${padre}">
-                    <input type="hidden" name="sub_vieja" value="${subActual}">
-                    <input type="hidden" name="sub_nueva" value="${nuevoNombre.trim()}">
-                `;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                cerrarModal();
-            }
-        });
-
-        document.getElementById('modalEditar').addEventListener('click', function(event) {
-            if (event.target === this) {
-                cerrarModal();
-            }
-        });
-    </script>
 </body>
 </html>

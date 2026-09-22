@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Mayorista - Bazar Guille</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body style="background: #f5f6fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
+
+<div style="background: white; padding: 30px; border-radius: 12px; max-width: 420px; width: 100%; box-shadow: var(--shadow);">
+    <h2 style="text-align: center; margin-top: 0; color: #2c3e50;">📝 Crear Cuenta</h2>
+    <p style="text-align: center; color: #666; font-size: 14px; margin-bottom: 20px;">
+        Registrate para acceder a la lista de precios por mayor (Mínimo de compra: $50.000).
+    </p>
+
+    {% if error %}
+        <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; text-align: center;">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <form action="/cliente/registro" method="POST">
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nombre Completo o Local (*):</label>
+            <input type="text" name="nombre" required placeholder="Ej: Bazar San Martín" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+        </div>
+
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Email (*):</label>
+            <input type="email" name="email" required placeholder="ejemplo@gmail.com" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+        </div>
+
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Teléfono / WhatsApp (*):</label>
+            <input type="text" name="telefono" required placeholder="11 2345 6789" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+        </div>
+
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tipo de Cuenta (*):</label>
+            <select name="tipo_cliente" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold;">
+                <option value="MAYORISTA" selected>🏷️ Revendedor / Mayorista ($50.000 min.)</option>
+                <option value="MINORISTA">👤 Cliente Final / Minorista</option>
+            </select>
+        </div>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Contraseña (*):</label>
+            <input type="password" name="password" required placeholder="******" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+        </div>
+
+        <button type="submit" class="btn-subir-banner" style="width: 100%; padding: 12px; font-size: 16px;">Registrarme</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px; font-size: 14px;">
+        ¿Ya tenés cuenta? <a href="/cliente/login" style="color: #3498db; font-weight: bold;">Iniciá sesión acá</a>
+    </p>
+</div>
+
+</body>
+</html>

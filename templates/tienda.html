@@ -6,17 +6,89 @@
     <title>Bazar Guille - Tienda</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='logo.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
-    
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Y3MN0GKBN"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-6Y3MN0GKBN');
-    </script>
+    <style>
+        /* ESTILOS DE BOTONES CON RECUADRO Y ENMASCARADO DE BARRA SUPERIOR */
+        .btn-top-bar {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none !important;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        /* Botón Iniciar Sesión */
+        .btn-top-login {
+            color: #ffffff !important;
+            background-color: transparent;
+            border: 2px solid #3498db;
+            margin-right: 10px;
+        }
+
+        .btn-top-login:hover {
+            background-color: #3498db;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Botón Registro Mayorista */
+        .btn-top-registro {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            border: 2px solid #a569bd;
+            box-shadow: 0 2px 6px rgba(142, 68, 173, 0.4);
+        }
+
+        .btn-top-registro:hover {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-color: #bb8fce;
+            box-shadow: 0 4px 12px rgba(142, 68, 173, 0.6);
+            transform: translateY(-1px);
+        }
+
+        /* Botón Cerrar Sesión */
+        .btn-top-logout {
+            color: #ffffff !important;
+            background-color: transparent;
+            border: 2px solid #e74c3c;
+        }
+
+        .btn-top-logout:hover {
+            background-color: #e74c3c;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 
 <body>
+
+<!-- BARRA DE SESIÓN CLIENTE / MAYORISTA CON BOTONES CON RECUADRO -->
+<div style="background: #1e272e; color: white; padding: 10px 20px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #34495e;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+        {% if session.get('cliente_id') %}
+            <span>👤 Hola, <strong style="color: #3498db;">{{ session.get('cliente_nombre') }}</strong></span>
+            {% if session.get('cliente_tipo') == 'MAYORISTA' %}
+                <span style="background: #8e44ad; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; border: 1px solid #a569bd;">🏷️ MAYORISTA</span>
+                <small style="color: #f1c40f; font-weight: bold; margin-left: 5px;">(Mínimo compra: {{ monto_minimo | pesos }})</small>
+            {% endif %}
+        {% else %}
+            <span style="font-weight: 500;">🛒 Venta Minorista y Mayorista a todo el país</span>
+        {% endif %}
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        {% if session.get('cliente_id') %}
+            <a href="/cliente/logout" class="btn-top-bar btn-top-logout">🚪 Cerrar Sesión</a>
+        {% else %}
+            <a href="/cliente/login" class="btn-top-bar btn-top-login">🔑 Iniciar Sesión</a>
+            <a href="/cliente/registro" class="btn-top-bar btn-top-registro">🏷️ Registro Mayorista</a>
+        {% endif %}
+    </div>
+</div>
 
 <header class="header">
     <div class="header-left">
@@ -36,7 +108,6 @@
 {% if banners %}
 <section class="slider-container">
     {% for b in banners %}
-    <!-- 🔴 CORREGIDO: Lógica inteligente para renderizar Banners desde ImgBB o Local -->
     <div class="slide {% if loop.first %}active{% endif %}" 
          style="background-image: url('{% if b.imagen and b.imagen.startswith('http') %}{{ b.imagen }}{% else %}{{ url_for('static', filename='uploads/' + b.imagen) }}{% endif %}');">
         {% if b.titulo or b.descripcion or (b.link and b.link != "/?q=" and b.link != "#productos") %}
@@ -55,20 +126,18 @@
 
 <div class="buscador">
     <form action="/" method="GET">
-        <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" required>
+        <input type="text" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ request.args.get('q', '') }}" required>
         <button type="submit">Buscar</button>
     </form>
 </div>
 
 <div class="categorias-nav">
     <a href="/" class="cat-chip {% if not request.args.get('cat') %}activo{% endif %}">Todos</a>
-    
     {% for cat in categorias %}
     <div class="dropdown-cat">
         <a href="/?cat={{ cat.nombre }}" class="cat-chip {% if request.args.get('cat') == cat.nombre %}activo{% endif %}">
             {{ cat.nombre }}
         </a>
-        
         {% if cat.subcategorias %}
         <div class="dropdown-content">
             {% for sub in cat.subcategorias %}
@@ -79,7 +148,6 @@
     </div>
     {% endfor %}
 </div>
-<div class="franja-naranja"></div>
 
 <div class="contenedor-categorias" id="productos">
     {% for categoria, items in productos | groupby('categoria') %}
@@ -89,8 +157,7 @@
                 {% for p in items %}
                     <div class="card" id="prod-{{ p.id }}">
                         <div class="contenedor-foto-principal">
-                            <!-- 🔴 CORREGIDO: Lógica inteligente para la foto de portada de la tarjeta -->
-                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
+                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}{% endif %}" 
                                  id="main-{{ p.id }}" 
                                  class="foto-principal"
                                  onclick="abrirModal(this.src)" 
@@ -99,14 +166,12 @@
                         </div>
                         
                         <div class="galeria-miniaturas">
-                            <!-- 🔴 CORREGIDO: Miniatura de la foto principal -->
-                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
+                            <img src="{% if p.imagen and p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename='uploads/' + (p.imagen if p.imagen else 'default.jpg')) }}{% endif %}" 
                                  onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
                                  class="mini-foto">
                             
                             {% if p.imagenes_extras %}
                                 {% for foto in p.imagenes_extras %}
-                                    <!-- 🔴 CORREGIDO: Lógica para las miniaturas secundarias -->
                                     <img src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + foto) }}{% endif %}" 
                                          onclick="document.getElementById('main-{{ p.id }}').src=this.src" 
                                          class="mini-foto">
@@ -116,11 +181,46 @@
 
                         <div class="card-content">
                             <h3>{{ p.nombre }}</h3>
-                            <p class="precio">{{ p.precio | pesos }}</p>
-                            <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
-                                <input type="hidden" name="id" value="{{ p.id }}">
-                                <button type="submit" class="btn-comprar">🛒 Añadir al Carrito</button>
-                            </form>
+                            
+                            <!-- PRECIO LIMPIO AL PÚBLICO -->
+                            <p class="precio" style="margin-bottom: 2px;">
+                                <strong>Precio:</strong> {{ p.precio | pesos }}
+                            </p>
+
+                            <!-- PRECIO MAYORISTA (SOLO SI ES CLIENTE MAYORISTA LOGUEADO) -->
+                            {% if session.get('cliente_tipo') == 'MAYORISTA' %}
+                                {% if p.precio_mayorista and p.precio_mayorista > 0 and p.precio_mayorista != p.precio %}
+                                    <p style="color: #8e44ad; font-size: 14px; font-weight: bold; margin-top: 0;">
+                                        🏷️ Precio Mayorista: {{ p.precio_mayorista | pesos }}
+                                    </p>
+                                {% endif %}
+                            {% else %}
+                                <small style="display: block; margin-top: 4px; margin-bottom: 8px;">
+                                    <a href="/cliente/registro" style="color: #8e44ad; text-decoration: underline; font-weight: bold; font-size: 12px;">
+                                        ¿Sos revendedor? Registrate para precio por mayor
+                                    </a>
+                                </small>
+                            {% endif %}
+                            
+                            {% if p.stock > 0 %}
+                                <form action="{{ url_for('agregar_al_carrito') }}" method="POST">
+                                    <input type="hidden" name="id" value="{{ p.id }}">
+                                    
+                                    {% if p.variantes and p.variantes|length > 0 %}
+                                        <div style="margin-bottom: 10px;">
+                                            <select name="variante" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #ccc;">
+                                                {% for v in p.variantes %}
+                                                    <option value="{{ v.nombre }}">{{ v.nombre }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <button type="submit" class="btn-comprar">🛒 Añadir al Carrito</button>
+                                </form>
+                            {% else %}
+                                <button class="btn-comprar" style="background-color: #ccc; cursor: not-allowed;" disabled>Sin Stock</button>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -130,13 +230,10 @@
 </div>
 
 <div id="modalZoom" class="modal-zoom" style="display: none;" onclick="cerrarModal()">
-    <span class="cerrar-zoom">&times;</span>
-    
-    <button class="nav-btn prev" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
-    
+    <span class="cerrar-zoom" style="position: absolute; top: 20px; right: 30px; color: white; font-size: 35px; cursor: pointer;">&times;</span>
+    <button type="button" class="nav-btn prev" onclick="cambiarFoto(-1); event.stopPropagation();">&#10094;</button>
     <img class="modal-contenido" id="imgAmpliada" onclick="event.stopPropagation()">
-    
-    <button class="nav-btn next" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
+    <button type="button" class="nav-btn next" onclick="cambiarFoto(1); event.stopPropagation();">&#10095;</button>
 </div>
 
 <footer class="footer">
@@ -147,7 +244,6 @@
 </footer>
 
 <script>
-    // Lógica del Slider
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
 
@@ -173,11 +269,9 @@
         const card = event.target.closest('.card');
         const todasLasFotos = card.querySelectorAll('.galeria-miniaturas img');
         
-        // Agarramos las fuentes exactas de las miniaturas para el carrusel de zoom
         fotosProductoActual = Array.from(todasLasFotos).map(img => img.src);
         indiceFotoActual = fotosProductoActual.indexOf(imgSrc);
 
-        // Si se clickea la principal y no mapea directo al index, forzamos la asignación
         if(indiceFotoActual === -1) indiceFotoActual = 0;
 
         modalImg.src = fotosProductoActual[indiceFotoActual];
@@ -185,6 +279,7 @@
     }
 
     function cambiarFoto(direccion) {
+        if (fotosProductoActual.length === 0) return;
         indiceFotoActual += direccion;
 
         if (indiceFotoActual >= fotosProductoActual.length) {
@@ -202,14 +297,12 @@
         fotosProductoActual = [];
     }
 
-    // Cerrar con tecla Escape
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") {
             cerrarModal();
         }
     });
 
-    // Auto-scroll si hay búsqueda
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('q') || urlParams.has('cat')) {
         const productosSection = document.getElementById('productos');
