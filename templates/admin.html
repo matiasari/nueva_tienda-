@@ -135,6 +135,7 @@
         <header class="admin-header">
             <h1><i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> Panel de Control - Bazar Guille</h1>
             <div class="admin-nav">
+                <a href="{{ url_for('ver_clientes_seccion') }}" class="btn btn-primary"><i class="fa-solid fa-users"></i> Ver Clientes</a>
                 <a href="{{ url_for('ver_pedidos_seccion') }}" class="btn btn-success"><i class="fa-solid fa-receipt"></i> Ver Pedidos</a>
                 <a href="{{ url_for('index') }}" class="btn btn-secondary" target="_blank"><i class="fa-solid fa-store"></i> Ver Tienda</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-danger"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
@@ -152,7 +153,7 @@
             </div>
         </div>
 
-        <!-- SECCIÓN DE GESTIÓN DE BANNERS -->
+        <!-- GESTIÓN DE BANNERS -->
         <div class="banners-card">
             <h2 style="font-size: 1.2rem; color: var(--dark); display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
                 <i class="fa-solid fa-images" style="color: var(--primary);"></i> Gestión de Banners de la Tienda
@@ -182,7 +183,7 @@
                     <img src="{{ b.imagen }}" alt="Banner">
                     <div style="padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
                         <div>
-                            <h4 style="font-size: 0.95font-weight: 700; color: var(--dark);">{{ b.titulo }}</h4>
+                            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--dark);">{{ b.titulo }}</h4>
                             <p style="font-size: 0.8rem; color: var(--gray); margin-top: 4px;">{{ b.descripcion }}</p>
                         </div>
                         <div style="margin-top: 10px; text-align: right;">
@@ -263,7 +264,8 @@
                             </td>
                             <td>
                                 <div style="display: flex; gap: 6px;">
-                                    <button onclick="abrirEditar({{ p | tojson | safe }})" class="btn btn-secondary" style="padding: 6px 10px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                                    <!-- 👈 BOTÓN CORREGIDO CON COMILLAS SIMPLES PARA EL JSON -->
+                                    <button onclick='abrirEditar({{ p | tojson | safe }})' class="btn btn-secondary" style="padding: 6px 10px;" title="Editar"><i class="fa-solid fa-pen"></i></button>
                                     <a href="{{ url_for('toggle_pausa', id=p.id) }}" class="btn btn-secondary" style="padding: 6px 10px;" title="Pausar / Activar"><i class="fa-solid fa-eye-slash"></i></a>
                                     <a href="{{ url_for('eliminar_producto', id=p.id) }}" class="btn btn-danger" style="padding: 6px 10px;" onclick="return confirm('¿Estás seguro de eliminar este producto?');" title="Eliminar"><i class="fa-solid fa-trash"></i></a>
                                 </div>

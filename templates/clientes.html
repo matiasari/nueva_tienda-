@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes Registrados - Bazar Guille</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--light); color: var(--dark); padding: 20px; }
+
+        .admin-container { max-width: 1400px; margin: 0 auto; }
+        
+        .admin-header {
+            background: white; padding: 20px 30px; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex;
+            justify-content: space-between; align-items: center; margin-bottom: 25px;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .admin-header h1 { font-size: 1.5rem; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        .admin-nav { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .btn {
+            padding: 10px 18px; border-radius: 8px; font-weight: 600; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none; font-size: 0.9rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-secondary:hover { background: #cbd5e1; }
+
+        .table-card {
+            background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            overflow: hidden; margin-bottom: 30px;
+        }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: #f1f5f9; color: #475569; padding: 14px 16px; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; color: #334155; }
+        tr:hover { background: #f8fafc; }
+
+        .badge {
+            padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; text-transform: uppercase;
+        }
+        .badge-minorista { background: #e0e7ff; color: #3730a3; }
+        .badge-mayorista { background: #dcfce7; color: #166534; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        
+        <header class="admin-header">
+            <h1><i class="fa-solid fa-users" style="color: var(--primary);"></i> Clientes Registrados - Bazar Guille</h1>
+            <div class="admin-nav">
+                <a href="{{ url_for('admin') }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</a>
+                <a href="{{ url_for('ver_pedidos_seccion') }}" class="btn btn-primary"><i class="fa-solid fa-receipt"></i> Ver Pedidos</a>
+            </div>
+        </header>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre y Apellido</th>
+                            <th>Correo Electrónico (Email)</th>
+                            <th>Teléfono / WhatsApp</th>
+                            <th>Tipo de Cliente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clientes %}
+                        <tr>
+                            <td><strong>#{{ c.id }}</strong></td>
+                            <td><strong>{{ c.nombre }}</strong></td>
+                            <td>{{ c.email }}</td>
+                            <td><a href="https://wa.me/{{ c.telefono }}" target="_blank" style="color: var(--success); text-decoration: none; font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> {{ c.telefono }}</a></td>
+                            <td>
+                                {% if c.tipo_cliente == 'MAYORISTA' %}
+                                    <span class="badge badge-mayorista">Mayorista</span>
+                                {% else %}
+                                    <span class="badge badge-minorista">Minorista</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: var(--gray);">No hay clientes registrados todavía.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

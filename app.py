@@ -334,6 +334,12 @@ def ver_pedidos_seccion():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template('pedidos.html', pedidos=pedidos)
 
+@app.route('/admin/clientes')
+@login_requerido
+def ver_clientes_seccion():
+    clientes = Cliente.query.order_by(Cliente.id.desc()).all()
+    return render_template('clientes.html', clientes=clientes)
+
 @app.route('/admin/pedido/cancelar/<int:id>')
 @login_requerido
 def cancelar_pedido(id):
